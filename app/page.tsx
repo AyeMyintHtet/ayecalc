@@ -229,7 +229,7 @@ export default function Home() {
               <span className="kicker light">Why AyeCalc</span>
               <h2 id="why-title">Confidence in every calculation.</h2>
               <p>
-                Numbers should help you decide, not leave you second-guessing.
+                Numbers should help you decide,  not leave you second-guessing.
                 Every tool is built to be understandable, dependable, and kind
                 to your privacy.
               </p>
