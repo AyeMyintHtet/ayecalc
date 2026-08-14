@@ -1,12 +1,20 @@
-import type { Metadata } from "next";
 import Calculator from "@/components/calculator";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "Free Online Calculators for Everyday Decisions",
+export const metadata = createPageMetadata({
+  title: "Free Online Calculators & Tools for Everyday Decisions",
   description:
-    "Use AyeCalc's free online calculators for loans, savings, percentages, BMI, dates, and everyday math. Fast results with no account required.",
-  alternates: { canonical: "/" },
-};
+    "Use AyeCalc's free calculators, converters, and practical tools for loans, savings, percentages, health, dates, development, and everyday tasks.",
+  path: "/",
+  keywords: [
+    "online calculator",
+    "free calculator",
+    "online tools",
+    "unit converter",
+    "financial calculator",
+    "developer tools",
+  ],
+});
 
 const categories = [
   {

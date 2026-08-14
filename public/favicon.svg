@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">AyeCalc</title>
   <rect width="64" height="64" rx="16" fill="#071c17"/>
-  <rect x="15" y="34" width="7" height="14" rx="3.5" fill="#67e5b4"/>
-  <rect x="28.5" y="25" width="7" height="23" rx="3.5" fill="#67e5b4"/>
-  <rect x="42" y="16" width="7" height="32" rx="3.5" fill="#67e5b4"/>
+  <path d="M13 50.5h38" stroke="#bff5dd" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+  <rect x="13" y="35" width="9" height="13" rx="4.5" fill="#67e5b4"/>
+  <rect x="27.5" y="26" width="9" height="22" rx="4.5" fill="#67e5b4"/>
+  <rect x="42" y="16" width="9" height="32" rx="4.5" fill="#67e5b4"/>
+  <circle cx="46.5" cy="12" r="2.5" fill="#fffefa"/>
 </svg>

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Manrope } from "next/font/google";
+import { siteConfig } from "@/lib/metadata";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,16 +15,14 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const siteUrl = "https://ayecalc.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
   title: {
-    default: "AyeCalc — Free, Fast & Private Online Calculators",
-    template: "%s | AyeCalc",
+    default: siteConfig.defaultTitle,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Calculate loans, savings, percentages, health metrics, and more with AyeCalc. Free, accurate, private, and easy-to-use online calculators.",
+  description: siteConfig.defaultDescription,
   keywords: [
     "online calculator",
     "free calculator",
@@ -32,18 +31,20 @@ export const metadata: Metadata = {
     "savings calculator",
     "percentage calculator",
   ],
-  authors: [{ name: "AyeCalc", url: siteUrl }],
-  creator: "AyeCalc",
-  publisher: "AyeCalc",
-  alternates: { canonical: "/" },
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml", sizes: "any" }],
+    shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteUrl,
-    siteName: "AyeCalc",
-    title: "AyeCalc — Free, Fast & Private Online Calculators",
-    description:
-      "Accurate everyday calculators for your money, health, and daily life. No sign-up required.",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.defaultTitle,
+    description: siteConfig.defaultDescription,
     images: [
       {
         url: "/opengraph-image",
@@ -55,9 +56,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AyeCalc — Calculate anything, clearly",
-    description:
-      "Free, accurate, and private calculators for everyday decisions.",
+    title: siteConfig.defaultTitle,
+    description: siteConfig.defaultDescription,
     images: ["/opengraph-image"],
   },
   robots: {
