@@ -682,6 +682,88 @@ input {
   font-size: 15px;
 }
 
+.resource-directory {
+  padding-top: 25px;
+}
+
+.resource-guides {
+  padding-top: 100px;
+  background: var(--paper);
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.resource-card {
+  min-height: 245px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfcf8;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.resource-card:hover {
+  border-color: #9fc6b7;
+  box-shadow: 0 20px 48px rgba(11, 42, 34, 0.09);
+  transform: translateY(-5px);
+}
+
+.resource-card:focus-visible,
+.directory-link:focus-visible {
+  outline: 3px solid #32a77d;
+  outline-offset: 3px;
+}
+
+.resource-card > span {
+  color: #31866a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.resource-card h3 {
+  margin: 22px 0 9px;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.resource-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.resource-card small {
+  margin-top: auto;
+  padding-top: 20px;
+  color: #496259;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.directory-link {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 27px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #a8b6b0;
+  color: #52605b;
+  font-size: 11px;
+  font-weight: 750;
+}
+
 .why {
   color: white;
   background: var(--green-950);
@@ -976,6 +1058,10 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .category-card:nth-child(3) {
     border-left: 1px solid var(--line);
   }
@@ -1069,6 +1155,19 @@ footer {
 
   .converter-directory-card {
     min-height: 210px;
+  }
+
+  .resource-directory,
+  .resource-guides {
+    padding-top: 0;
+  }
+
+  .resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-card {
+    min-height: 215px;
   }
 
   .category-card,

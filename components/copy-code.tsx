@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import styles from "@/app/[conversion]/converter.module.css";
+import styles from "@/components/tool-page.module.css";
 
 type CopyCodeProps = {
   label: string;

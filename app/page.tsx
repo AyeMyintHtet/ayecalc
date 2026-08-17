@@ -1,11 +1,13 @@
 import Calculator from "@/components/calculator";
 import { converterDefinitions } from "@/lib/converters";
+import { developerTools } from "@/lib/developer-tools";
+import { guides } from "@/lib/guides";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
   title: "Free Online Calculators & Tools for Everyday Decisions",
   description:
-    "Use AyeCalc's free calculators, converters, and practical tools for loans, savings, percentages, health, dates, development, and everyday tasks.",
+    "Use AyeCalc's free loan calculator, unit converters, CSS developer tools, and practical guides with visible formulas and browser-based results.",
   path: "/",
   keywords: [
     "online calculator",
@@ -31,7 +33,7 @@ const categories = [
     title: "Developer Units",
     description: "Move between PX, REM, and EM for CSS workflows.",
     tools: "Browse converters",
-    href: "#converters",
+    href: "/developer-tools",
     accent: "yellow",
   },
   {
@@ -39,7 +41,7 @@ const categories = [
     title: "Weight",
     description: "Convert pounds and kilograms with an exact factor.",
     tools: "Browse converters",
-    href: "#converters",
+    href: "/unit-converters",
     accent: "coral",
   },
   {
@@ -47,7 +49,7 @@ const categories = [
     title: "Length",
     description: "Convert centimeters and inches for everyday measurements.",
     tools: "Browse converters",
-    href: "#converters",
+    href: "/unit-converters",
     accent: "blue",
   },
 ];
@@ -104,13 +106,13 @@ export default function Home() {
           </a>
 
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <a href="#calculators">Calculators</a>
-            <a href="#converters">Converters</a>
-            <a href="#why-ayecalc">Why AyeCalc</a>
+            <a href="/developer-tools">Developer tools</a>
+            <a href="/unit-converters">Converters</a>
+            <a href="/guides">Guides</a>
           </nav>
 
-          <a className="nav-cta" href="#calculator">
-            Try a calculator
+          <a className="nav-cta" href="/developer-tools">
+            Explore tools
             <span aria-hidden="true">↗</span>
           </a>
         </div>
@@ -136,8 +138,8 @@ export default function Home() {
                 feel a little easier.
               </p>
               <div className="hero-actions">
-                <a className="button button-primary" href="#calculators">
-                  Explore calculators
+                <a className="button button-primary" href="/developer-tools">
+                  Explore developer tools
                   <span aria-hidden="true">→</span>
                 </a>
                 <a className="text-link" href="#why-ayecalc">
@@ -242,6 +244,32 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="resource-directory section" aria-labelledby="developer-tools-title">
+          <div className="container">
+            <div className="section-heading">
+              <div>
+                <span className="kicker">Frontend toolbox</span>
+                <h2 id="developer-tools-title">Useful CSS tools for real workflows</h2>
+              </div>
+              <p>
+                Generate fluid values, compare units, translate framework spacing,
+                and check visual decisions without sending inputs to a server.
+              </p>
+            </div>
+
+            <div className="resource-grid">
+              {developerTools.map((tool) => (
+                <a className="resource-card" href={`/${tool.slug}`} key={tool.slug}>
+                  <span>{tool.category}</span>
+                  <h3>{tool.shortTitle}</h3>
+                  <p>{tool.description}</p>
+                  <small>Open tool ↗</small>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="why section" id="why-ayecalc" aria-labelledby="why-title">
           <div className="container why-grid">
             <div className="why-visual" aria-hidden="true">
@@ -292,6 +320,34 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="resource-directory resource-guides section" aria-labelledby="home-guides-title">
+          <div className="container">
+            <div className="section-heading">
+              <div>
+                <span className="kicker">Practical guides</span>
+                <h2 id="home-guides-title">Understand the method behind the value</h2>
+              </div>
+              <p>
+                Learn how relative units, design handoff, framework spacing, and
+                fluid typography behave before choosing a production value.
+              </p>
+            </div>
+            <div className="resource-grid">
+              {guides.slice(0, 3).map((guide) => (
+                <a className="resource-card" href={`/guides/${guide.slug}`} key={guide.slug}>
+                  <span>{guide.category}</span>
+                  <h3>{guide.title}</h3>
+                  <p>{guide.description}</p>
+                  <small>Read guide ↗</small>
+                </a>
+              ))}
+            </div>
+            <a className="directory-link" href="/guides">
+              View all guides <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
         <section className="guides section" id="guides" aria-labelledby="guides-title">
           <div className="container narrow">
             <div className="center-heading">
@@ -339,10 +395,13 @@ export default function Home() {
             <p>Numbers, made human.</p>
           </div>
           <nav aria-label="Footer navigation">
-            <a href="#calculators">Calculators</a>
-            <a href="#converters">Converters</a>
-            <a href="#why-ayecalc">About</a>
-            <a href="#guides">FAQs</a>
+            <a href="/developer-tools">Developer tools</a>
+            <a href="/unit-converters">Converters</a>
+            <a href="/guides">Guides</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
           </nav>
           <p className="copyright">© {new Date().getFullYear()} AyeCalc. All rights reserved.</p>
         </div>

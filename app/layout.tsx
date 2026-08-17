@@ -26,10 +26,10 @@ export const metadata: Metadata = {
   keywords: [
     "online calculator",
     "free calculator",
-    "financial calculator",
     "loan calculator",
-    "savings calculator",
-    "percentage calculator",
+    "unit converter",
+    "CSS calculator",
+    "developer tools",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,

@@ -13,7 +13,7 @@ import {
   getExample,
 } from "@/lib/converters";
 import { createPageMetadata, siteConfig } from "@/lib/metadata";
-import styles from "./converter.module.css";
+import styles from "@/components/tool-page.module.css";
 
 type ConverterPageProps = {
   params: Promise<{
@@ -133,7 +133,7 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
             "@type": "ListItem",
             position: 2,
             name: "Converters",
-            item: `${siteConfig.url}/#converters`,
+            item: `${siteConfig.url}/unit-converters`,
           },
           {
             "@type": "ListItem",
@@ -164,11 +164,11 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
             <span>AyeCalc</span>
           </Link>
           <nav className={styles.headerNav} aria-label="Converter navigation">
-            <Link href="/#converters">All converters</Link>
+            <Link href="/unit-converters">All converters</Link>
             <Link href="#formula">Formula</Link>
             <Link href="#conversion-table">Table</Link>
           </nav>
-          <Link className={styles.headerCta} href="/#converters">
+          <Link className={styles.headerCta} href="/developer-tools">
             Explore tools <span aria-hidden="true">↗</span>
           </Link>
         </div>
@@ -181,7 +181,7 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
             <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
               <Link href="/">Home</Link>
               <span aria-hidden="true">/</span>
-              <Link href="/#converters">Converters</Link>
+              <Link href="/unit-converters">Converters</Link>
               <span aria-hidden="true">/</span>
               <span aria-current="page">{converter.title}</span>
             </nav>
@@ -421,7 +421,7 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
                 <span className={styles.sectionKicker}>Keep converting</span>
                 <h2>Related converters</h2>
               </div>
-              <Link href="/#converters">View all converters</Link>
+              <Link href="/unit-converters">View all converters</Link>
             </div>
             <div className={styles.relatedGrid}>
               {relatedConverters.map((item) => (
@@ -453,9 +453,11 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
             <p>Numbers, made human.</p>
           </div>
           <nav aria-label="Footer navigation">
-            <Link href="/#calculators">Calculators</Link>
-            <Link href="/#converters">Converters</Link>
-            <Link href="/#guides">FAQs</Link>
+            <Link href="/developer-tools">Developer tools</Link>
+            <Link href="/unit-converters">Converters</Link>
+            <Link href="/guides">Guides</Link>
+            <Link href="/methodology">Methodology</Link>
+            <Link href="/contact">Contact</Link>
           </nav>
           <p>© {new Date().getFullYear()} AyeCalc. All rights reserved.</p>
         </div>

@@ -8,7 +8,7 @@ import {
   type ConversionContext,
 } from "@/lib/conversion-math";
 import type { ContextField } from "@/lib/converters";
-import styles from "@/app/[conversion]/converter.module.css";
+import styles from "@/components/tool-page.module.css";
 
 type UnitConverterProps = {
   from: string;

@@ -5,7 +5,7 @@ export const siteConfig = {
   url: "https://ayecalc.com",
   defaultTitle: "AyeCalc — Free Online Calculators, Converters & Tools",
   defaultDescription:
-    "Use free calculators, converters, and practical tools for finance, math, health, time, development, and everyday decisions.",
+    "Use free calculators, unit converters, CSS developer tools, and practical guides with visible formulas, assumptions, and local browser calculations.",
 } as const;
 
 type PageMetadataOptions = {
