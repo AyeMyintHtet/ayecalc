@@ -5,6 +5,9 @@ Use this workflow for every feature, page, calculator, converter, developer util
 ## 1. Understand the request
 
 - Identify the user problem, primary search intent, and desired route.
+- For every new, renamed, redirected, or removed public route, update
+  `app/sitemap.ts` in the same change. Never leave a finished page out of the
+  sitemap or keep a removed route in it.
 - Confirm whether the work affects a calculator or utility, content, navigation, metadata, structured data, accessibility, performance, or future advertising.
 - Inspect the relevant existing files and preserve established patterns where they still meet `SKILLS.md`.
 - Check for overlapping routes or pages that could target the same search intent.
