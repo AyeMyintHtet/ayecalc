@@ -253,7 +253,7 @@ export default function Home() {
                   <span>02</span>
                   <div>
                     <strong>Formulas you can trust</strong>
-                    <p>Carefully tested  calculations with assumptions made visible.</p>
+                    <p>Carefully tested calculations with assumptions made visible.</p>
                   </div> 
                 </li>
                 <li>
