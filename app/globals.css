@@ -603,6 +603,85 @@ input {
   font-size: 18px;
 }
 
+.converter-directory {
+  padding-top: 20px;
+  background: var(--paper);
+}
+
+.converter-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.converter-directory-card {
+  min-height: 238px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfcf8;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.converter-directory-card:hover {
+  border-color: #a9c9bc;
+  box-shadow: 0 20px 50px rgba(11, 42, 34, 0.09);
+  transform: translateY(-5px);
+}
+
+.converter-directory-card:focus-visible {
+  outline: 3px solid #32a77d;
+  outline-offset: 3px;
+}
+
+.converter-card-category {
+  color: #32866a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.converter-directory-card > strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 29px;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.converter-directory-card > strong span {
+  color: #94a09b;
+  font-weight: 500;
+}
+
+.converter-directory-card h3 {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.converter-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  color: #53625c;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.converter-card-action b {
+  color: #147251;
+  font-size: 15px;
+}
+
 .why {
   color: white;
   background: var(--green-950);
@@ -893,6 +972,10 @@ footer {
     grid-template-columns: 1fr 1fr;
   }
 
+  .converter-directory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .category-card:nth-child(3) {
     border-left: 1px solid var(--line);
   }
@@ -974,6 +1057,18 @@ footer {
 
   .category-grid {
     grid-template-columns: 1fr;
+  }
+
+  .converter-directory {
+    padding-top: 0;
+  }
+
+  .converter-directory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .converter-directory-card {
+    min-height: 210px;
   }
 
   .category-card,

@@ -1,4 +1,5 @@
 import Calculator from "@/components/calculator";
+import { converterDefinitions } from "@/lib/converters";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
@@ -20,29 +21,33 @@ const categories = [
   {
     icon: "↗",
     title: "Finance",
-    description: "Plan loans, savings, investments, and budgets.",
-    tools: "18 calculators",
+    description: "Estimate a monthly loan payment with visible assumptions.",
+    tools: "Try calculator",
+    href: "#calculator",
     accent: "mint",
   },
   {
-    icon: "%",
-    title: "Everyday Math",
-    description: "Solve percentages, fractions, tips, and conversions.",
-    tools: "24 calculators",
+    icon: "⌘",
+    title: "Developer Units",
+    description: "Move between PX, REM, and EM for CSS workflows.",
+    tools: "Browse converters",
+    href: "#converters",
     accent: "yellow",
   },
   {
-    icon: "♡",
-    title: "Health",
-    description: "Understand BMI, calories, hydration, and more.",
-    tools: "12 calculators",
+    icon: "↔",
+    title: "Weight",
+    description: "Convert pounds and kilograms with an exact factor.",
+    tools: "Browse converters",
+    href: "#converters",
     accent: "coral",
   },
   {
     icon: "⌁",
-    title: "Time & Date",
-    description: "Calculate age, duration, workdays, and deadlines.",
-    tools: "10 calculators",
+    title: "Length",
+    description: "Convert centimeters and inches for everyday measurements.",
+    tools: "Browse converters",
+    href: "#converters",
     accent: "blue",
   },
 ];
@@ -76,27 +81,6 @@ const jsonLd = {
       description: "Free online calculators for smarter everyday decisions.",
       inLanguage: "en-US",
     },
-    {
-      "@type": "SoftwareApplication",
-      name: "AyeCalc Loan Calculator",
-      applicationCategory: "FinanceApplication",
-      operatingSystem: "Any",
-      url: "https://ayecalc.com/",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "1240",
-      },
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqs.map((faq) => ({
-        "@type": "Question",
-        name: faq.question,
-        acceptedAnswer: { "@type": "Answer", text: faq.answer },
-      })),
-    },
   ],
 };
 
@@ -121,8 +105,8 @@ export default function Home() {
 
           <nav className="desktop-nav" aria-label="Primary navigation">
             <a href="#calculators">Calculators</a>
+            <a href="#converters">Converters</a>
             <a href="#why-ayecalc">Why AyeCalc</a>
-            <a href="#guides">Guides</a>
           </nav>
 
           <a className="nav-cta" href="#calculator">
@@ -179,8 +163,8 @@ export default function Home() {
               <div className="card-float card-float-bottom" aria-hidden="true">
                 <span>✓</span>
                 <div>
-                  <strong>1,240,000+</strong>
-                  <small>calculations this month</small>
+                  <strong>Private by default</strong>
+                  <small>browser-based calculations</small>
                 </div>
               </div>
             </div>
@@ -202,7 +186,7 @@ export default function Home() {
 
             <div className="category-grid">
               {categories.map((category) => (
-                <a className="category-card" href="#calculator" key={category.title}>
+                <a className="category-card" href={category.href} key={category.title}>
                   <span className={`category-icon ${category.accent}`} aria-hidden="true">
                     {category.icon}
                   </span>
@@ -211,6 +195,46 @@ export default function Home() {
                   <span className="category-meta">
                     {category.tools}
                     <b aria-hidden="true">→</b>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="converter-directory section"
+          id="converters"
+          aria-labelledby="converters-title"
+        >
+          <div className="container">
+            <div className="section-heading">
+              <div>
+                <span className="kicker">Instant converters</span>
+                <h2 id="converters-title">Move between units without the guesswork</h2>
+              </div>
+              <p>
+                Fast browser-based conversions with visible formulas, adjustable
+                assumptions, examples, and reference tables.
+              </p>
+            </div>
+
+            <div className="converter-directory-grid">
+              {converterDefinitions.map((converter) => (
+                <a
+                  className="converter-directory-card"
+                  href={`/${converter.slug}`}
+                  key={converter.slug}
+                >
+                  <span className="converter-card-category">{converter.category}</span>
+                  <strong>
+                    {converter.fromSymbol}
+                    <span aria-hidden="true">→</span>
+                    {converter.toSymbol}
+                  </strong>
+                  <h3>{converter.title}</h3>
+                  <span className="converter-card-action">
+                    Open converter <b aria-hidden="true">↗</b>
                   </span>
                 </a>
               ))}
@@ -228,9 +252,9 @@ export default function Home() {
                 <strong>Clear by design</strong>
                 <small>No jargon. No hidden steps.</small>
               </div>
-              <span className="visual-chip chip-one">98%</span>
-              <span className="visual-chip chip-two">$2.4k</span>
-              <span className="visual-chip chip-three">42 days</span>
+              <span className="visual-chip chip-one">Clear</span>
+              <span className="visual-chip chip-two">Fast</span>
+              <span className="visual-chip chip-three">Private</span>
             </div>
 
             <div className="why-copy">
@@ -254,7 +278,7 @@ export default function Home() {
                   <div>
                     <strong>Formulas you can trust</strong>
                     <p>Carefully tested calculations with assumptions made visible.</p>
-                  </div> 
+                  </div>
                 </li>
                 <li>
                   <span>03</span>
@@ -316,6 +340,7 @@ export default function Home() {
           </div>
           <nav aria-label="Footer navigation">
             <a href="#calculators">Calculators</a>
+            <a href="#converters">Converters</a>
             <a href="#why-ayecalc">About</a>
             <a href="#guides">FAQs</a>
           </nav>
