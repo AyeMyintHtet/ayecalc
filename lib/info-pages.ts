@@ -137,6 +137,7 @@ export const infoPages: InfoPageDefinition[] = [
         title: "Calculator and tool inputs",
         paragraphs: [
           "The current calculators and developer tools perform their arithmetic in browser memory. Values entered into those tool fields are not intentionally transmitted to AyeCalc for calculation or stored in a user profile.",
+          "The background remover passes the selected image to a worker inside the browser. The selected image is not intentionally uploaded to AyeCalc, Hugging Face, or jsDelivr for processing, and the generated PNG remains a local browser object unless the visitor chooses to download it.",
           "Do not enter confidential, personal, regulated, or security-sensitive information into a public web tool unless the page explicitly supports that use and explains the handling involved.",
         ],
       },
@@ -153,6 +154,7 @@ export const infoPages: InfoPageDefinition[] = [
         title: "Analytics, advertising, and third parties",
         paragraphs: [
           "The current application code does not include live advertising or analytics integrations. External reference links lead to third-party websites with their own privacy practices.",
+          "When a visitor starts the background remover, the browser downloads machine-learning model files from Hugging Face and WebAssembly runtime files from jsDelivr. Those asset requests can expose standard request information such as IP address, browser details, referrer, and request time to those providers, but AyeCalc does not intentionally include the selected image in the requests.",
           "If analytics, advertising, affiliate tracking, consent management, or another third-party service is enabled later, AyeCalc must update the relevant disclosures and consent behavior before or alongside that launch.",
         ],
       },
@@ -181,6 +183,7 @@ export const infoPages: InfoPageDefinition[] = [
         title: "Current use of cookies",
         paragraphs: [
           "Calculator values are held in temporary component state while the page is open. The current tool implementation does not require a user account or a persistent calculation-history cookie.",
+          "After the background remover is started, the browser may store downloaded model and runtime files in its cache so they do not need to be downloaded for every image. This functional cache contains software assets rather than the selected image or generated PNG and can be cleared through browser site-data controls.",
           "The production hosting platform or security layer may use strictly necessary technical mechanisms for delivery, abuse prevention, load management, or security. Those mechanisms should be documented here when the final production configuration is confirmed.",
         ],
       },
@@ -275,6 +278,7 @@ export const infoPages: InfoPageDefinition[] = [
         paragraphs: [
           "Generated CSS and code snippets are starting points. Browser support, framework versions, inheritance, build configuration, content, and user settings can change the rendered result.",
           "A passing color ratio or generated fluid type value is not an accessibility certification. Evaluate the complete interface against applicable WCAG requirements and real interaction conditions.",
+          "Automatic background removal is an estimated segmentation result. Review fine edges, transparent materials, shadows, and missing foreground detail before publishing or relying on the generated image.",
         ],
       },
       {

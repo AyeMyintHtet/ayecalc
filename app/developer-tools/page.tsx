@@ -6,11 +6,17 @@ import { guides } from "@/lib/guides";
 import { createPageMetadata, siteConfig } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Free CSS & Developer Tools",
+  title: "Free Developer, CSS & Image Tools",
   description:
-    "Use free browser-based tools for CSS clamp values, REM and EM conversion, Tailwind spacing, aspect ratios, colors, viewport units, and contrast.",
+    "Use free browser-based tools for background removal, CSS clamp values, REM and EM conversion, Tailwind spacing, aspect ratios, colors, viewport units, and contrast.",
   path: "/developer-tools",
-  keywords: ["developer tools", "CSS tools", "frontend tools", "web design calculators"],
+  keywords: [
+    "developer tools",
+    "CSS tools",
+    "image tools",
+    "background remover",
+    "web design calculators",
+  ],
 });
 
 const jsonLd = {
@@ -21,7 +27,7 @@ const jsonLd = {
       url: `${siteConfig.url}/developer-tools`,
       name: "AyeCalc Developer Tools",
       description:
-        "Browser-based CSS and frontend utilities with visible methods and practical guidance.",
+        "Browser-based developer, CSS, accessibility, and image utilities with visible methods and practical guidance.",
     },
     {
       "@type": "BreadcrumbList",
@@ -57,15 +63,15 @@ export default function DeveloperToolsPage() {
             <span aria-hidden="true">/</span>
             <span aria-current="page">Developer tools</span>
           </nav>
-          <span className={styles.eyebrow}>Frontend utilities</span>
-          <h1>Free CSS and developer tools</h1>
+          <span className={styles.eyebrow}>Browser-based utilities</span>
+          <h1>Free developer, CSS, and image tools</h1>
           <p className={styles.heroLead}>
-            Build responsive, consistent, and accessible interfaces with instant
-            calculations that stay in your browser and show their assumptions.
+            Build responsive interfaces, check accessibility, and process images
+            with focused tools that explain their methods and privacy behavior.
           </p>
           <div className={styles.heroMeta}>
             <span>No account</span>
-            <span>Local calculations</span>
+            <span>Local processing</span>
             <span>Copy-ready results</span>
           </div>
         </div>
@@ -76,11 +82,11 @@ export default function DeveloperToolsPage() {
           <div className={styles.sectionHeading}>
             <div>
               <span className={styles.sectionKicker}>Toolbox</span>
-              <h2>Tools for real frontend workflows</h2>
+              <h2>Tools for practical digital workflows</h2>
             </div>
             <p>
-              Generate production values, inspect context-dependent units, and
-              verify the output before carrying it into a design system.
+              Generate production values, inspect context-dependent units, remove
+              image backgrounds, and verify output before using it in a project.
             </p>
           </div>
           <div className={styles.cardGrid}>

@@ -22,6 +22,7 @@ export default function DeveloperToolPage({
   children,
 }: DeveloperToolPageProps) {
   const canonicalUrl = `${siteConfig.url}/${tool.slug}`;
+  const isImageTool = tool.category === "Image tools";
   const relatedTools = developerTools
     .filter((candidate) => candidate.slug !== tool.slug)
     .slice(0, 4);
@@ -43,9 +44,13 @@ export default function DeveloperToolPage({
         name: tool.title,
         url: canonicalUrl,
         description: tool.description,
-        applicationCategory: "DeveloperApplication",
+        applicationCategory: isImageTool
+          ? "MultimediaApplication"
+          : "DeveloperApplication",
         operatingSystem: "Any",
-        browserRequirements: "JavaScript enabled for live calculations",
+        browserRequirements: isImageTool
+          ? "Modern browser with JavaScript; network access required for first-use model files"
+          : "JavaScript enabled for live calculations",
         offers: {
           "@type": "Offer",
           price: "0",
@@ -170,11 +175,16 @@ export default function DeveloperToolPage({
             <section className={styles.contentSection}>
               <span className={styles.sectionNumber}>03</span>
               <div>
-                <span className={styles.sectionKicker}>Implementation</span>
-                <h2>Copyable code examples</h2>
+                <span className={styles.sectionKicker}>
+                  {isImageTool ? "Output" : "Implementation"}
+                </span>
+                <h2>
+                  {isImageTool ? "Using the transparent PNG" : "Copyable code examples"}
+                </h2>
                 <p>
-                  Use these examples as a starting point, then match the values and
-                  assumptions to the rendered project.
+                  {isImageTool
+                    ? "Preserve the PNG alpha channel and provide accurate dimensions and alternative text when adding the result to a page."
+                    : "Use these examples as a starting point, then match the values and assumptions to the rendered project."}
                 </p>
                 <div className={styles.snippetGrid}>
                   {tool.codeSnippets.map((snippet) => (
@@ -210,7 +220,7 @@ export default function DeveloperToolPage({
               <span>On this page</span>
               <a href="#formula">Formula and method</a>
               <a href="#faq">Frequently asked questions</a>
-              <a href="#related-tools">Related developer tools</a>
+              <a href="#related-tools">Related tools</a>
             </div>
             <div className={styles.reviewCard}>
               <span aria-hidden="true">✓</span>
@@ -247,8 +257,10 @@ export default function DeveloperToolPage({
           <div className={styles.pageContainer}>
             <div className={styles.relatedHeading}>
               <div>
-                <span className={styles.sectionKicker}>Build better interfaces</span>
-                <h2>Related developer tools</h2>
+                <span className={styles.sectionKicker}>
+                  {isImageTool ? "Continue creating" : "Build better interfaces"}
+                </span>
+                <h2>Related tools</h2>
               </div>
               <Link href="/developer-tools">View all developer tools</Link>
             </div>

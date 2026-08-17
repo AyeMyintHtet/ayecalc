@@ -37,7 +37,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteConfig.url}/${tool.slug}`,
       lastModified,
       changeFrequency: "monthly" as const,
-      priority: tool.slug === "css-clamp-generator" ? 0.9 : 0.8,
+      priority:
+        tool.slug === "css-clamp-generator" || tool.slug === "background-remover"
+          ? 0.9
+          : 0.8,
     })),
     ...guides.map((guide) => ({
       url: `${siteConfig.url}/guides/${guide.slug}`,

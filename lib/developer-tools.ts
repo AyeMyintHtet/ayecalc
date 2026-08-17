@@ -446,6 +446,65 @@ export const developerTools: DeveloperToolDefinition[] = [
       href: "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum",
     },
   },
+  {
+    slug: "background-remover",
+    title: "Free Background Image Remover",
+    shortTitle: "Background Remover",
+    category: "Image tools",
+    description:
+      "Remove an image background in your browser, preview the transparent result, and download a full-size PNG without uploading the selected image to AyeCalc.",
+    introduction:
+      "Choose a JPEG, PNG, or WebP image and create a transparent PNG with browser-based foreground segmentation. The image is processed in a dedicated browser worker, while the model and runtime files are downloaded on first use and cached by the browser when available.",
+    formula: "transparent pixel = source pixel × foreground alpha mask",
+    formulaNote:
+      "The segmentation model estimates a foreground mask from 0 (transparent) to 1 (opaque) for each pixel.",
+    method:
+      "The browser decodes the selected image, resizes a working copy for the segmentation model, and predicts which pixels belong to the main foreground subject. That mask is resized to the original dimensions and applied as an alpha channel, preserving the original RGB pixels in a transparent PNG.",
+    exampleTitle: "Remove the background from a product or portrait image",
+    exampleText:
+      "Select a supported image, start removal, and wait for the first-use model download and local processing. The preview displays transparency as a checkerboard. Downloading saves the original dimensions as a PNG with an alpha channel.",
+    guidance:
+      "Use a clearly defined foreground subject, adequate lighting, and visible separation between subject and background. Inspect hair, fur, glass, shadows, and similarly colored edges at full size before using the result in production.",
+    limitation:
+      "Automatic segmentation can remove fine foreground detail or retain parts of a complex background. Processing speed depends on the device, browser, image dimensions, model cache, and available memory. The tool does not provide manual mask correction.",
+    benefits: ["Local image processing", "Transparent PNG output", "No account"],
+    codeSnippets: [
+      {
+        label: "HTML transparent image",
+        code: '<img src="subject-no-background.png" width="1200" height="800" alt="Product shown without its original background">',
+      },
+      {
+        label: "CSS preview surface",
+        code: ".transparent-preview {\n  background-color: #fff;\n  background-image:\n    linear-gradient(45deg, #e5e7eb 25%, transparent 25%),\n    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%);\n}",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does AyeCalc upload my selected image?",
+        answer:
+          "No. The selected image is passed to a worker inside your browser and is not intentionally uploaded to AyeCalc, Hugging Face, or jsDelivr. The browser separately downloads the model from Hugging Face and runtime files from jsDelivr on first use.",
+      },
+      {
+        question: "Why can the first background removal take longer?",
+        answer:
+          "The first run downloads the quantized segmentation model and browser runtime. Browsers can cache those files, so later runs may avoid downloading them again.",
+      },
+      {
+        question: "Which image formats are supported?",
+        answer:
+          "The uploader accepts JPEG, PNG, and WebP files up to 15 MB and 25 megapixels. The result is downloaded as a transparent PNG.",
+      },
+      {
+        question: "Will every edge be removed perfectly?",
+        answer:
+          "No automatic model is perfect. Fine hair, fur, transparent objects, motion blur, low contrast, and complex scenes can produce inaccurate edges or missing foreground details.",
+      },
+    ],
+    source: {
+      label: "Hugging Face ONNX Community: ORMBG background-removal model",
+      href: "https://huggingface.co/onnx-community/ormbg-ONNX",
+    },
+  },
 ];
 
 export function getDeveloperTool(slug: string) {
