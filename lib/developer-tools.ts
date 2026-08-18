@@ -4,6 +4,8 @@ export type DeveloperToolDefinition = {
   slug: string;
   title: string;
   shortTitle: string;
+  seoTitle?: string;
+  searchTerms?: string[];
   category: string;
   description: string;
   introduction: string;
@@ -25,6 +27,18 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "css-clamp-generator",
     title: "CSS Clamp Generator & Fluid Typography Calculator",
     shortTitle: "CSS Clamp Generator",
+    searchTerms: [
+      "CSS clamp calculator",
+      "CSS clamp maker",
+      "clamp function calculator",
+      "fluid typography generator",
+      "fluid typography calculator",
+      "fluid font size calculator",
+      "responsive font size calculator",
+      "responsive typography generator",
+      "CSS fluid type scale",
+      "fluid spacing calculator",
+    ],
     category: "CSS typography",
     description:
       "Generate a responsive CSS clamp() value from minimum and maximum font sizes and viewport widths, with pixel and REM output.",
@@ -88,6 +102,18 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "rem-em-px-converter",
     title: "REM, EM & PX Converter",
     shortTitle: "REM/EM/PX Matrix",
+    searchTerms: [
+      "PX REM EM converter",
+      "CSS unit converter",
+      "CSS unit calculator",
+      "font size unit converter",
+      "pixel REM converter",
+      "pixel EM converter",
+      "REM calculator",
+      "EM calculator",
+      "PX REM matrix",
+      "relative unit converter",
+    ],
     category: "CSS units",
     description:
       "Convert one CSS length across PX, REM, and EM with adjustable root and element font sizes and a live comparison matrix.",
@@ -147,6 +173,18 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "tailwind-spacing-converter",
     title: "Tailwind Spacing Converter",
     shortTitle: "Tailwind Spacing Converter",
+    searchTerms: [
+      "Tailwind spacing calculator",
+      "Tailwind spacing scale",
+      "Tailwind spacing chart",
+      "Tailwind REM converter",
+      "Tailwind PX converter",
+      "Tailwind class spacing calculator",
+      "Tailwind padding converter",
+      "Tailwind margin converter",
+      "Tailwind gap converter",
+      "Tailwind spacing values",
+    ],
     category: "Tailwind CSS",
     description:
       "Convert Tailwind spacing numbers to REM and pixels using an adjustable spacing variable and root font size, with utility examples.",
@@ -207,9 +245,122 @@ export const developerTools: DeveloperToolDefinition[] = [
     },
   },
   {
+    slug: "tailwind-grid-guide",
+    title: "Tailwind Grid Guide & Visual Builder",
+    shortTitle: "Tailwind Grid Builder",
+    seoTitle: "Tailwind Grid Builder & Generator",
+    searchTerms: [
+      "tailwind grid builder",
+      "tailwind grid generator",
+      "tailwind grid maker",
+      "tailwind grid editor",
+      "tailwind grid playground",
+      "tailwind layout builder",
+      "tailwind layout generator",
+      "responsive grid builder",
+      "responsive grid generator",
+      "responsive layout maker",
+      "visual grid builder",
+      "visual grid editor",
+      "custom grid builder",
+      "custom grid maker",
+      "custom grid generator",
+      "grid layout maker",
+      "grid layout editor",
+      "grid changer",
+      "grid UI changer",
+      "grid UI builder",
+      "drag and drop grid builder",
+      "CSS grid builder",
+      "CSS grid generator",
+      "bento grid builder",
+      "Tailwind bento grid builder",
+    ],
+    category: "Tailwind CSS",
+    description:
+      "Build responsive Tailwind CSS grids visually with a custom grid maker. Drag, edit, resize, reorder, and delete blocks across every default breakpoint.",
+    introduction:
+      "Use this Tailwind grid builder as a visual grid maker, responsive layout editor, or grid UI builder. Arrange editable content blocks on a live canvas, set columns and gaps for each screen size, adjust every block's column and row span, and copy the generated Tailwind markup.",
+    formula: "responsive utility = breakpoint prefix + grid utility",
+    formulaNote:
+      "Base utilities apply at every size; sm:, md:, lg:, xl:, and 2xl: override them from their minimum widths upward.",
+    method:
+      "Start with the unprefixed mobile layout, which acts as the base or XS view. Configure grid-template columns and gap, then move through Tailwind's mobile-first breakpoints. Each block combines col-span and row-span utilities at every breakpoint, while document order determines automatic grid placement.",
+    exampleTitle: "Build a sidebar and main-content layout across six screen sizes",
+    exampleText:
+      "Use one column at the base size, two at sm, four at md, and progressively wider grids through 2xl. A sidebar can span the full base grid, one column at sm, and three of twelve columns at 2xl, while the main area uses the remaining tracks.",
+    guidance:
+      "Design the smallest layout first, keep source order meaningful, and add breakpoint overrides only where the content needs them. Check that column spans never exceed their active grid, avoid unnecessary row spans, and test the copied markup with real content at widths around every breakpoint.",
+    limitation:
+      "The preview models Tailwind's default breakpoints and common grid utilities. A project with custom breakpoints, custom spacing, dense auto-placement, explicit start lines, subgrid, or arbitrary templates may need manual changes after copying the markup.",
+    benefits: ["Drag-and-drop blocks", "Six responsive layouts", "Live Tailwind markup"],
+    codeSnippets: [
+      {
+        label: "Responsive Tailwind grid",
+        code: '<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">\n  <aside class="col-span-1 md:col-span-1 lg:col-span-2">Sidebar</aside>\n  <main class="col-span-1 md:col-span-3 lg:col-span-4">Content</main>\n</div>',
+      },
+      {
+        label: "Optional custom XS breakpoint",
+        code: '@import "tailwindcss";\n\n@theme {\n  --breakpoint-xs: 30rem;\n}\n\n/* xs:grid-cols-2 now starts at 30rem */',
+      },
+      {
+        label: "Mobile-first classes",
+        code: '<section class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4 xl:gap-6">\n  <!-- Base classes apply first; prefixed classes override upward. -->\n</section>',
+      },
+    ],
+    faqs: [
+      {
+        question: "Does Tailwind CSS include an XS breakpoint by default?",
+        answer:
+          "No. Tailwind's unprefixed utilities are the mobile or base layout below sm. The builder labels that view Base / XS. You can add a custom xs breakpoint with a --breakpoint-xs theme variable if the project needs one.",
+      },
+      {
+        question: "How do I reorder Tailwind grid items?",
+        answer:
+          "Drag blocks on the canvas or use their arrow controls. The builder changes source order, allowing normal CSS Grid auto-placement to position the items without extra order utilities.",
+      },
+      {
+        question: "Can every breakpoint use a different number of columns?",
+        answer:
+          "Yes. Base, sm, md, lg, xl, and 2xl each have independent column and gap controls. Every block also stores a separate column span and row span for each view.",
+      },
+      {
+        question: "Will the generated classes work with Tailwind CSS v4?",
+        answer:
+          "Yes. The output uses complete grid-cols, gap, col-span, row-span, and responsive variant class names that Tailwind CSS v4 can detect in source files.",
+      },
+      {
+        question: "Does the grid content leave my browser?",
+        answer:
+          "No. The builder keeps the layout and content in temporary browser state. Copying the generated markup uses the browser clipboard only when you choose the copy action.",
+      },
+      {
+        question: "What can I create with this custom grid maker?",
+        answer:
+          "Use the visual grid editor for dashboard layouts, card collections, Tailwind bento grids, landing-page sections, sidebars, content feeds, galleries, and other responsive grid interfaces.",
+      },
+    ],
+    source: {
+      label: "Tailwind CSS grid-template-columns documentation",
+      href: "https://tailwindcss.com/docs/grid-template-columns",
+    },
+  },
+  {
     slug: "aspect-ratio-calculator",
     title: "Aspect Ratio Calculator",
     shortTitle: "Aspect Ratio Calculator",
+    searchTerms: [
+      "ratio calculator",
+      "image aspect ratio calculator",
+      "screen ratio calculator",
+      "width height ratio calculator",
+      "dimension ratio calculator",
+      "resize aspect ratio calculator",
+      "proportional resize calculator",
+      "16:9 calculator",
+      "image dimension calculator",
+      "aspect ratio finder",
+    ],
     category: "Responsive layout",
     description:
       "Simplify width and height into an aspect ratio, calculate a proportional target height, and copy CSS aspect-ratio code.",
@@ -269,6 +420,18 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "color-converter",
     title: "HEX, RGB & HSL Color Converter",
     shortTitle: "Color Converter",
+    searchTerms: [
+      "HEX color converter",
+      "color code converter",
+      "HEX to RGB converter",
+      "HEX to HSL converter",
+      "HEX to RGBA converter",
+      "CSS color converter",
+      "color value converter",
+      "HEX alpha converter",
+      "RGB color calculator",
+      "HSL color calculator",
+    ],
     category: "CSS color",
     description:
       "Convert HEX colors to RGB and HSL instantly, including alpha values, with a live preview and copyable CSS output.",
@@ -332,6 +495,18 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "viewport-unit-converter",
     title: "PX to VW, VH, Vmin & Vmax Converter",
     shortTitle: "Viewport Unit Converter",
+    searchTerms: [
+      "PX to VW calculator",
+      "PX to VH calculator",
+      "pixels to viewport units",
+      "VW calculator",
+      "VH calculator",
+      "Vmin converter",
+      "Vmax converter",
+      "CSS viewport calculator",
+      "responsive unit converter",
+      "viewport percentage converter",
+    ],
     category: "Responsive CSS",
     description:
       "Convert pixels to VW, VH, Vmin, and Vmax using an adjustable viewport width and height, with copyable CSS results.",
@@ -391,6 +566,18 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "contrast-checker",
     title: "WCAG Color Contrast Checker",
     shortTitle: "Contrast Checker",
+    searchTerms: [
+      "color contrast checker",
+      "WCAG contrast calculator",
+      "accessibility contrast checker",
+      "AA contrast checker",
+      "AAA contrast checker",
+      "text contrast checker",
+      "contrast ratio calculator",
+      "foreground background contrast",
+      "website color accessibility checker",
+      "HEX contrast checker",
+    ],
     category: "Accessibility",
     description:
       "Check two HEX colors against WCAG 2.2 AA and AAA text contrast thresholds with a live preview and exact contrast ratio.",
@@ -450,6 +637,21 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "background-remover",
     title: "Free Background Remover Online",
     shortTitle: "Background Remover",
+    searchTerms: [
+      "remove image background",
+      "image background remover",
+      "photo background remover",
+      "AI background remover",
+      "transparent background maker",
+      "PNG background remover",
+      "background eraser",
+      "automatic background remover",
+      "portrait background remover",
+      "product background remover",
+      "image cutout maker",
+      "private background remover",
+      "no upload background remover",
+    ],
     category: "Image tools",
     description:
       "Remove image backgrounds online for free, preview the transparent result, and download a full-size PNG with private browser-based processing.",
@@ -512,20 +714,23 @@ export function getDeveloperTool(slug: string) {
 }
 
 export function createDeveloperToolMetadata(tool: DeveloperToolDefinition) {
-  const title = tool.title.startsWith("Free ")
-    ? tool.title
-    : `Free ${tool.title} Online`;
+  const pageTitle = tool.seoTitle ?? tool.title;
+  const title = pageTitle.startsWith("Free ")
+    ? pageTitle
+    : `Free ${pageTitle} Online`;
+  const keywords = [
+    tool.shortTitle.toLowerCase(),
+    tool.title.toLowerCase(),
+    `${tool.shortTitle.toLowerCase()} online`,
+    tool.category.toLowerCase(),
+    ...(tool.searchTerms ?? []),
+  ];
 
   return createPageMetadata({
     title,
     description: tool.description,
     path: `/${tool.slug}`,
-    keywords: [
-      tool.shortTitle.toLowerCase(),
-      tool.title.toLowerCase(),
-      `${tool.shortTitle.toLowerCase()} online`,
-      tool.category.toLowerCase(),
-    ],
+    keywords: Array.from(new Set(keywords)),
     imageAlt: `${tool.shortTitle} on AyeCalc`,
   });
 }

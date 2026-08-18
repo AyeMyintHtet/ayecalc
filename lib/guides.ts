@@ -12,6 +12,7 @@ export type GuideSection = {
 export type GuideDefinition = {
   slug: string;
   title: string;
+  searchTerms?: string[];
   description: string;
   introduction: string;
   category: string;
@@ -25,6 +26,16 @@ export const guides: GuideDefinition[] = [
   {
     slug: "rem-vs-em",
     title: "REM vs EM: How CSS Relative Units Actually Differ",
+    searchTerms: [
+      "REM vs EM",
+      "CSS REM vs EM",
+      "difference between REM and EM",
+      "REM or EM",
+      "when to use REM or EM",
+      "EM versus REM explained",
+      "CSS relative units guide",
+      "REM EM comparison",
+    ],
     description:
       "Understand the difference between REM and EM, how each resolves in CSS, when values compound, and which unit fits a design-system decision.",
     introduction:
@@ -87,6 +98,16 @@ export const guides: GuideDefinition[] = [
   {
     slug: "root-font-size-rem",
     title: "Root Font Size and REM: A Practical CSS Guide",
+    searchTerms: [
+      "CSS root font size",
+      "REM base font size",
+      "HTML root font size",
+      "how many pixels is 1REM",
+      "change REM size CSS",
+      "REM font size guide",
+      "CSS REM calculation",
+      "root element font size",
+    ],
     description:
       "Learn how the root font size controls REM values, why 16px is a common assumption rather than a universal constant, and how to test responsibly.",
     introduction:
@@ -149,6 +170,16 @@ export const guides: GuideDefinition[] = [
   {
     slug: "figma-px-to-rem",
     title: "How to Convert Figma PX Values to REM",
+    searchTerms: [
+      "Figma PX to REM",
+      "Figma pixel to REM converter",
+      "convert Figma pixels to REM",
+      "Figma REM handoff",
+      "design tokens PX to REM",
+      "Figma CSS unit conversion",
+      "developer handoff REM",
+      "Figma typography REM",
+    ],
     description:
       "Move pixel-based Figma measurements into a REM-based CSS system without losing scale, context, accessibility, or design-token intent.",
     introduction:
@@ -211,6 +242,16 @@ export const guides: GuideDefinition[] = [
   {
     slug: "tailwind-spacing-rem",
     title: "Tailwind Spacing to REM and PX: Understanding the Scale",
+    searchTerms: [
+      "Tailwind spacing chart",
+      "Tailwind spacing pixels",
+      "Tailwind spacing REM values",
+      "Tailwind spacing scale explained",
+      "Tailwind p-4 pixels",
+      "Tailwind gap values",
+      "Tailwind padding size chart",
+      "Tailwind CSS spacing guide",
+    ],
     description:
       "Understand how Tailwind CSS v4 numeric spacing utilities derive from --spacing and how to translate them to REM and pixels safely.",
     introduction:
@@ -277,6 +318,16 @@ export const guides: GuideDefinition[] = [
   {
     slug: "accessible-fluid-typography",
     title: "Accessible Fluid Typography with CSS Clamp",
+    searchTerms: [
+      "accessible fluid typography",
+      "CSS clamp typography accessibility",
+      "responsive font size accessibility",
+      "fluid type scale guide",
+      "accessible responsive typography",
+      "WCAG fluid typography",
+      "CSS clamp font size guide",
+      "fluid typography best practices",
+    ],
     description:
       "Build fluid typography with CSS clamp() while protecting zoom, readable minimums, content reflow, and WCAG-oriented testing.",
     introduction:
@@ -351,7 +402,11 @@ export function createGuideMetadata(guide: GuideDefinition) {
     title: guide.title,
     description: guide.description,
     path: `/guides/${guide.slug}`,
-    keywords: [guide.title.toLowerCase(), guide.category.toLowerCase()],
+    keywords: Array.from(new Set([
+      guide.title.toLowerCase(),
+      guide.category.toLowerCase(),
+      ...(guide.searchTerms ?? []),
+    ])),
     imageAlt: `${guide.title} on AyeCalc`,
   });
 }

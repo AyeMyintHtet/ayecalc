@@ -39,13 +39,14 @@ export async function generateMetadata({
     title: `Free ${converter.title} Online`,
     description: converter.description,
     path: `/${converter.slug}`,
-    keywords: [
+    keywords: Array.from(new Set([
       `${converter.fromSymbol} to ${converter.toSymbol}`,
       `${converter.fromName} to ${converter.toName}`,
       `${converter.fromSymbol} to ${converter.toSymbol} converter`,
       `${converter.fromSymbol} to ${converter.toSymbol} formula`,
       `convert ${converter.fromSymbol} to ${converter.toSymbol}`,
-    ],
+      ...(converter.searchTerms ?? []),
+    ])),
     imageAlt: `${converter.title} on AyeCalc`,
   });
 }
@@ -97,7 +98,9 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
         "@id": `${canonicalUrl}#webpage`,
         url: canonicalUrl,
         name: converter.title,
+        alternateName: converter.searchTerms,
         description: converter.description,
+        keywords: converter.searchTerms?.join(", "),
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         inLanguage: "en-US",
       },
@@ -105,6 +108,7 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
         "@type": "WebApplication",
         "@id": `${canonicalUrl}#application`,
         name: converter.title,
+        alternateName: converter.searchTerms,
         url: canonicalUrl,
         description: converter.description,
         applicationCategory:

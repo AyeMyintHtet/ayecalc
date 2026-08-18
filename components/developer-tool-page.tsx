@@ -35,6 +35,7 @@ export default function DeveloperToolPage({
         url: canonicalUrl,
         name: tool.title,
         description: tool.description,
+        keywords: tool.searchTerms?.join(", "),
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         inLanguage: "en-US",
       },
@@ -42,6 +43,7 @@ export default function DeveloperToolPage({
         "@type": "WebApplication",
         "@id": `${canonicalUrl}#application`,
         name: tool.title,
+        alternateName: tool.searchTerms,
         url: canonicalUrl,
         description: tool.description,
         applicationCategory: isImageTool

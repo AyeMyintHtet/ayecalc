@@ -16,6 +16,12 @@ export const metadata = createPageMetadata({
     "unit converter",
     "financial calculator",
     "developer tools",
+    "loan payment calculator",
+    "monthly loan calculator",
+    "loan repayment calculator",
+    "mortgage payment calculator",
+    "personal loan calculator",
+    "principal and interest calculator",
   ],
 });
 
@@ -82,6 +88,29 @@ const jsonLd = {
       name: "AyeCalc",
       description: "Free online calculators for smarter everyday decisions.",
       inLanguage: "en-US",
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://ayecalc.com/#loan-calculator",
+      url: "https://ayecalc.com/#calculator",
+      name: "Loan Payment Calculator",
+      alternateName: [
+        "Monthly Loan Calculator",
+        "Loan Repayment Calculator",
+        "Mortgage Payment Calculator",
+        "Personal Loan Calculator",
+        "Principal and Interest Calculator",
+      ],
+      description:
+        "Estimate a monthly principal-and-interest payment from a loan amount, annual interest rate, and loan term.",
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Any",
+      browserRequirements: "JavaScript enabled for live calculations",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
     },
   ],
 };
