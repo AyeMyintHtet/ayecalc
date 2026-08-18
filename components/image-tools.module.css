@@ -1,0 +1,792 @@
+.toolCard {
+  position: relative;
+  z-index: 3;
+  min-height: 560px;
+  margin-top: 42px;
+  padding: clamp(22px, 4vw, 38px);
+  border: 1px solid rgba(16, 34, 29, 0.12);
+  border-radius: 18px;
+  color: var(--ink);
+  background: rgba(255, 254, 250, 0.99);
+  box-shadow: 0 28px 80px rgba(3, 25, 19, 0.16);
+}
+
+.toolCard button,
+.toolCard input,
+.toolCard select {
+  font: inherit;
+}
+
+.toolCard button:focus-visible,
+.toolCard input:focus-visible,
+.toolCard select:focus-visible,
+.toolCard a:focus-visible,
+.cropSelection:focus-visible {
+  outline: 3px solid rgba(35, 129, 94, 0.32);
+  outline-offset: 3px;
+}
+
+.toolHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.toolHeading > div > span,
+.settingLabel,
+.field > span,
+.cropPanelLabel {
+  color: #39715f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.toolHeading h2 {
+  margin: 7px 0 0;
+  color: #10221d;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.privacyBadge {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid #b9dccd;
+  border-radius: 999px;
+  color: #1e654e;
+  background: #eaf8f1;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dropZone {
+  display: grid;
+  justify-items: center;
+  min-height: 226px;
+  padding: 32px 20px;
+  border: 2px dashed #a9c5ba;
+  border-radius: 14px;
+  background: #f5f9f5;
+  text-align: center;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.dragging {
+  border-color: #23815e;
+  background: #e8f8f0;
+  transform: translateY(-2px);
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.uploadIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 13px;
+  place-items: center;
+  border-radius: 50%;
+  color: #0d4f3d;
+  background: #c9f2df;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.dropZone strong {
+  color: #10221d;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 18px;
+}
+
+.dropZone p {
+  margin: 7px 0 18px;
+  color: #63716d;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.chooseButton,
+.primaryButton,
+.secondaryButton {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 19px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.chooseButton {
+  border: 1px solid #1d7155;
+  color: #13533f;
+  background: #fffefa;
+}
+
+.chooseButton:hover:not(:disabled),
+.secondaryButton:hover:not(:disabled) {
+  background: #e8f8f0;
+}
+
+.chooseButton:disabled,
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.errorList {
+  margin-top: 15px;
+  padding: 14px 16px;
+  border: 1px solid #efc5bb;
+  border-radius: 9px;
+  color: #84382e;
+  background: #fff2ef;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.errorList strong {
+  font-size: 11px;
+}
+
+.errorList ul {
+  margin: 7px 0 0;
+  padding-left: 17px;
+}
+
+.settingsPanel {
+  min-inline-size: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+  gap: 16px;
+  margin-top: 20px;
+  padding: 19px;
+  border: 1px solid #dce4de;
+  border-radius: 12px;
+  background: #f7faf7;
+}
+
+.settingGroup,
+.outputSettings {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 13px;
+}
+
+.outputSettings:only-child {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.segmentedControl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.segmentedControl button,
+.presetRow button,
+.batchHeader button,
+.itemActions button,
+.cropToolbar button,
+.aspectButtons button {
+  min-height: 36px;
+  border: 1px solid #d3ddd6;
+  border-radius: 7px;
+  color: #51635c;
+  background: white;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.segmentedControl button[aria-pressed="true"],
+.aspectButtons button[aria-pressed="true"] {
+  color: white;
+  border-color: #176f50;
+  background: #176f50;
+}
+
+.dimensionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.dimensionGrid > label:only-child {
+  grid-column: 1 / -1;
+}
+
+.field {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.field > span {
+  color: #60736b;
+  font-size: 8px;
+  letter-spacing: 0.07em;
+}
+
+.field select,
+.numberControl,
+.colorControl {
+  min-height: 45px;
+  width: 100%;
+  border: 1px solid #d3ddd6;
+  border-radius: 7px;
+  color: #173d30;
+  background: white;
+}
+
+.field select {
+  padding: 0 11px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.formatWarning {
+  color: #9b3b30;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.numberControl,
+.colorControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+}
+
+.numberControl input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #173d30;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.numberControl b,
+.rangeField b {
+  color: #6f7c77;
+  font-size: 8px;
+}
+
+.colorControl input {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.colorControl code {
+  color: #4d6058;
+  font-size: 9px;
+}
+
+.rangeField > span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rangeField input {
+  width: 100%;
+  accent-color: #21825e;
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.presetRow button {
+  min-height: 31px;
+  padding: 0 9px;
+}
+
+.checkboxRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.checkboxRow label,
+.checkboxLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #56675f;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.checkboxRow input,
+.checkboxLabel input {
+  accent-color: #21825e;
+}
+
+.targetControl {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+}
+
+.batchHeader {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 23px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e6e1;
+}
+
+.batchHeader > div {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.batchHeader strong {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 15px;
+}
+
+.batchHeader span {
+  color: #75817c;
+  font-size: 9px;
+}
+
+.batchHeader button {
+  min-height: 33px;
+  padding: 0 10px;
+}
+
+.resultList {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.resultItem {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 10px;
+  border: 1px solid #dfe6e0;
+  border-radius: 9px;
+  background: #fbfcfa;
+}
+
+.resultItem > img {
+  width: 68px;
+  height: 58px;
+  display: block;
+  object-fit: contain;
+  border: 1px solid #e0e6e2;
+  border-radius: 6px;
+  background: #eef2ee;
+}
+
+.resultMeta {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.resultMeta strong {
+  overflow: hidden;
+  color: #263e35;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resultMeta span {
+  color: #73807b;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.resultMeta .resultSuccess {
+  color: #1b7655;
+  font-weight: 750;
+}
+
+.resultMeta .resultError {
+  color: #9b3b30;
+}
+
+.resultMeta .resultWarning {
+  color: #8b6015;
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.itemActions a {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 6px;
+  color: white;
+  background: #176f50;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.itemActions button {
+  width: 34px;
+  padding: 0;
+  color: #8e493f;
+}
+
+.statusPill {
+  padding: 5px 7px;
+  border-radius: 999px;
+  color: #52665e;
+  background: #e9efea;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.statusArea {
+  min-height: 50px;
+  padding-top: 13px;
+}
+
+.statusArea p {
+  margin: 0;
+  color: #53665f;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.progressTrack {
+  height: 7px;
+  margin-top: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbe7e0;
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #23815e;
+  transition: width 180ms ease;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 7px;
+}
+
+.primaryButton {
+  flex: 1;
+  border: 1px solid #0c392d;
+  color: #fff;
+  background: #0c392d;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: #15523f;
+}
+
+.secondaryButton {
+  border: 1px solid #cbd8d1;
+  color: #25483d;
+  background: #fffefa;
+}
+
+.privacyNote {
+  margin: 17px 0 0;
+  color: #6a7772;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+/* Crop editor */
+.cropWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(290px, 0.75fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.cropPreviewPanel,
+.cropControlsPanel {
+  min-width: 0;
+  min-inline-size: 0;
+  border: 1px solid #dce4de;
+  border-radius: 12px;
+  background: #f7faf7;
+}
+
+.cropPreviewPanel {
+  padding: 16px;
+}
+
+.cropViewport {
+  min-height: 470px;
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 9px;
+  background:
+    linear-gradient(45deg, #dfe6e1 25%, transparent 25%),
+    linear-gradient(-45deg, #dfe6e1 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #dfe6e1 75%),
+    linear-gradient(-45deg, transparent 75%, #dfe6e1 75%),
+    #f8faf8;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  background-size: 20px 20px;
+}
+
+.cropSurface {
+  position: relative;
+  max-width: 100%;
+  max-height: 470px;
+  transform-origin: center;
+}
+
+.cropSurface canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 470px;
+}
+
+.cropMask {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 24, 18, 0.48);
+  pointer-events: none;
+}
+
+.cropSelection {
+  position: absolute;
+  border: 2px solid #72edbd;
+  background: transparent;
+  box-shadow: 0 0 0 9999px rgba(5, 24, 18, 0.46);
+  cursor: move;
+  touch-action: none;
+}
+
+.cropSelection::before,
+.cropSelection::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.cropSelection::before {
+  top: 33.333%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  box-shadow: 0 calc(100% + (var(--crop-selection-height, 0px) / 3)) rgba(255, 255, 255, 0.5);
+}
+
+.cropSelection::after {
+  top: 0;
+  left: 33.333%;
+  width: 1px;
+  height: 100%;
+}
+
+.cropHandle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #0c4937;
+  border-radius: 50%;
+  background: #72edbd;
+}
+
+.cropHandle[data-handle="nw"] { top: -8px; left: -8px; cursor: nwse-resize; }
+.cropHandle[data-handle="ne"] { top: -8px; right: -8px; cursor: nesw-resize; }
+.cropHandle[data-handle="sw"] { bottom: -8px; left: -8px; cursor: nesw-resize; }
+.cropHandle[data-handle="se"] { right: -8px; bottom: -8px; cursor: nwse-resize; }
+
+.cropToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.cropToolbar button {
+  padding: 0 10px;
+}
+
+.cropControlsPanel {
+  display: grid;
+  align-content: start;
+  gap: 17px;
+  padding: 18px;
+}
+
+.cropControlGroup {
+  display: grid;
+  gap: 9px;
+}
+
+.aspectButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.cropNumberGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cropOutputPreview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.cropOutputPreview figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.cropOutputPreview figcaption {
+  margin-bottom: 7px;
+  color: #3d5e52;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cropOutputPreview img {
+  width: 100%;
+  min-height: 180px;
+  max-height: 330px;
+  display: block;
+  object-fit: contain;
+  border: 1px solid #dce4de;
+  border-radius: 9px;
+  background: #eef2ee;
+}
+
+@media (max-width: 850px) {
+  .settingsPanel,
+  .cropWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .outputSettings:only-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .toolCard {
+    min-height: 500px;
+    margin-top: 30px;
+    border-radius: 14px;
+  }
+
+  .toolHeading,
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .privacyBadge {
+    align-self: flex-start;
+  }
+
+  .segmentedControl,
+  .outputSettings:only-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resultItem {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .resultItem > img {
+    width: 58px;
+    height: 54px;
+  }
+
+  .itemActions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .cropViewport {
+    min-height: 350px;
+  }
+
+  .cropOutputPreview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .dimensionGrid,
+  .cropNumberGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .batchHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aspectButtons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropZone,
+  .progressTrack span {
+    transition-duration: 0.01ms;
+  }
+}

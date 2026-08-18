@@ -76,7 +76,7 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "This methodology explains how AyeCalc turns a formula, conversion factor, or transformation rule into an interactive tool and a useful reference page.",
     category: "Trust and accuracy",
-    reviewed: "August 17, 2026",
+    reviewed: "August 18, 2026",
     sections: [
       {
         id: "sources",
@@ -109,6 +109,20 @@ export const infoPages: InfoPageDefinition[] = [
         ],
       },
       {
+        id: "image-processing",
+        title: "Browser image-processing methodology",
+        paragraphs: [
+          "The image resizer, compressor, cropper, and format converter decode supported files with browser image APIs, draw the requested pixels to a canvas, and encode a new JPEG, PNG, or WebP result. Batch work runs sequentially so several full-resolution images are not decoded at once, and completed items remain available when another file fails.",
+          "Generated files are new encodings and intentionally omit EXIF and other embedded metadata. This protects against carrying location and camera details into the result, but it also removes orientation, resolution, authorship, and similar metadata. Canvas decoding and encoding can also normalize or change embedded color-profile information, so color-critical output should be reviewed in its destination workflow.",
+        ],
+        bullets: [
+          "Validate file type, file size, decoded dimensions, animation, and batch limits before processing.",
+          "Treat compression target sizes as best-effort because browser encoders can produce different results.",
+          "Keep JPEG transparency handling explicit by filling transparent pixels with the selected background color.",
+          "Load ZIP creation code only when a visitor chooses to download a completed batch as a ZIP file.",
+        ],
+      },
+      {
         id: "corrections",
         title: "Limitations and corrections",
         paragraphs: [
@@ -130,7 +144,7 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "AyeCalc is designed so ordinary calculator and converter inputs can be processed in the browser without being submitted to an AyeCalc calculation API.",
     category: "Privacy",
-    reviewed: "August 17, 2026",
+    reviewed: "August 18, 2026",
     sections: [
       {
         id: "inputs",
@@ -138,6 +152,8 @@ export const infoPages: InfoPageDefinition[] = [
         paragraphs: [
           "The current calculators and developer tools perform their arithmetic in browser memory. Values entered into those tool fields are not intentionally transmitted to AyeCalc for calculation or stored in a user profile.",
           "The background remover passes the selected image to a worker inside the browser. The selected image is not intentionally uploaded to AyeCalc, Hugging Face, or jsDelivr for processing, and the generated PNG remains a local browser object unless the visitor chooses to download it.",
+          "The image resizer, compressor, cropper, and format converter decode and generate selected images in browser memory. Selected files, previews, completed images, and ZIP archives are not intentionally transmitted to AyeCalc for processing and remain temporary browser objects unless the visitor chooses to download them.",
+          "Every generated image is a new browser encoding that intentionally removes EXIF and other embedded metadata, including metadata that may contain location or camera details. Removed metadata cannot be restored from the generated file, and browser canvas processing may normalize or change embedded color profiles.",
           "Do not enter confidential, personal, regulated, or security-sensitive information into a public web tool unless the page explicitly supports that use and explains the handling involved.",
         ],
       },
@@ -176,7 +192,7 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "The current AyeCalc application does not intentionally set non-essential cookies for calculator inputs, advertising, or behavioral analytics.",
     category: "Privacy",
-    reviewed: "August 17, 2026",
+    reviewed: "August 18, 2026",
     sections: [
       {
         id: "current-use",
@@ -184,6 +200,7 @@ export const infoPages: InfoPageDefinition[] = [
         paragraphs: [
           "Calculator values are held in temporary component state while the page is open. The current tool implementation does not require a user account or a persistent calculation-history cookie.",
           "After the background remover is started, the browser may store downloaded model and runtime files in its cache so they do not need to be downloaded for every image. This functional cache contains software assets rather than the selected image or generated PNG and can be cleared through browser site-data controls.",
+          "The image tools use temporary in-memory state and browser object URLs for selected files, previews, generated images, and on-demand ZIP archives. These objects are released when files are removed, results are cleared, or the page is closed; the tools do not use a cookie to retain image history.",
           "The production hosting platform or security layer may use strictly necessary technical mechanisms for delivery, abuse prevention, load management, or security. Those mechanisms should be documented here when the final production configuration is confirmed.",
         ],
       },

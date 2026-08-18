@@ -7,7 +7,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Online Calculators & Tools for Everyday Decisions",
   description:
-    "Use AyeCalc's free loan calculator, unit converters, CSS developer tools, and practical guides with clear browser-based results.",
+    "Use AyeCalc's free loan calculator, unit converters, private browser image tools, CSS developer tools, and practical guides.",
   path: "/",
   keywords: [
     "online calculator",
@@ -16,6 +16,11 @@ export const metadata = createPageMetadata({
     "unit converter",
     "financial calculator",
     "developer tools",
+    "image tools",
+    "image resizer",
+    "image compressor",
+    "image cropper",
+    "image converter",
     "loan payment calculator",
     "monthly loan calculator",
     "loan repayment calculator",
@@ -281,9 +286,9 @@ export default function Home() {
                 <h2 id="developer-tools-title">Useful tools for real workflows</h2>
               </div>
               <p>
-                Remove image backgrounds, generate fluid values, compare units,
-                translate spacing, and check visual decisions with clear privacy
-                and method notes.
+                Resize, compress, crop, convert, and remove image backgrounds;
+                then generate fluid values, compare units, and check visual
+                decisions with clear privacy and method notes.
               </p>
             </div>
 

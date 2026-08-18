@@ -23,9 +23,17 @@ export default function DeveloperToolPage({
 }: DeveloperToolPageProps) {
   const canonicalUrl = `${siteConfig.url}/${tool.slug}`;
   const isImageTool = tool.category === "Image tools";
-  const relatedTools = developerTools
-    .filter((candidate) => candidate.slug !== tool.slug)
-    .slice(0, 4);
+  const isBackgroundRemover = tool.slug === "background-remover";
+  const relatedTools = [
+    ...developerTools.filter(
+      (candidate) =>
+        candidate.slug !== tool.slug && candidate.category === tool.category,
+    ),
+    ...developerTools.filter(
+      (candidate) =>
+        candidate.slug !== tool.slug && candidate.category !== tool.category,
+    ),
+  ].slice(0, 4);
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -50,9 +58,11 @@ export default function DeveloperToolPage({
           ? "MultimediaApplication"
           : "DeveloperApplication",
         operatingSystem: "Any",
-        browserRequirements: isImageTool
+        browserRequirements: isBackgroundRemover
           ? "Modern browser with JavaScript; network access required for first-use model files"
-          : "JavaScript enabled for live calculations",
+          : isImageTool
+            ? "Modern browser with JavaScript and Canvas image encoding"
+            : "JavaScript enabled for live calculations",
         offers: {
           "@type": "Offer",
           price: "0",
@@ -181,12 +191,18 @@ export default function DeveloperToolPage({
                   {isImageTool ? "Output" : "Implementation"}
                 </span>
                 <h2>
-                  {isImageTool ? "Using the transparent PNG" : "Copyable code examples"}
+                  {isBackgroundRemover
+                    ? "Using the transparent PNG"
+                    : isImageTool
+                      ? "Using the processed image"
+                      : "Copyable code examples"}
                 </h2>
                 <p>
-                  {isImageTool
+                  {isBackgroundRemover
                     ? "Preserve the PNG alpha channel and provide accurate dimensions and alternative text when adding the result to a page."
-                    : "Use these examples as a starting point, then match the values and assumptions to the rendered project."}
+                    : isImageTool
+                      ? "Keep the exported dimensions, format, transparency, and compression level appropriate for where the image will be used."
+                      : "Use these examples as a starting point, then match the values and assumptions to the rendered project."}
                 </p>
                 <div className={styles.snippetGrid}>
                   {tool.codeSnippets.map((snippet) => (
@@ -228,7 +244,7 @@ export default function DeveloperToolPage({
               <span aria-hidden="true">✓</span>
               <div>
                 <strong>Reviewed</strong>
-                <small>August 17, 2026</small>
+                <small>August 18, 2026</small>
               </div>
             </div>
           </aside>

@@ -7,6 +7,15 @@ import { siteConfig } from "@/lib/metadata";
 
 const lastModified = new Date("2026-08-18T00:00:00.000Z");
 
+const highPriorityDeveloperTools = new Set([
+  "css-clamp-generator",
+  "background-remover",
+  "image-resizer",
+  "image-compressor",
+  "image-cropper",
+  "image-format-converter",
+]);
+
 const staticPages: Array<{
   path: string;
   changeFrequency: "weekly" | "monthly" | "yearly";
@@ -37,10 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteConfig.url}/${tool.slug}`,
       lastModified,
       changeFrequency: "monthly" as const,
-      priority:
-        tool.slug === "css-clamp-generator" || tool.slug === "background-remover"
-          ? 0.9
-          : 0.8,
+      priority: highPriorityDeveloperTools.has(tool.slug) ? 0.9 : 0.8,
     })),
     ...guides.map((guide) => ({
       url: `${siteConfig.url}/guides/${guide.slug}`,

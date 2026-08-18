@@ -634,6 +634,306 @@ export const developerTools: DeveloperToolDefinition[] = [
     },
   },
   {
+    slug: "image-resizer",
+    title: "Free Image Resizer Online",
+    shortTitle: "Image Resizer",
+    searchTerms: [
+      "resize image online",
+      "photo resizer",
+      "picture resizer",
+      "image dimension changer",
+      "resize image pixels",
+      "batch image resizer",
+      "image size changer",
+      "resize JPEG PNG WebP",
+      "private image resizer",
+      "image resize tool",
+      "change image dimensions",
+      "resize photo online",
+      "pixel image resizer",
+      "image width height changer",
+    ],
+    category: "Image tools",
+    description:
+      "Resize JPEG, PNG, and WebP images by width, height, percentage, or exact dimensions with private batch processing in your browser.",
+    introduction:
+      "Resize up to ten images without uploading them. Preserve each image's aspect ratio, prevent accidental upscaling, apply common width presets, choose an output format, and download individual files or one ZIP archive.",
+    formula: "output height = source height × output width ÷ source width",
+    formulaNote:
+      "Aspect-locked resizing applies one scale factor to both dimensions; exact mode can change width and height independently.",
+    method:
+      "The browser decodes each selected image, calculates the requested output dimensions, draws the pixels onto a new canvas with high-quality smoothing, and encodes a metadata-free JPEG, PNG, or WebP file.",
+    exampleTitle: "Resize a 2400 × 1600 image to 1200 pixels wide",
+    exampleText:
+      "With the aspect ratio preserved, the scale factor is 0.5 and the output becomes 1200 × 800 pixels. Prevent-upscale mode leaves images smaller than the requested width at their original dimensions.",
+    guidance:
+      "Resize to the largest dimensions the final layout actually needs. Keep the aspect ratio locked for photographs and interface assets unless intentional distortion is required, and inspect text or fine detail after a large reduction.",
+    limitation:
+      "Upscaling cannot restore missing detail. Browser encoders can produce slightly different file sizes, color output, and compression artifacts, and generated files do not retain EXIF, camera, location, or resolution metadata.",
+    benefits: ["Batch resize up to 10", "Aspect-safe dimensions", "Local processing"],
+    codeSnippets: [
+      {
+        label: "Canvas resize",
+        code: "canvas.width = outputWidth;\ncanvas.height = outputHeight;\ncontext.drawImage(bitmap, 0, 0, outputWidth, outputHeight);",
+      },
+      {
+        label: "Aspect calculation",
+        code: "const outputHeight = Math.round(\n  sourceHeight * outputWidth / sourceWidth\n);",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does AyeCalc upload images while resizing them?",
+        answer:
+          "No. Image decoding, resizing, and encoding happen inside the browser. The generated files remain local unless you choose to download or share them.",
+      },
+      {
+        question: "Can I resize several images at once?",
+        answer:
+          "Yes. Add up to ten JPEG, PNG, or WebP images and apply the same resize rules to the batch. Each successful result remains available even if another file fails.",
+      },
+      {
+        question: "What does prevent upscaling do?",
+        answer:
+          "It stops an image from being enlarged beyond its decoded dimensions, which avoids creating a larger file with no new source detail.",
+      },
+      {
+        question: "Will transparency be preserved?",
+        answer:
+          "PNG and WebP output can preserve transparent pixels. JPEG has no alpha channel, so transparent areas use the selected background color.",
+      },
+    ],
+    source: {
+      label: "MDN CanvasRenderingContext2D drawImage()",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage",
+    },
+  },
+  {
+    slug: "image-compressor",
+    title: "Free Image Compressor Online",
+    shortTitle: "Image Compressor",
+    searchTerms: [
+      "compress image online",
+      "photo compressor",
+      "reduce image file size",
+      "image size reducer",
+      "compress JPEG PNG WebP",
+      "batch image compressor",
+      "image quality compressor",
+      "compress image to KB",
+      "private image compressor",
+      "compress photo online",
+      "photo size reducer",
+      "image optimizer",
+      "shrink image size",
+      "reduce photo size in KB",
+    ],
+    category: "Image tools",
+    description:
+      "Compress JPEG, PNG, and WebP images locally with adjustable quality, optional target-KB output, batch results, and ZIP download.",
+    introduction:
+      "Reduce image file sizes without sending them to a server. Choose a quality level or a best-effort target size for JPEG and WebP, compare source and result sizes, and keep successful files from a partial batch.",
+    formula: "output bytes = browser encoder(image, format, quality)",
+    formulaNote:
+      "Target-size mode tests at most seven quality levels and accepts a result within five percent when possible.",
+    method:
+      "The browser decodes each image, redraws it at its original dimensions, and encodes a new file at the selected quality. Target-size mode searches progressively lower quality values for the closest usable JPEG or WebP result.",
+    exampleTitle: "Compress a 1.8 MB JPEG toward a 300 KB target",
+    exampleText:
+      "The tool first encodes at the selected maximum quality. If that result is too large, it tests lower quality levels, keeps the closest result below the target when available, and warns when the requested size cannot be reached.",
+    guidance:
+      "Compare detail around text, hair, gradients, and high-contrast edges rather than relying only on byte size. WebP is often useful for web delivery, while JPEG remains broadly compatible for opaque photographs.",
+    limitation:
+      "A requested byte size is not guaranteed because image complexity and browser encoders differ. PNG quality is lossless and does not use the quality slider, and re-encoding can occasionally create a file larger than its source.",
+    benefits: ["Quality and target size", "Before/after comparison", "Private batch compression"],
+    codeSnippets: [
+      {
+        label: "JPEG quality",
+        code: 'canvas.toBlob(handleBlob, "image/jpeg", 0.8);',
+      },
+      {
+        label: "WebP quality",
+        code: 'canvas.toBlob(handleBlob, "image/webp", 0.8);',
+      },
+    ],
+    faqs: [
+      {
+        question: "Can I compress an image to an exact KB size?",
+        answer:
+          "The target is best-effort. The tool tries up to seven JPEG or WebP quality levels and reports when the image cannot reach the requested size without going below the minimum quality.",
+      },
+      {
+        question: "Why does PNG not have the same quality control?",
+        answer:
+          "Browser canvas PNG output is lossless, so its encoder does not use the lossy quality value available for JPEG and WebP.",
+      },
+      {
+        question: "Are compressed images uploaded?",
+        answer:
+          "No. The images are decoded and re-encoded in browser memory. Batch ZIP creation also happens locally after you request it.",
+      },
+      {
+        question: "Does compression remove image metadata?",
+        answer:
+          "Yes. Generated files omit EXIF and other embedded metadata, including camera or location information that may have been present in the source.",
+      },
+    ],
+    source: {
+      label: "MDN HTMLCanvasElement toBlob()",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob",
+    },
+  },
+  {
+    slug: "image-cropper",
+    title: "Free Image Cropper Online",
+    shortTitle: "Image Cropper",
+    searchTerms: [
+      "crop image online",
+      "photo cropper",
+      "picture cropper",
+      "image crop tool",
+      "crop image to ratio",
+      "square image cropper",
+      "16:9 image cropper",
+      "rotate and crop image",
+      "private image cropper",
+      "crop photo online",
+      "picture crop tool",
+      "image cropping tool",
+      "photo trimmer",
+      "resize and crop image",
+    ],
+    category: "Image tools",
+    description:
+      "Crop, zoom, rotate, and flip JPEG, PNG, or WebP images with freeform and preset aspect ratios using private browser processing.",
+    introduction:
+      "Create a precise crop without uploading the image. Drag or resize the selection, enter pixel coordinates, use common square, landscape, and portrait ratios, zoom the editor, rotate or flip the source, and export to JPEG, PNG, or WebP.",
+    formula: "output = transformed source pixels inside the crop rectangle",
+    formulaNote:
+      "The crop rectangle uses pixel coordinates in the rotated image, then the selected region is encoded in the chosen format.",
+    method:
+      "The browser applies quarter-turn rotation and optional flips, maps the crop rectangle to transformed image pixels, draws that source region onto a new canvas, and exports a metadata-free image.",
+    exampleTitle: "Crop a landscape photo to a centered 1:1 square",
+    exampleText:
+      "Selecting 1:1 creates the largest centered square that fits the transformed image. Drag the selection to reposition it, resize from a corner, or enter exact X, Y, width, and height values before export.",
+    guidance:
+      "Choose an aspect ratio that matches the final placement and leave enough space around important subjects. Use numeric controls or arrow-key movement for precise placement, then verify the output dimensions before downloading.",
+    limitation:
+      "Cropping permanently removes pixels outside the selection. Editor zoom changes only the working view, extreme rotations or repeated lossy exports can affect quality, and embedded metadata is not preserved.",
+    benefits: ["Free and preset crops", "Touch and keyboard controls", "Rotate and flip"],
+    codeSnippets: [
+      {
+        label: "Canvas crop",
+        code: "context.drawImage(\n  source, cropX, cropY, cropWidth, cropHeight,\n  0, 0, cropWidth, cropHeight\n);",
+      },
+      {
+        label: "Centered square",
+        code: "const size = Math.min(width, height);\nconst x = (width - size) / 2;\nconst y = (height - size) / 2;",
+      },
+    ],
+    faqs: [
+      {
+        question: "Which crop ratios are available?",
+        answer:
+          "Use a freeform selection or choose 1:1, 4:3, 3:2, 16:9, or 9:16. Pixel coordinate fields remain available for precise adjustments.",
+      },
+      {
+        question: "Can I crop with a keyboard or touch screen?",
+        answer:
+          "Yes. The selection supports pointer and touch dragging. Focus it and use arrow keys to move one pixel, or hold Shift to move ten pixels.",
+      },
+      {
+        question: "Does editor zoom change the exported crop?",
+        answer:
+          "No. Zoom magnifies the editing surface for easier selection. The crop coordinates and exported pixels remain based on the decoded image dimensions.",
+      },
+      {
+        question: "Is the image uploaded while I crop it?",
+        answer:
+          "No. Preview, transformation, cropping, and output encoding happen in the browser.",
+      },
+    ],
+    source: {
+      label: "MDN CanvasRenderingContext2D drawImage()",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage",
+    },
+  },
+  {
+    slug: "image-format-converter",
+    title: "Free Image Format Converter Online",
+    shortTitle: "Image Format Converter",
+    searchTerms: [
+      "image converter online",
+      "convert image format",
+      "JPEG to PNG converter",
+      "PNG to JPEG converter",
+      "image to WebP converter",
+      "WebP to PNG converter",
+      "batch image converter",
+      "photo format converter",
+      "private image converter",
+      "image file converter",
+      "picture converter",
+      "photo converter",
+      "JPG PNG WebP converter",
+      "change image file type",
+    ],
+    category: "Image tools",
+    description:
+      "Convert up to ten JPEG, PNG, or WebP images to another supported format locally, with quality, transparency, and ZIP controls.",
+    introduction:
+      "Convert image formats without uploading files. Choose JPEG, PNG, or WebP output for an entire batch, adjust lossy quality, set the JPEG background used for transparent pixels, and download results separately or together.",
+    formula: "output file = encode(decoded pixels, selected format, quality)",
+    formulaNote:
+      "PNG and WebP can preserve transparency; JPEG replaces transparent pixels with the selected background color.",
+    method:
+      "The browser decodes the source pixels, draws them onto a clean canvas, fills a background when JPEG output requires it, and encodes the canvas in the selected supported format.",
+    exampleTitle: "Convert transparent PNG assets to WebP",
+    exampleText:
+      "Choose WebP output, set the desired quality, and process the batch. Transparent pixels remain transparent, while the new files use the .webp extension and omit embedded source metadata.",
+    guidance:
+      "Use PNG when lossless pixels or broad transparency support matters, JPEG for opaque photographs, and WebP when modern web compression and optional transparency fit the delivery requirements.",
+    limitation:
+      "The first release does not accept GIF, SVG, HEIC, or AVIF and does not preserve animation. Browser format support can differ, and conversion does not improve detail already lost in a compressed source.",
+    benefits: ["JPEG, PNG, and WebP", "Batch ZIP download", "Transparency controls"],
+    codeSnippets: [
+      {
+        label: "Convert to WebP",
+        code: 'canvas.toBlob(handleBlob, "image/webp", 0.85);',
+      },
+      {
+        label: "JPEG background",
+        code: 'context.fillStyle = "#ffffff";\ncontext.fillRect(0, 0, width, height);\ncontext.drawImage(bitmap, 0, 0);',
+      },
+    ],
+    faqs: [
+      {
+        question: "Which image conversions are supported?",
+        answer:
+          "Convert JPEG, PNG, or WebP inputs to JPEG, PNG, or WebP output when the selected browser supports that encoder.",
+      },
+      {
+        question: "What happens to transparency when converting to JPEG?",
+        answer:
+          "JPEG cannot store transparent pixels. The converter fills those areas with the selected background color, which defaults to white.",
+      },
+      {
+        question: "Can several images be converted together?",
+        answer:
+          "Yes. Apply one output format and quality setting to up to ten images, then download individual results or a locally created ZIP archive.",
+      },
+      {
+        question: "Does conversion preserve EXIF metadata?",
+        answer:
+          "No. The new image contains the decoded pixels but omits EXIF, camera, location, and other embedded metadata from the source file.",
+      },
+    ],
+    source: {
+      label: "MDN HTMLCanvasElement toBlob()",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob",
+    },
+  },
+  {
     slug: "background-remover",
     title: "Free Background Remover Online",
     shortTitle: "Background Remover",

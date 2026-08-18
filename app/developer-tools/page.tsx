@@ -8,12 +8,16 @@ import { createPageMetadata, siteConfig } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Developer, CSS & Image Tools",
   description:
-    "Use free browser-based tools for background removal, CSS clamp values, REM and EM conversion, Tailwind spacing, aspect ratios, colors, viewport units, and contrast.",
+    "Use free browser-based tools to resize, compress, crop, convert, and remove image backgrounds, plus CSS, Tailwind, color, and accessibility utilities.",
   path: "/developer-tools",
   keywords: [
     "developer tools",
     "CSS tools",
     "image tools",
+    "image resizer",
+    "image compressor",
+    "image cropper",
+    "image format converter",
     "background remover",
     "web design calculators",
   ],
@@ -95,8 +99,8 @@ export default function DeveloperToolsPage() {
               <h2>Tools for practical digital workflows</h2>
             </div>
             <p>
-              Generate production values, inspect context-dependent units, remove
-              image backgrounds, and verify output before using it in a project.
+              Resize, compress, crop, convert, and remove image backgrounds, then
+              generate production values and inspect context-dependent units.
             </p>
           </div>
           <div className={styles.cardGrid}>
