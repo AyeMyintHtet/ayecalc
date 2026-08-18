@@ -287,7 +287,7 @@ export default function BackgroundRemover() {
       <div className={styles.toolHeading}>
         <div>
           <span>Browser-based image segmentation</span>
-          <h2>Remove an image background</h2>
+          <h2 style={{color:"rgb(57, 113, 95)"}}>Remove an image background</h2>
         </div>
         <span className={styles.privacyBadge}>Image stays local</span>
       </div>

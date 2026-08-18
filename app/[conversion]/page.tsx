@@ -36,7 +36,7 @@ export async function generateMetadata({
   if (!converter) return {};
 
   return createPageMetadata({
-    title: converter.title,
+    title: `Free ${converter.title} Online`,
     description: converter.description,
     path: `/${converter.slug}`,
     keywords: [

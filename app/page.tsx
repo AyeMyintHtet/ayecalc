@@ -7,7 +7,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Online Calculators & Tools for Everyday Decisions",
   description:
-    "Use AyeCalc's free background remover, loan calculator, unit converters, CSS developer tools, and practical guides with browser-based results.",
+    "Use AyeCalc's free loan calculator, unit converters, CSS developer tools, and practical guides with clear browser-based results.",
   path: "/",
   keywords: [
     "online calculator",
@@ -16,7 +16,6 @@ export const metadata = createPageMetadata({
     "unit converter",
     "financial calculator",
     "developer tools",
-    "background remover",
   ],
 });
 

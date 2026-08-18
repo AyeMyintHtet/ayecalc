@@ -21,6 +21,16 @@ const jsonLd = {
       name: "AyeCalc Unit Converters",
       description:
         "Unit converters with visible formulas, adjustable assumptions, and reference tables.",
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: converterDefinitions.length,
+        itemListElement: converterDefinitions.map((converter, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: converter.title,
+          url: `${siteConfig.url}/${converter.slug}`,
+        })),
+      },
     },
     {
       "@type": "BreadcrumbList",

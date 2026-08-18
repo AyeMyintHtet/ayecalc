@@ -28,6 +28,16 @@ const jsonLd = {
       name: "AyeCalc Developer Tools",
       description:
         "Browser-based developer, CSS, accessibility, and image utilities with visible methods and practical guidance.",
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: developerTools.length,
+        itemListElement: developerTools.map((tool, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: tool.title,
+          url: `${siteConfig.url}/${tool.slug}`,
+        })),
+      },
     },
     {
       "@type": "BreadcrumbList",

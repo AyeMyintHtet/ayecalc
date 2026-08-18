@@ -448,11 +448,11 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "background-remover",
-    title: "Free Background Image Remover",
+    title: "Free Background Remover Online",
     shortTitle: "Background Remover",
     category: "Image tools",
     description:
-      "Remove an image background in your browser, preview the transparent result, and download a full-size PNG without uploading the selected image to AyeCalc.",
+      "Remove image backgrounds online for free, preview the transparent result, and download a full-size PNG with private browser-based processing.",
     introduction:
       "Choose a JPEG, PNG, or WebP image and create a transparent PNG with browser-based foreground segmentation. The image is processed in a dedicated browser worker, while the model and runtime files are downloaded on first use and cached by the browser when available.",
     formula: "transparent pixel = source pixel × foreground alpha mask",
@@ -512,8 +512,12 @@ export function getDeveloperTool(slug: string) {
 }
 
 export function createDeveloperToolMetadata(tool: DeveloperToolDefinition) {
+  const title = tool.title.startsWith("Free ")
+    ? tool.title
+    : `Free ${tool.title} Online`;
+
   return createPageMetadata({
-    title: tool.title,
+    title,
     description: tool.description,
     path: `/${tool.slug}`,
     keywords: [

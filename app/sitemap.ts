@@ -5,7 +5,7 @@ import { guides } from "@/lib/guides";
 import { infoPages } from "@/lib/info-pages";
 import { siteConfig } from "@/lib/metadata";
 
-const lastModified = new Date("2026-08-17T00:00:00.000Z");
+const lastModified = new Date("2026-08-18T00:00:00.000Z");
 
 const staticPages: Array<{
   path: string;
