@@ -8,7 +8,7 @@ import { createPageMetadata, siteConfig } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Developer, CSS & Image Tools",
   description:
-    "Use free browser-based tools to resize, compress, crop, convert, and remove image backgrounds, plus CSS, Tailwind, color, and accessibility utilities.",
+    "Use free browser-based tools to convert HEIC photos, resize, compress, crop, convert formats, and remove image backgrounds, plus CSS and accessibility utilities.",
   path: "/developer-tools",
   keywords: [
     "developer tools",
@@ -18,6 +18,7 @@ export const metadata = createPageMetadata({
     "image compressor",
     "image cropper",
     "image format converter",
+    "HEIC to JPG converter",
     "background remover",
     "web design calculators",
   ],

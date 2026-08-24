@@ -6,6 +6,8 @@ export type DeveloperToolDefinition = {
   shortTitle: string;
   seoTitle?: string;
   searchTerms?: string[];
+  reviewed?: string;
+  lastModified?: string;
   category: string;
   description: string;
   introduction: string;
@@ -634,6 +636,87 @@ export const developerTools: DeveloperToolDefinition[] = [
     },
   },
   {
+    slug: "heic-to-jpg",
+    title: "HEIC to JPG Converter",
+    shortTitle: "HEIC to JPG Converter",
+    seoTitle: "Free HEIC to JPG Converter",
+    reviewed: "August 24, 2026",
+    lastModified: "2026-08-24T00:00:00.000Z",
+    searchTerms: [
+      "HEIC to JPG converter",
+      "convert HEIC to JPG",
+      "HEIF to JPG converter",
+      "HEIC converter online",
+      "iPhone photo converter",
+      "batch HEIC converter",
+      "HEIC to PNG",
+      "HEIC to WebP",
+      "open HEIC photo",
+      "private HEIC converter",
+      "paste HEIC image",
+      "convert Apple photos to JPEG",
+    ],
+    category: "Image tools",
+    description:
+      "Convert HEIC and HEIF photos to JPG, PNG, or WebP with paste, drag-and-drop, batch resizing, quality controls, and private browser processing.",
+    introduction:
+      "Convert iPhone and other HEIC or HEIF photos without uploading them. Paste, drag, or choose up to ten files, then export JPG, PNG, or WebP with adjustable quality, resizing, filename controls, and a batch ZIP download.",
+    formula: "output dimensions = source dimensions × selected scale",
+    formulaNote:
+      "Original mode keeps the decoded dimensions; percentage, maximum-width, and long-edge modes preserve the aspect ratio.",
+    method:
+      "A dedicated browser worker decodes the primary HEIC or HEIF still image with libheif, calculates safe output dimensions, redraws the pixels on a canvas, and encodes a new JPG, PNG, or WebP file. The generated file does not copy the source metadata.",
+    exampleTitle: "Convert a 4032 × 3024 iPhone photo to JPG",
+    exampleText:
+      "Original-size mode keeps the 4032 × 3024 pixel dimensions and JPG quality controls the lossy encoder. Choosing a 1920-pixel long edge instead produces a 1920 × 1440 image while preserving the 4:3 aspect ratio.",
+    guidance:
+      "Use JPG for broadly compatible photographs, PNG when lossless output is more important than file size, and WebP for modern web delivery. Inspect gradients, fine detail, and color after conversion, especially when the source uses HDR or a wide color gamut.",
+    limitation:
+      "The converter exports the primary still image only. It does not preserve Live Photo video, secondary images, EXIF, location data, depth maps, HDR gain maps, or every color-profile behavior. A converted file can also be larger than its HEIC source.",
+    benefits: ["Paste, drop, or upload", "Batch convert up to 10", "Photos stay on device"],
+    codeSnippets: [
+      {
+        label: "HTML image",
+        code: '<img src="photo-converted.jpg" width="1920" height="1440" alt="Describe the visible photo">',
+      },
+      {
+        label: "Responsive image",
+        code: '<picture>\n  <source srcset="photo-converted.webp" type="image/webp">\n  <img src="photo-converted.jpg" width="1920" height="1440" alt="Describe the visible photo">\n</picture>',
+      },
+    ],
+    faqs: [
+      {
+        question: "Are HEIC photos uploaded during conversion?",
+        answer:
+          "No. File reading, HEIC decoding, resizing, output encoding, and ZIP creation run in your browser. The selected photos are not sent to AyeCalc for conversion.",
+      },
+      {
+        question: "Can I convert several HEIC photos at once?",
+        answer:
+          "Yes. Paste, drop, or choose up to ten HEIC or HEIF files, apply one set of output settings, and download each successful result or one ZIP archive.",
+      },
+      {
+        question: "Should I choose JPG, PNG, or WebP?",
+        answer:
+          "JPG is a practical compatibility choice for opaque photos. PNG is lossless but often much larger. WebP can be useful for websites that target modern browsers.",
+      },
+      {
+        question: "Does conversion preserve Live Photos and metadata?",
+        answer:
+          "No. The tool converts the primary still image and does not copy the paired Live Photo video, EXIF, GPS location, camera metadata, depth information, or other auxiliary HEIC items.",
+      },
+      {
+        question: "Why can the converted image look or size differently?",
+        answer:
+          "HEIC and the selected output format use different encoders and color capabilities. Quality, resizing, HDR or wide-gamut content, browser behavior, and image complexity can change appearance and file size.",
+      },
+    ],
+    source: {
+      label: "libheif: HEIF and AVIF codec library",
+      href: "https://github.com/strukturag/libheif",
+    },
+  },
+  {
     slug: "image-resizer",
     title: "Free Image Resizer Online",
     shortTitle: "Image Resizer",
@@ -994,7 +1077,7 @@ export const developerTools: DeveloperToolDefinition[] = [
       {
         question: "Which image formats are supported?",
         answer:
-          "The uploader accepts JPEG, PNG, and WebP files up to 15 MB and 25 megapixels. The result is downloaded as a transparent PNG.",
+          "The uploader accepts JPEG, PNG, and WebP files up to 50 MB and 25 megapixels. Lower-memory devices can use a smaller pixel limit for stability. The result is downloaded as a transparent PNG.",
       },
       {
         question: "Will every edge be removed perfectly?",

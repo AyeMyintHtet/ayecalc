@@ -24,6 +24,7 @@ export default function DeveloperToolPage({
   const canonicalUrl = `${siteConfig.url}/${tool.slug}`;
   const isImageTool = tool.category === "Image tools";
   const isBackgroundRemover = tool.slug === "background-remover";
+  const isHeicConverter = tool.slug === "heic-to-jpg";
   const relatedTools = [
     ...developerTools.filter(
       (candidate) =>
@@ -60,6 +61,8 @@ export default function DeveloperToolPage({
         operatingSystem: "Any",
         browserRequirements: isBackgroundRemover
           ? "Modern browser with JavaScript; network access required for first-use model files"
+          : isHeicConverter
+            ? "Modern browser with JavaScript, Web Workers, WebAssembly, and OffscreenCanvas"
           : isImageTool
             ? "Modern browser with JavaScript and Canvas image encoding"
             : "JavaScript enabled for live calculations",
@@ -244,7 +247,7 @@ export default function DeveloperToolPage({
               <span aria-hidden="true">✓</span>
               <div>
                 <strong>Reviewed</strong>
-                <small>August 18, 2026</small>
+                <small>{tool.reviewed ?? "August 18, 2026"}</small>
               </div>
             </div>
           </aside>

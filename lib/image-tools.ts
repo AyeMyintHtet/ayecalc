@@ -1,7 +1,12 @@
-export const MAX_IMAGE_FILE_BYTES = 15 * 1024 * 1024;
-export const MAX_IMAGE_PIXELS = 25_000_000;
+export const MAX_IMAGE_FILE_BYTES = 100 * 1024 * 1024;
+export const MAX_IMAGE_PIXELS = 50_000_000;
+export const MAX_BACKGROUND_IMAGE_FILE_BYTES = 50 * 1024 * 1024;
+export const MAX_BACKGROUND_IMAGE_PIXELS = 25_000_000;
 export const MAX_BATCH_FILES = 10;
-export const MAX_BATCH_BYTES = 75 * 1024 * 1024;
+export const MAX_BATCH_BYTES = 200 * 1024 * 1024;
+
+const LOW_MEMORY_IMAGE_PIXELS = 25_000_000;
+const VERY_LOW_MEMORY_IMAGE_PIXELS = 12_000_000;
 
 export const SUPPORTED_IMAGE_MIME_TYPES = [
   "image/jpeg",
@@ -46,6 +51,7 @@ export type ImageProcessingRequest = {
   inputBytes: number;
   sourceWidth: number;
   sourceHeight: number;
+  maxPixels: number;
   output: ImageOutputOptions;
   resize?: { width: number; height: number };
   crop?: CropTransform;
@@ -128,7 +134,50 @@ export function resolveOutputMime(
 export function formatImageBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  const megabytes = bytes / 1024 / 1024;
+  return `${Number.isInteger(megabytes) ? megabytes.toFixed(0) : megabytes.toFixed(1)} MB`;
+}
+
+export function formatImageMegapixels(pixels: number) {
+  const megapixels = pixels / 1_000_000;
+  return `${Number.isInteger(megapixels) ? megapixels : megapixels.toFixed(1)} megapixels`;
+}
+
+export function getImagePixelLimitForDevice(
+  maximumPixels: number,
+  deviceMemory?: number,
+  useConservativeFallback = false,
+) {
+  if (!Number.isFinite(deviceMemory) || !deviceMemory) {
+    return useConservativeFallback
+      ? Math.min(maximumPixels, LOW_MEMORY_IMAGE_PIXELS)
+      : maximumPixels;
+  }
+  if (deviceMemory > 4) {
+    return maximumPixels;
+  }
+  if (deviceMemory <= 2) {
+    return Math.min(maximumPixels, VERY_LOW_MEMORY_IMAGE_PIXELS);
+  }
+  return Math.min(maximumPixels, LOW_MEMORY_IMAGE_PIXELS);
+}
+
+export function getRuntimeImagePixelLimit(maximumPixels = MAX_IMAGE_PIXELS) {
+  if (typeof navigator === "undefined") return maximumPixels;
+  const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  const compactTouchDevice =
+    navigator.maxTouchPoints > 0 &&
+    typeof matchMedia === "function" &&
+    matchMedia("(max-width: 1180px)").matches;
+  const limitedCpu =
+    Number.isFinite(navigator.hardwareConcurrency) &&
+    navigator.hardwareConcurrency > 0 &&
+    navigator.hardwareConcurrency <= 4;
+  return getImagePixelLimitForDevice(
+    maximumPixels,
+    deviceMemory,
+    compactTouchDevice || limitedCpu,
+  );
 }
 
 export function safeImageBaseName(fileName: string) {
@@ -183,12 +232,17 @@ export async function isAnimatedImage(file: File) {
   return includesAscii(sample, "acTL");
 }
 
-export function validateImageFileBasics(file: File) {
+export function validateImageFileBasics(
+  file: Pick<File, "size" | "type">,
+  maximumBytes = MAX_IMAGE_FILE_BYTES,
+) {
   if (!isSupportedImageMime(file.type)) {
     return "Use a JPEG, PNG, or WebP image.";
   }
   if (file.size === 0) return "The image is empty.";
-  if (file.size > MAX_IMAGE_FILE_BYTES) return "The image is larger than 15 MB.";
+  if (file.size > maximumBytes) {
+    return `The image is larger than ${formatImageBytes(maximumBytes)}.`;
+  }
   return "";
 }
 

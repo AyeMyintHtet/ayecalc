@@ -14,15 +14,27 @@ const highPriorityDeveloperTools = new Set([
   "image-compressor",
   "image-cropper",
   "image-format-converter",
+  "heic-to-jpg",
 ]);
 
 const staticPages: Array<{
   path: string;
   changeFrequency: "weekly" | "monthly" | "yearly";
   priority: number;
+  lastModified?: Date;
 }> = [
-  { path: "", changeFrequency: "weekly", priority: 1 },
-  { path: "/developer-tools", changeFrequency: "weekly", priority: 0.9 },
+  {
+    path: "",
+    changeFrequency: "weekly",
+    priority: 1,
+    lastModified: new Date("2026-08-24T00:00:00.000Z"),
+  },
+  {
+    path: "/developer-tools",
+    changeFrequency: "weekly",
+    priority: 0.9,
+    lastModified: new Date("2026-08-24T00:00:00.000Z"),
+  },
   { path: "/unit-converters", changeFrequency: "weekly", priority: 0.9 },
   { path: "/guides", changeFrequency: "monthly", priority: 0.8 },
   { path: "/contact", changeFrequency: "yearly", priority: 0.5 },
@@ -32,7 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticPages.map((page) => ({
       url: `${siteConfig.url}${page.path}`,
-      lastModified,
+      lastModified: page.lastModified ?? lastModified,
       changeFrequency: page.changeFrequency,
       priority: page.priority,
     })),
@@ -44,7 +56,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...developerTools.map((tool) => ({
       url: `${siteConfig.url}/${tool.slug}`,
-      lastModified,
+      lastModified: tool.lastModified
+        ? new Date(tool.lastModified)
+        : lastModified,
       changeFrequency: "monthly" as const,
       priority: highPriorityDeveloperTools.has(tool.slug) ? 0.9 : 0.8,
     })),

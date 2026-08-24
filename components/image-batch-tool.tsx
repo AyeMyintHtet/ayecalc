@@ -10,8 +10,11 @@ import {
 import {
   MAX_BATCH_BYTES,
   MAX_BATCH_FILES,
+  MAX_IMAGE_FILE_BYTES,
   MAX_IMAGE_PIXELS,
   formatImageBytes,
+  formatImageMegapixels,
+  getRuntimeImagePixelLimit,
   isAnimatedImage,
   isSupportedImageMime,
   resolveOutputMime,
@@ -66,6 +69,25 @@ function createJobId() {
   return `job-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+async function createBatchPreviewUrl(source: ImageBitmap, file: File) {
+  const scale = Math.min(640 / source.width, 640 / source.height, 1);
+  if (scale === 1) return URL.createObjectURL(file);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(source.width * scale));
+  canvas.height = Math.max(1, Math.round(source.height * scale));
+  const context = canvas.getContext("2d");
+  if (!context) return URL.createObjectURL(file);
+
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(source, 0, 0, canvas.width, canvas.height);
+  const previewBlob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, "image/webp", 0.85),
+  );
+  return URL.createObjectURL(previewBlob ?? file);
+}
+
 export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   const [items, setItems] = useState<ImageFileRecord[]>([]);
   const [rejections, setRejections] = useState<string[]>([]);
@@ -90,6 +112,7 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     "image/png",
   ]);
   const [isCreatingZip, setIsCreatingZip] = useState(false);
+  const [imagePixelLimit, setImagePixelLimit] = useState(MAX_IMAGE_PIXELS);
   const inputRef = useRef<HTMLInputElement>(null);
   const workerRef = useRef<Worker | null>(null);
   const isAddingRef = useRef(false);
@@ -97,6 +120,10 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   const itemsRef = useRef(items);
 
   itemsRef.current = items;
+
+  useEffect(() => {
+    setImagePixelLimit(getRuntimeImagePixelLimit());
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -164,7 +191,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         continue;
       }
       if (totalBytes + file.size > MAX_BATCH_BYTES) {
-        errors.push(`${file.name}: the batch would exceed 75 MB.`);
+        errors.push(
+          `${file.name}: the batch would exceed ${formatImageBytes(MAX_BATCH_BYTES)}.`,
+        );
         continue;
       }
 
@@ -174,29 +203,34 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
           continue;
         }
         const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-        const dimensions = { width: bitmap.width, height: bitmap.height };
-        bitmap.close();
-        if (
-          dimensions.width === 0 ||
-          dimensions.height === 0 ||
-          dimensions.width * dimensions.height > MAX_IMAGE_PIXELS
-        ) {
-          errors.push(`${file.name}: use an image no larger than 25 megapixels.`);
-          continue;
-        }
-        if (!isSupportedImageMime(file.type)) continue;
+        try {
+          const dimensions = { width: bitmap.width, height: bitmap.height };
+          if (
+            dimensions.width === 0 ||
+            dimensions.height === 0 ||
+            dimensions.width * dimensions.height > imagePixelLimit
+          ) {
+            errors.push(
+              `${file.name}: use an image no larger than ${formatImageMegapixels(imagePixelLimit)}.`,
+            );
+            continue;
+          }
+          if (!isSupportedImageMime(file.type)) continue;
 
-        accepted.push({
-          id: createRecordId(),
-          file,
-          mimeType: file.type,
-          width: dimensions.width,
-          height: dimensions.height,
-          previewUrl: URL.createObjectURL(file),
-          status: "ready",
-        });
-        totalBytes += file.size;
-        remainingSlots -= 1;
+          accepted.push({
+            id: createRecordId(),
+            file,
+            mimeType: file.type,
+            width: dimensions.width,
+            height: dimensions.height,
+            previewUrl: await createBatchPreviewUrl(bitmap, file),
+            status: "ready",
+          });
+          totalBytes += file.size;
+          remainingSlots -= 1;
+        } finally {
+          bitmap.close();
+        }
       } catch {
         errors.push(`${file.name}: the browser could not decode this image.`);
       }
@@ -299,6 +333,7 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       inputBytes: item.file.size,
       sourceWidth: item.width,
       sourceHeight: item.height,
+      maxPixels: imagePixelLimit,
       output: {
         format: outputFormat,
         quality: quality / 100,
@@ -487,7 +522,11 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         />
         <span className={styles.uploadIcon} aria-hidden="true">↑</span>
         <strong>{items.length ? "Add more images" : "Drop images here"}</strong>
-        <p>JPEG, PNG, or WebP · up to 10 files, 15 MB each, and 25 megapixels</p>
+        <p>
+          JPEG, PNG, or WebP · up to {MAX_BATCH_FILES} files, {formatImageBytes(MAX_IMAGE_FILE_BYTES)} each,
+          and {formatImageMegapixels(imagePixelLimit)}
+          {imagePixelLimit < MAX_IMAGE_PIXELS ? " on this device" : ""}
+        </p>
         <button
           type="button"
           className={styles.chooseButton}

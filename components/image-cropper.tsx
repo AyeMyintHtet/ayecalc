@@ -10,10 +10,13 @@ import {
   type PointerEvent,
 } from "react";
 import {
+  MAX_IMAGE_FILE_BYTES,
   MAX_IMAGE_PIXELS,
   createCenteredCrop,
   formatImageBytes,
+  formatImageMegapixels,
   getRotatedDimensions,
+  getRuntimeImagePixelLimit,
   isAnimatedImage,
   isSupportedImageMime,
   validateImageFileBasics,
@@ -58,6 +61,32 @@ function createRecordId() {
   return `crop-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+async function createEditorPreview(source: ImageBitmap) {
+  const scale = Math.min(2048 / source.width, 2048 / source.height, 1);
+  if (scale === 1) return { bitmap: source, previewBlob: null };
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(source.width * scale));
+  canvas.height = Math.max(1, Math.round(source.height * scale));
+  const context = canvas.getContext("2d");
+  if (!context) return { bitmap: source, previewBlob: null };
+
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(source, 0, 0, canvas.width, canvas.height);
+
+  try {
+    const [bitmap, previewBlob] = await Promise.all([
+      createImageBitmap(canvas),
+      new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.9)),
+    ]);
+    source.close();
+    return { bitmap, previewBlob };
+  } catch {
+    return { bitmap: source, previewBlob: null };
+  }
+}
+
 export default function ImageCropper() {
   const [item, setItem] = useState<ImageFileRecord | null>(null);
   const [transform, setTransform] = useState(initialTransform);
@@ -73,6 +102,7 @@ export default function ImageCropper() {
   const [supportedOutputs, setSupportedOutputs] = useState<SupportedImageMime[]>([
     "image/png",
   ]);
+  const [imagePixelLimit, setImagePixelLimit] = useState(MAX_IMAGE_PIXELS);
   const inputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
@@ -88,6 +118,10 @@ export default function ImageCropper() {
   } | null>(null);
 
   itemRef.current = item;
+
+  useEffect(() => {
+    setImagePixelLimit(getRuntimeImagePixelLimit());
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -193,13 +227,17 @@ export default function ImageCropper() {
         bitmap.close();
         return;
       }
+      const sourceWidth = bitmap.width;
+      const sourceHeight = bitmap.height;
       if (
-        bitmap.width === 0 ||
-        bitmap.height === 0 ||
-        bitmap.width * bitmap.height > MAX_IMAGE_PIXELS
+        sourceWidth === 0 ||
+        sourceHeight === 0 ||
+        sourceWidth * sourceHeight > imagePixelLimit
       ) {
         bitmap.close();
-        setMessage("Use an image no larger than 25 megapixels.");
+        setMessage(
+          `Use an image no larger than ${formatImageMegapixels(imagePixelLimit)}.`,
+        );
         return;
       }
       if (!isSupportedImageMime(file.type)) {
@@ -207,22 +245,28 @@ export default function ImageCropper() {
         return;
       }
 
+      const editorPreview = await createEditorPreview(bitmap);
+      if (run !== runRef.current) {
+        editorPreview.bitmap.close();
+        return;
+      }
+
       bitmapRef.current?.close();
-      bitmapRef.current = bitmap;
+      bitmapRef.current = editorPreview.bitmap;
       if (item) {
         URL.revokeObjectURL(item.previewUrl);
         if (item.result) URL.revokeObjectURL(item.result.previewUrl);
       }
-      const crop = createCenteredCrop(bitmap.width, bitmap.height, null);
+      const crop = createCenteredCrop(sourceWidth, sourceHeight, null);
       setTransform({ ...initialTransform, ...crop });
       setRatioId("free");
       setItem({
         id: createRecordId(),
         file,
         mimeType: file.type,
-        width: bitmap.width,
-        height: bitmap.height,
-        previewUrl: URL.createObjectURL(file),
+        width: sourceWidth,
+        height: sourceHeight,
+        previewUrl: URL.createObjectURL(editorPreview.previewBlob ?? file),
         status: "ready",
       });
       setMessage("Image ready. Adjust the crop area and export when finished.");
@@ -380,6 +424,7 @@ export default function ImageCropper() {
       inputBytes: item.file.size,
       sourceWidth: item.width,
       sourceHeight: item.height,
+      maxPixels: imagePixelLimit,
       output: {
         format: outputFormat,
         quality: quality / 100,
@@ -470,7 +515,11 @@ export default function ImageCropper() {
           />
           <span className={styles.uploadIcon} aria-hidden="true">↑</span>
           <strong>Drop an image here</strong>
-          <p>JPEG, PNG, or WebP · up to 15 MB and 25 megapixels</p>
+          <p>
+            JPEG, PNG, or WebP · up to {formatImageBytes(MAX_IMAGE_FILE_BYTES)} and{" "}
+            {formatImageMegapixels(imagePixelLimit)}
+            {imagePixelLimit < MAX_IMAGE_PIXELS ? " on this device" : ""}
+          </p>
           <button type="button" className={styles.chooseButton} onClick={() => inputRef.current?.click()}>Choose image</button>
         </div>
       ) : (

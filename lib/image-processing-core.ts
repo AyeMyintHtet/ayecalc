@@ -1,6 +1,7 @@
 import {
   clampInteger,
   createImageOutputName,
+  formatImageMegapixels,
   getRotatedDimensions,
   MAX_IMAGE_PIXELS,
   resolveOutputMime,
@@ -32,6 +33,16 @@ export type ImageCoreResult = {
   warning?: string;
 };
 
+const MAX_CANVAS_DIMENSION = 32_767;
+
+function assertCanvasDimensions(width: number, height: number) {
+  if (width > MAX_CANVAS_DIMENSION || height > MAX_CANVAS_DIMENSION) {
+    throw new Error(
+      `The generated image would exceed the browser canvas limit of ${MAX_CANVAS_DIMENSION.toLocaleString()} pixels per side.`,
+    );
+  }
+}
+
 function prepareContext(
   surface: ImageCanvasSurface,
   mimeType: SupportedImageMime,
@@ -45,30 +56,6 @@ function prepareContext(
   }
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
-}
-
-function drawTransformedSource(
-  source: CanvasImageSource,
-  sourceWidth: number,
-  sourceHeight: number,
-  request: ImageProcessingRequest,
-  createSurface: ImageCanvasFactory,
-) {
-  const transform = request.crop!;
-  const dimensions = getRotatedDimensions(
-    sourceWidth,
-    sourceHeight,
-    transform.rotation,
-  );
-  const surface = createSurface(dimensions.width, dimensions.height);
-  const { context } = surface;
-  context.save();
-  context.translate(dimensions.width / 2, dimensions.height / 2);
-  context.scale(transform.flipX ? -1 : 1, transform.flipY ? -1 : 1);
-  context.rotate((transform.rotation * Math.PI) / 180);
-  context.drawImage(source, -sourceWidth / 2, -sourceHeight / 2);
-  context.restore();
-  return surface;
 }
 
 async function encodeSurface(
@@ -131,6 +118,10 @@ export async function processImageBitmap(
   createSurface: ImageCanvasFactory,
 ): Promise<ImageCoreResult> {
   const mimeType = resolveOutputMime(request.inputMimeType, request.output.format);
+  const maximumPixels = Math.min(
+    MAX_IMAGE_PIXELS,
+    Math.max(1, request.maxPixels || MAX_IMAGE_PIXELS),
+  );
   let outputWidth = request.sourceWidth;
   let outputHeight = request.sourceHeight;
   let surface: ImageCanvasSurface;
@@ -142,41 +133,42 @@ export async function processImageBitmap(
       request.sourceHeight,
       request.crop.rotation,
     );
-    const transformed = drawTransformedSource(
-      bitmap,
-      request.sourceWidth,
-      request.sourceHeight,
-      request,
-      createSurface,
-    );
     const cropX = clampInteger(request.crop.x, 0, Math.max(0, rotated.width - 1));
     const cropY = clampInteger(request.crop.y, 0, Math.max(0, rotated.height - 1));
     outputWidth = clampInteger(request.crop.width, 1, rotated.width - cropX);
     outputHeight = clampInteger(request.crop.height, 1, rotated.height - cropY);
-    if (outputWidth * outputHeight > MAX_IMAGE_PIXELS) {
-      throw new Error("The generated image would exceed the 25 megapixel limit.");
+    if (outputWidth * outputHeight > maximumPixels) {
+      throw new Error(
+        `The generated image would exceed the ${formatImageMegapixels(maximumPixels)} limit.`,
+      );
     }
+    assertCanvasDimensions(outputWidth, outputHeight);
     surface = createSurface(outputWidth, outputHeight);
     prepareContext(surface, mimeType, request.output.backgroundColor);
-    surface.context.drawImage(
-      transformed.canvas,
-      cropX,
-      cropY,
-      outputWidth,
-      outputHeight,
-      0,
-      0,
-      outputWidth,
-      outputHeight,
+    surface.context.save();
+    surface.context.translate(
+      rotated.width / 2 - cropX,
+      rotated.height / 2 - cropY,
     );
+    surface.context.scale(request.crop.flipX ? -1 : 1, request.crop.flipY ? -1 : 1);
+    surface.context.rotate((request.crop.rotation * Math.PI) / 180);
+    surface.context.drawImage(
+      bitmap,
+      -request.sourceWidth / 2,
+      -request.sourceHeight / 2,
+    );
+    surface.context.restore();
   } else {
     if (request.operation === "resize" && request.resize) {
       outputWidth = clampInteger(request.resize.width, 1, 32767);
       outputHeight = clampInteger(request.resize.height, 1, 32767);
     }
-    if (outputWidth * outputHeight > MAX_IMAGE_PIXELS) {
-      throw new Error("The generated image would exceed the 25 megapixel limit.");
+    if (outputWidth * outputHeight > maximumPixels) {
+      throw new Error(
+        `The generated image would exceed the ${formatImageMegapixels(maximumPixels)} limit.`,
+      );
     }
+    assertCanvasDimensions(outputWidth, outputHeight);
     surface = createSurface(outputWidth, outputHeight);
     prepareContext(surface, mimeType, request.output.backgroundColor);
     surface.context.drawImage(bitmap, 0, 0, outputWidth, outputHeight);

@@ -152,6 +152,13 @@
   opacity: 0.55;
 }
 
+.dropActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+}
+
 .errorList {
   margin-top: 15px;
   padding: 14px 16px;
@@ -250,13 +257,20 @@
 
 .field select,
 .numberControl,
-.colorControl {
+.colorControl,
+.textControl {
   min-height: 45px;
   width: 100%;
   border: 1px solid #d3ddd6;
   border-radius: 7px;
   color: #173d30;
   background: white;
+}
+
+.textControl {
+  padding: 0 11px;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .field select {
@@ -417,6 +431,20 @@
   border: 1px solid #e0e6e2;
   border-radius: 6px;
   background: #eef2ee;
+}
+
+.heicPlaceholder {
+  width: 68px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d7e1db;
+  border-radius: 6px;
+  color: #176f50;
+  background: linear-gradient(145deg, #e8f8f0, #f9fbf9);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
 }
 
 .resultMeta {
@@ -749,7 +777,8 @@
     grid-template-columns: 58px minmax(0, 1fr);
   }
 
-  .resultItem > img {
+  .resultItem > img,
+  .heicPlaceholder {
     width: 58px;
     height: 54px;
   }

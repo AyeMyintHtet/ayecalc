@@ -7,11 +7,15 @@ import {
   type ChangeEvent,
   type DragEvent,
 } from "react";
+import {
+  MAX_BACKGROUND_IMAGE_FILE_BYTES,
+  MAX_BACKGROUND_IMAGE_PIXELS,
+  formatImageBytes,
+  formatImageMegapixels,
+  getRuntimeImagePixelLimit,
+  validateImageFileBasics,
+} from "@/lib/image-tools";
 import styles from "@/components/background-remover.module.css";
-
-const MAX_FILE_BYTES = 15 * 1024 * 1024;
-const MAX_PIXELS = 25_000_000;
-const SUPPORTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 type Dimensions = { width: number; height: number };
 type ToolStatus =
@@ -33,10 +37,6 @@ type WorkerMessage =
       height: number;
     }
   | { type: "error"; message: string };
-
-function bytesToMegabytes(bytes: number) {
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
 
 function createDownloadName(fileName: string) {
   const baseName = fileName.replace(/\.[^.]+$/, "").trim() || "image";
@@ -80,6 +80,9 @@ export default function BackgroundRemover() {
     "Choose a JPEG, PNG, or WebP image to begin.",
   );
   const [isDragging, setIsDragging] = useState(false);
+  const [imagePixelLimit, setImagePixelLimit] = useState(
+    MAX_BACKGROUND_IMAGE_PIXELS,
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const workerRef = useRef<Worker | null>(null);
   const originalUrlRef = useRef("");
@@ -87,6 +90,12 @@ export default function BackgroundRemover() {
   const operationRef = useRef(0);
 
   const isBusy = ["loading-model", "processing", "encoding"].includes(status);
+
+  useEffect(() => {
+    setImagePixelLimit(
+      getRuntimeImagePixelLimit(MAX_BACKGROUND_IMAGE_PIXELS),
+    );
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -136,13 +145,12 @@ export default function BackgroundRemover() {
   async function selectFile(file: File) {
     const operation = ++operationRef.current;
 
-    if (!SUPPORTED_TYPES.has(file.type)) {
-      setError("Use a JPEG, PNG, or WebP image.");
-      return;
-    }
-
-    if (file.size === 0 || file.size > MAX_FILE_BYTES) {
-      setError("Choose an image larger than 0 bytes and no more than 15 MB.");
+    const basicError = validateImageFileBasics(
+      file,
+      MAX_BACKGROUND_IMAGE_FILE_BYTES,
+    );
+    if (basicError) {
+      setError(basicError);
       return;
     }
 
@@ -156,9 +164,11 @@ export default function BackgroundRemover() {
       if (
         nextDimensions.width === 0 ||
         nextDimensions.height === 0 ||
-        nextDimensions.width * nextDimensions.height > MAX_PIXELS
+        nextDimensions.width * nextDimensions.height > imagePixelLimit
       ) {
-        setError("Choose an image no larger than 25 megapixels.");
+        setError(
+          `Choose an image no larger than ${formatImageMegapixels(imagePixelLimit)}.`,
+        );
         return;
       }
 
@@ -312,7 +322,11 @@ export default function BackgroundRemover() {
         />
         <span className={styles.uploadIcon} aria-hidden="true">↑</span>
         <strong>{selectedFile ? "Choose a different image" : "Drop an image here"}</strong>
-        <p>JPEG, PNG, or WebP · up to 15 MB and 25 megapixels</p>
+        <p>
+          JPEG, PNG, or WebP · up to {formatImageBytes(MAX_BACKGROUND_IMAGE_FILE_BYTES)} and{" "}
+          {formatImageMegapixels(imagePixelLimit)}
+          {imagePixelLimit < MAX_BACKGROUND_IMAGE_PIXELS ? " on this device" : ""}
+        </p>
         <button
           type="button"
           className={styles.chooseButton}
@@ -349,7 +363,7 @@ export default function BackgroundRemover() {
           <div className={styles.fileMeta}>
             <span>{selectedFile.name}</span>
             <span>
-              {dimensions.width} × {dimensions.height}px · {bytesToMegabytes(selectedFile.size)}
+              {dimensions.width} × {dimensions.height}px · {formatImageBytes(selectedFile.size)}
             </span>
           </div>
 
