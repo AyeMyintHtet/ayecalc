@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const siteConfig = {
   name: "AyeCalc",
-  url: "https://ayecalc.com",
+  url: "https://www.ayecalc.com",
   defaultTitle: "AyeCalc — Free Online Calculators, Converters & Tools",
   defaultDescription:
     "Use free calculators, unit converters, CSS developer tools, image tools, and practical guides with visible methods and browser-based processing.",

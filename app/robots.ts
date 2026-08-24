@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://ayecalc.com/sitemap.xml",
-    host: "https://ayecalc.com",
+    sitemap: "https://www.ayecalc.com/sitemap.xml",
+    host: "https://www.ayecalc.com",
   };
 }

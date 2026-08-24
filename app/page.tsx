@@ -88,16 +88,16 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://ayecalc.com/#website",
-      url: "https://ayecalc.com/",
+      "@id": "https://www.ayecalc.com/#website",
+      url: "https://www.ayecalc.com/",
       name: "AyeCalc",
       description: "Free online calculators for smarter everyday decisions.",
       inLanguage: "en-US",
     },
     {
       "@type": "WebApplication",
-      "@id": "https://ayecalc.com/#loan-calculator",
-      url: "https://ayecalc.com/#calculator",
+      "@id": "https://www.ayecalc.com/#loan-calculator",
+      url: "https://www.ayecalc.com/#calculator",
       name: "Loan Payment Calculator",
       alternateName: [
         "Monthly Loan Calculator",
