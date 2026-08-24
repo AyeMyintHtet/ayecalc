@@ -50,7 +50,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...converterDefinitions.map((converter) => ({
       url: `${siteConfig.url}/${converter.slug}`,
-      lastModified,
+      lastModified: converter.lastModified
+        ? new Date(converter.lastModified)
+        : lastModified,
       changeFrequency: "monthly" as const,
       priority: converter.slug === "px-to-rem" ? 0.9 : 0.8,
     })),

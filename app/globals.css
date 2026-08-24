@@ -536,6 +536,88 @@ input {
   border-bottom: 1px solid var(--line);
 }
 
+.popular-searches {
+  position: relative;
+  z-index: 2;
+  padding: 34px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #f7faf6;
+}
+
+.popular-searches-inner {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.45fr) minmax(0, 1.55fr);
+  align-items: center;
+  gap: 42px;
+}
+
+.popular-searches-heading h2 {
+  margin: 9px 0 0;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.popular-search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.popular-search-grid a {
+  position: relative;
+  min-width: 0;
+  min-height: 78px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  padding: 13px 34px 13px 14px;
+  border: 1px solid #d8e3dc;
+  border-radius: 9px;
+  background: #fffefa;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.popular-search-grid a:hover {
+  border-color: #9fc6b7;
+  box-shadow: 0 12px 28px rgba(11, 42, 34, 0.08);
+  transform: translateY(-2px);
+}
+
+.popular-search-grid a:focus-visible {
+  outline: 3px solid #32a77d;
+  outline-offset: 3px;
+}
+
+.popular-search-grid strong {
+  overflow: hidden;
+  color: #183e32;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popular-search-grid span {
+  overflow: hidden;
+  color: #75827d;
+  font-size: 8px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popular-search-grid b {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  color: #23815e;
+  font-size: 13px;
+  transform: translateY(-50%);
+}
+
 .category-card {
   min-height: 295px;
   padding: 31px 26px 27px;
@@ -1141,6 +1223,19 @@ footer {
     margin-bottom: 34px;
   }
 
+  .popular-searches {
+    padding: 30px 0;
+  }
+
+  .popular-searches-inner {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .popular-search-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .category-grid {
     grid-template-columns: 1fr;
   }
@@ -1208,6 +1303,12 @@ footer {
 
   .copyright {
     justify-self: start;
+  }
+}
+
+@media (max-width: 460px) {
+  .popular-search-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -65,6 +65,39 @@ const categories = [
   },
 ];
 
+const popularQueryDestinations = [
+  {
+    label: "Color contrast checker",
+    aliases: "WCAG color contrast checker",
+    href: "/contrast-checker",
+  },
+  {
+    label: "PX to REM",
+    aliases: "Pixels to REM converter",
+    href: "/px-to-rem",
+  },
+  {
+    label: "REM to PX",
+    aliases: "1 REM to PX · REM to PX converter",
+    href: "/rem-to-px",
+  },
+  {
+    label: "EM to PX",
+    aliases: "EM PX · 1 EM to PX",
+    href: "/em-to-px",
+  },
+  {
+    label: "Aspect ratio calculator",
+    aliases: "Size ratio calculator",
+    href: "/aspect-ratio-calculator",
+  },
+  {
+    label: "REM vs EM",
+    aliases: "EM vs REM guide",
+    href: "/guides/rem-vs-em",
+  },
+];
+
 const faqs = [
   {
     question: "Are AyeCalc calculators free to use?",
@@ -204,6 +237,24 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="popular-searches" aria-labelledby="popular-searches-title">
+          <div className="container popular-searches-inner">
+            <div className="popular-searches-heading">
+              <span className="kicker">Popular searches</span>
+              <h2 id="popular-searches-title">Go directly to the right tool</h2>
+            </div>
+            <nav className="popular-search-grid" aria-label="Popular tools and guides">
+              {popularQueryDestinations.map((destination) => (
+                <a href={destination.href} key={destination.href}>
+                  <strong>{destination.label}</strong>
+                  <span>{destination.aliases}</span>
+                  <b aria-hidden="true">↗</b>
+                </a>
+              ))}
+            </nav>
           </div>
         </section>
 

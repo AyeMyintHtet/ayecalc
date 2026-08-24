@@ -351,7 +351,9 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "aspect-ratio-calculator",
     title: "Aspect Ratio Calculator",
     shortTitle: "Aspect Ratio Calculator",
+    lastModified: "2026-08-24T00:00:00.000Z",
     searchTerms: [
+      "size ratio calculator",
       "ratio calculator",
       "image aspect ratio calculator",
       "screen ratio calculator",

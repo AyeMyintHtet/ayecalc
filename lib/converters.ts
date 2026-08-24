@@ -22,6 +22,7 @@ export type ConverterDefinition = {
   slug: string;
   title: string;
   searchTerms?: string[];
+  lastModified?: string;
   fromName: string;
   toName: string;
   fromSymbol: string;
@@ -115,7 +116,11 @@ export const converterDefinitions: ConverterDefinition[] = [
     to: "px",
     slug: "rem-to-px",
     title: "REM to PX Converter",
+    lastModified: "2026-08-24T00:00:00.000Z",
     searchTerms: [
+      "1 REM to PX",
+      "1rem to px",
+      "REM to PX converter",
       "REM to pixel converter",
       "REM to pixels calculator",
       "REM PX calculator",
@@ -203,7 +208,11 @@ export const converterDefinitions: ConverterDefinition[] = [
     to: "px",
     slug: "em-to-px",
     title: "EM to PX Converter",
+    lastModified: "2026-08-24T00:00:00.000Z",
     searchTerms: [
+      "EM PX",
+      "1 EM to PX",
+      "1em to px",
       "EM to pixel converter",
       "EM to pixels calculator",
       "EM PX calculator",
