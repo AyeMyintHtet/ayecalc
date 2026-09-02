@@ -337,9 +337,8 @@ export default function Home() {
                 <h2 id="developer-tools-title">Useful tools for real workflows</h2>
               </div>
               <p>
-                Resize, compress, crop, convert, and remove image backgrounds;
-                then generate fluid values, compare units, and check visual
-                decisions with clear privacy and method notes.
+                Shape CSS corners, generate fluid values, compare units, and
+                process images with clear privacy and method notes.
               </p>
             </div>
 

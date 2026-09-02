@@ -31,10 +31,31 @@ import {
   processImageWithWorker,
   WorkerProcessingError,
 } from "@/lib/image-worker-client";
+import {
+  normalizeWatermarkText,
+  type ImageWatermarkOptions,
+  type WatermarkFontFamily,
+  type WatermarkMode,
+  type WatermarkPosition,
+} from "@/lib/image-watermark";
+import { drawImageWatermark } from "@/lib/image-processing-core";
 import styles from "@/components/image-tools.module.css";
 
-type BatchMode = Extract<ImageOperation, "resize" | "compress" | "convert">;
+type BatchMode = Extract<
+  ImageOperation,
+  "resize" | "compress" | "convert" | "watermark"
+>;
 type ResizeMode = "width" | "height" | "percentage" | "exact";
+
+type LogoFileRecord = {
+  file: File;
+  previewUrl: string;
+  width: number;
+  height: number;
+};
+
+const MAX_WATERMARK_LOGO_BYTES = 10 * 1024 * 1024;
+const MAX_WATERMARK_LOGO_PIXELS = 10_000_000;
 
 const modeCopy: Record<BatchMode, { eyebrow: string; title: string; action: string }> = {
   resize: {
@@ -52,6 +73,11 @@ const modeCopy: Record<BatchMode, { eyebrow: string; title: string; action: stri
     title: "Convert image formats",
     action: "Convert images",
   },
+  watermark: {
+    eyebrow: "Private batch watermark tool",
+    title: "Add watermarks to images",
+    action: "Watermark images",
+  },
 };
 
 const outputFormats: Array<{ value: ImageOutputFormat; label: string }> = [
@@ -61,12 +87,37 @@ const outputFormats: Array<{ value: ImageOutputFormat; label: string }> = [
   { value: "image/webp", label: "WebP" },
 ];
 
+const watermarkPositions: Array<{
+  value: WatermarkPosition;
+  label: string;
+  symbol: string;
+}> = [
+  { value: "top-left", label: "Top left", symbol: "↖" },
+  { value: "top-center", label: "Top center", symbol: "↑" },
+  { value: "top-right", label: "Top right", symbol: "↗" },
+  { value: "middle-left", label: "Middle left", symbol: "←" },
+  { value: "center", label: "Center", symbol: "•" },
+  { value: "middle-right", label: "Middle right", symbol: "→" },
+  { value: "bottom-left", label: "Bottom left", symbol: "↙" },
+  { value: "bottom-center", label: "Bottom center", symbol: "↓" },
+  { value: "bottom-right", label: "Bottom right", symbol: "↘" },
+];
+
 function createRecordId() {
   return `image-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 function createJobId() {
   return `job-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function isTextEntryTarget(target: EventTarget | null) {
+  return (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement ||
+    (target instanceof HTMLElement && target.isContentEditable)
+  );
 }
 
 async function createBatchPreviewUrl(source: ImageBitmap, file: File) {
@@ -94,7 +145,11 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [message, setMessage] = useState("Choose JPEG, PNG, or WebP images to begin.");
+  const [message, setMessage] = useState(
+    mode === "watermark"
+      ? "Paste, drop, or choose JPEG, PNG, or WebP images to begin."
+      : "Choose JPEG, PNG, or WebP images to begin.",
+  );
   const [outputFormat, setOutputFormat] = useState<ImageOutputFormat>(
     mode === "convert" ? "image/webp" : "original",
   );
@@ -113,17 +168,83 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   ]);
   const [isCreatingZip, setIsCreatingZip] = useState(false);
   const [imagePixelLimit, setImagePixelLimit] = useState(MAX_IMAGE_PIXELS);
+  const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("text");
+  const [watermarkText, setWatermarkText] = useState("© AyeCalc");
+  const [watermarkFont, setWatermarkFont] =
+    useState<WatermarkFontFamily>("Arial");
+  const [watermarkWeight, setWatermarkWeight] = useState<400 | 600 | 700>(700);
+  const [watermarkColor, setWatermarkColor] = useState("#ffffff");
+  const [watermarkOutlineColor, setWatermarkOutlineColor] = useState("#000000");
+  const [watermarkOutlineWidth, setWatermarkOutlineWidth] = useState(8);
+  const [watermarkOpacity, setWatermarkOpacity] = useState(65);
+  const [watermarkSize, setWatermarkSize] = useState(7);
+  const [watermarkRotation, setWatermarkRotation] = useState(0);
+  const [watermarkPosition, setWatermarkPosition] =
+    useState<WatermarkPosition>("bottom-right");
+  const [watermarkMargin, setWatermarkMargin] = useState(3);
+  const [watermarkTiled, setWatermarkTiled] = useState(false);
+  const [watermarkGap, setWatermarkGap] = useState(12);
+  const [logo, setLogo] = useState<LogoFileRecord | null>(null);
+  const [isReadingClipboard, setIsReadingClipboard] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const watermarkPreviewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const watermarkPreviewImageRef = useRef<HTMLImageElement>(null);
+  const watermarkPreviewLogoRef = useRef<HTMLImageElement>(null);
   const workerRef = useRef<Worker | null>(null);
   const isAddingRef = useRef(false);
+  const isBusyRef = useRef(isBusy);
+  const addFilesRef = useRef<(files: File[]) => void>(() => undefined);
   const runRef = useRef(0);
   const itemsRef = useRef(items);
+  const logoRef = useRef(logo);
+  const [watermarkPreviewRevision, setWatermarkPreviewRevision] = useState(0);
 
   itemsRef.current = items;
+  logoRef.current = logo;
+  isBusyRef.current = isBusy;
+
+  const watermarkOptions: ImageWatermarkOptions = {
+    mode: watermarkMode,
+    text: normalizeWatermarkText(watermarkText),
+    fontFamily: watermarkFont,
+    fontWeight: watermarkWeight,
+    color: watermarkColor,
+    outlineColor: watermarkOutlineColor,
+    outlineWidthPercent: watermarkOutlineWidth,
+    opacity: watermarkOpacity / 100,
+    sizePercent: watermarkSize,
+    rotation: watermarkRotation,
+    position: watermarkPosition,
+    marginPercent: watermarkMargin,
+    tiled: watermarkTiled,
+    gapPercent: watermarkGap,
+    logoBlob: watermarkMode === "logo" ? logo?.file : undefined,
+  };
+  const watermarkPreviewItem = mode === "watermark" ? items[0] : undefined;
 
   useEffect(() => {
     setImagePixelLimit(getRuntimeImagePixelLimit());
   }, []);
+
+  useEffect(() => {
+    if (mode !== "watermark") return;
+    const handlePaste = (event: ClipboardEvent) => {
+      if (isBusyRef.current || isTextEntryTarget(event.target)) return;
+      const files = Array.from(event.clipboardData?.items ?? [])
+        .filter((item) => item.kind === "file")
+        .map((item) => item.getAsFile())
+        .filter((file): file is File => Boolean(file));
+
+      if (files.length) {
+        event.preventDefault();
+        addFilesRef.current(files);
+      }
+    };
+
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+  }, [mode]);
 
   useEffect(() => {
     return () => {
@@ -133,6 +254,7 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         URL.revokeObjectURL(item.previewUrl);
         if (item.result) URL.revokeObjectURL(item.result.previewUrl);
       });
+      if (logoRef.current) URL.revokeObjectURL(logoRef.current.previewUrl);
     };
   }, []);
 
@@ -159,7 +281,61 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     };
   }, [items.length > 0]);
 
-  function clearResults() {
+  useEffect(() => {
+    if (mode !== "watermark" || !watermarkPreviewItem) return;
+
+    const canvas = watermarkPreviewCanvasRef.current;
+    const source = watermarkPreviewImageRef.current;
+    if (!canvas || !source?.complete || !source.naturalWidth) return;
+
+    canvas.width = source.naturalWidth;
+    canvas.height = source.naturalHeight;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(source, 0, 0, canvas.width, canvas.height);
+
+    const previewLogo = watermarkPreviewLogoRef.current;
+    const hasPreviewMark =
+      watermarkMode === "text"
+        ? Boolean(watermarkOptions.text)
+        : Boolean(previewLogo?.complete && previewLogo.naturalWidth);
+
+    if (hasPreviewMark) {
+      drawImageWatermark(
+        { canvas, context },
+        watermarkOptions,
+        watermarkMode === "logo" ? previewLogo : undefined,
+      );
+    }
+  }, [
+    mode,
+    watermarkPreviewItem?.id,
+    watermarkPreviewItem?.previewUrl,
+    watermarkPreviewRevision,
+    watermarkMode,
+    watermarkText,
+    watermarkFont,
+    watermarkWeight,
+    watermarkColor,
+    watermarkOutlineColor,
+    watermarkOutlineWidth,
+    watermarkOpacity,
+    watermarkSize,
+    watermarkRotation,
+    watermarkPosition,
+    watermarkMargin,
+    watermarkTiled,
+    watermarkGap,
+    logo?.previewUrl,
+  ]);
+
+  function clearResults(
+    nextMessage = "Settings changed. Process the images again.",
+  ) {
     setItems((current) =>
       current.map((item) => {
         if (item.result) URL.revokeObjectURL(item.result.previewUrl);
@@ -167,7 +343,7 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       }),
     );
     setProgress(0);
-    setMessage(items.length ? "Settings changed. Process the images again." : message);
+    setMessage(items.length ? nextMessage : message);
   }
 
   async function addFiles(fileList: FileList | File[]) {
@@ -251,6 +427,103 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     isAddingRef.current = false;
   }
 
+  addFilesRef.current = (files) => {
+    void addFiles(files);
+  };
+
+  async function pasteImages() {
+    if (isBusy || isReadingClipboard) return;
+    if (!navigator.clipboard?.read) {
+      setRejections([
+        "Clipboard access is unavailable in this browser. Drag images here or choose them from your device.",
+      ]);
+      return;
+    }
+
+    setIsReadingClipboard(true);
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+      const files: File[] = [];
+      for (const item of clipboardItems) {
+        const imageType = item.types.find((type) =>
+          ["image/jpeg", "image/png", "image/webp"].includes(type),
+        );
+        if (!imageType) continue;
+        const blob = await item.getType(imageType);
+        const extension =
+          imageType === "image/png"
+            ? "png"
+            : imageType === "image/webp"
+              ? "webp"
+              : "jpg";
+        files.push(
+          new File([blob], `pasted-image-${files.length + 1}.${extension}`, {
+            type: imageType,
+          }),
+        );
+      }
+
+      if (files.length) await addFiles(files);
+      else setRejections(["The clipboard does not contain a JPEG, PNG, or WebP image."]);
+    } catch {
+      setRejections([
+        "Clipboard permission was not granted. Drag images here or choose them from your device.",
+      ]);
+    } finally {
+      setIsReadingClipboard(false);
+    }
+  }
+
+  async function chooseLogo(file?: File) {
+    if (!file || isBusy) return;
+    const basicError = validateImageFileBasics(file, MAX_WATERMARK_LOGO_BYTES);
+    if (basicError) {
+      setRejections([`Watermark logo: ${basicError}`]);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+      return;
+    }
+
+    try {
+      if (await isAnimatedImage(file)) {
+        setRejections(["Watermark logo: animated images are not supported."]);
+        return;
+      }
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      try {
+        if (bitmap.width * bitmap.height > MAX_WATERMARK_LOGO_PIXELS) {
+          setRejections(["Watermark logo: use an image no larger than 10 megapixels."]);
+          return;
+        }
+        const previewUrl = URL.createObjectURL(file);
+        setLogo((current) => {
+          if (current) URL.revokeObjectURL(current.previewUrl);
+          return {
+            file,
+            previewUrl,
+            width: bitmap.width,
+            height: bitmap.height,
+          };
+        });
+        clearResults("Logo changed. Watermark the images again.");
+        setRejections([]);
+      } finally {
+        bitmap.close();
+      }
+    } catch {
+      setRejections(["Watermark logo: the browser could not decode this image."]);
+    } finally {
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }
+
+  function removeLogo() {
+    setLogo((current) => {
+      if (current) URL.revokeObjectURL(current.previewUrl);
+      return null;
+    });
+    clearResults("Logo removed. Choose another logo before processing.");
+  }
+
   function removeItem(id: string) {
     setItems((current) => {
       const target = current.find((item) => item.id === id);
@@ -273,7 +546,11 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     setRejections([]);
     setIsBusy(false);
     setProgress(0);
-    setMessage("Choose JPEG, PNG, or WebP images to begin.");
+    setMessage(
+      mode === "watermark"
+        ? "Paste, drop, or choose JPEG, PNG, or WebP images to begin."
+        : "Choose JPEG, PNG, or WebP images to begin.",
+    );
   }
 
   function cancelProcessing() {
@@ -341,11 +618,20 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         targetBytes: useTarget ? Math.max(1, targetKilobytes) * 1024 : undefined,
       },
       resize: mode === "resize" ? getResizeDimensions(item) : undefined,
+      watermark: mode === "watermark" ? watermarkOptions : undefined,
     };
   }
 
   async function processImages() {
     if (!items.length || isBusy) return;
+    if (mode === "watermark" && watermarkMode === "text" && !normalizeWatermarkText(watermarkText)) {
+      setMessage("Enter watermark text before processing.");
+      return;
+    }
+    if (mode === "watermark" && watermarkMode === "logo" && !logo) {
+      setMessage("Choose a logo image before processing.");
+      return;
+    }
     if (
       mode === "compress" &&
       targetEnabled &&
@@ -482,6 +768,11 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     items.some(
       (item) => resolveOutputMime(item.mimeType, outputFormat) === "image/png",
     );
+  const hasInvalidWatermark =
+    mode === "watermark" &&
+    (watermarkMode === "text"
+      ? !normalizeWatermarkText(watermarkText)
+      : !logo);
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
@@ -523,18 +814,32 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         <span className={styles.uploadIcon} aria-hidden="true">↑</span>
         <strong>{items.length ? "Add more images" : "Drop images here"}</strong>
         <p>
-          JPEG, PNG, or WebP · up to {MAX_BATCH_FILES} files, {formatImageBytes(MAX_IMAGE_FILE_BYTES)} each,
+          {mode === "watermark"
+            ? "Paste, drop, or upload JPEG, PNG, or WebP"
+            : "JPEG, PNG, or WebP"} · up to {MAX_BATCH_FILES} files, {formatImageBytes(MAX_IMAGE_FILE_BYTES)} each,
           and {formatImageMegapixels(imagePixelLimit)}
           {imagePixelLimit < MAX_IMAGE_PIXELS ? " on this device" : ""}
         </p>
-        <button
-          type="button"
-          className={styles.chooseButton}
-          disabled={isBusy || items.length >= MAX_BATCH_FILES}
-          onClick={() => inputRef.current?.click()}
-        >
-          Choose images
-        </button>
+        <div className={styles.dropActions}>
+          <button
+            type="button"
+            className={styles.chooseButton}
+            disabled={isBusy || items.length >= MAX_BATCH_FILES}
+            onClick={() => inputRef.current?.click()}
+          >
+            Choose images
+          </button>
+          {mode === "watermark" && (
+            <button
+              type="button"
+              className={styles.chooseButton}
+              disabled={isBusy || isReadingClipboard || items.length >= MAX_BATCH_FILES}
+              onClick={() => void pasteImages()}
+            >
+              {isReadingClipboard ? "Reading clipboard…" : "Paste images"}
+            </button>
+          )}
+        </div>
       </div>
 
       {rejections.length > 0 && (
@@ -551,6 +856,46 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
             disabled={isBusy}
             aria-label={`${modeCopy[mode].title} settings`}
           >
+            {mode === "watermark" && watermarkPreviewItem && (
+              <figure className={styles.watermarkLivePreview}>
+                <div className={styles.watermarkPreviewHeader}>
+                  <strong>Live preview</strong>
+                  <span title={watermarkPreviewItem.file.name}>
+                    First image · {watermarkPreviewItem.file.name}
+                  </span>
+                </div>
+                <div className={styles.watermarkPreviewViewport}>
+                  <canvas
+                    ref={watermarkPreviewCanvasRef}
+                    className={styles.watermarkPreviewCanvas}
+                    role="img"
+                    aria-label={`Watermark preview for ${watermarkPreviewItem.file.name}`}
+                  />
+                  <img
+                    ref={watermarkPreviewImageRef}
+                    className={styles.watermarkPreviewAsset}
+                    src={watermarkPreviewItem.previewUrl}
+                    alt=""
+                    aria-hidden="true"
+                    onLoad={() => setWatermarkPreviewRevision((current) => current + 1)}
+                  />
+                  {logo && (
+                    <img
+                      ref={watermarkPreviewLogoRef}
+                      className={styles.watermarkPreviewAsset}
+                      src={logo.previewUrl}
+                      alt=""
+                      aria-hidden="true"
+                      onLoad={() => setWatermarkPreviewRevision((current) => current + 1)}
+                    />
+                  )}
+                </div>
+                <figcaption>
+                  Preview only. The same settings are applied to every image when you process the batch.
+                </figcaption>
+              </figure>
+            )}
+
             {mode === "resize" && (
               <div className={styles.settingGroup}>
                 <span className={styles.settingLabel}>Resize method</span>
@@ -616,6 +961,270 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                     setPreventUpscale(event.target.checked);
                   }} /> Prevent upscaling</label>
                 </div>
+              </div>
+            )}
+
+            {mode === "watermark" && (
+              <div className={styles.settingGroup}>
+                <span className={styles.settingLabel}>Watermark</span>
+                <div className={`${styles.segmentedControl} ${styles.watermarkModeControl}`}>
+                  {(["text", "logo"] as WatermarkMode[]).map((value) => (
+                    <button
+                      type="button"
+                      aria-pressed={watermarkMode === value}
+                      onClick={() => {
+                        clearResults();
+                        setWatermarkMode(value);
+                        setWatermarkSize(value === "text" ? 7 : 22);
+                      }}
+                      key={value}
+                    >
+                      {value === "text" ? "Text watermark" : "Logo watermark"}
+                    </button>
+                  ))}
+                </div>
+
+                {watermarkMode === "text" ? (
+                  <>
+                    <label className={styles.field}>
+                      <span>Watermark text</span>
+                      <input
+                        className={styles.textControl}
+                        type="text"
+                        maxLength={120}
+                        value={watermarkText}
+                        placeholder="© Your brand"
+                        aria-invalid={!normalizeWatermarkText(watermarkText)}
+                        aria-describedby={
+                          normalizeWatermarkText(watermarkText)
+                            ? undefined
+                            : "watermark-text-error"
+                        }
+                        onChange={(event) => {
+                          clearResults();
+                          setWatermarkText(event.target.value);
+                        }}
+                      />
+                      {!normalizeWatermarkText(watermarkText) && (
+                        <small id="watermark-text-error" className={styles.formatWarning}>
+                          Enter text before watermarking the images.
+                        </small>
+                      )}
+                    </label>
+                    <div className={styles.dimensionGrid}>
+                      <label className={styles.field}>
+                        <span>Font</span>
+                        <select
+                          value={watermarkFont}
+                          onChange={(event) => {
+                            clearResults();
+                            setWatermarkFont(event.target.value as WatermarkFontFamily);
+                          }}
+                        >
+                          <option value="Arial">Arial</option>
+                          <option value="Georgia">Georgia</option>
+                          <option value="Courier New">Courier New</option>
+                          <option value="Trebuchet MS">Trebuchet MS</option>
+                        </select>
+                      </label>
+                      <label className={styles.field}>
+                        <span>Weight</span>
+                        <select
+                          value={watermarkWeight}
+                          onChange={(event) => {
+                            clearResults();
+                            setWatermarkWeight(Number(event.target.value) as 400 | 600 | 700);
+                          }}
+                        >
+                          <option value="400">Regular</option>
+                          <option value="600">Semi-bold</option>
+                          <option value="700">Bold</option>
+                        </select>
+                      </label>
+                      <label className={styles.field}>
+                        <span>Text color</span>
+                        <span className={styles.colorControl}>
+                          <input
+                            type="color"
+                            value={watermarkColor}
+                            onChange={(event) => {
+                              clearResults();
+                              setWatermarkColor(event.target.value);
+                            }}
+                          />
+                          <code>{watermarkColor}</code>
+                        </span>
+                      </label>
+                      <label className={styles.field}>
+                        <span>Outline color</span>
+                        <span className={styles.colorControl}>
+                          <input
+                            type="color"
+                            value={watermarkOutlineColor}
+                            onChange={(event) => {
+                              clearResults();
+                              setWatermarkOutlineColor(event.target.value);
+                            }}
+                          />
+                          <code>{watermarkOutlineColor}</code>
+                        </span>
+                      </label>
+                    </div>
+                    <label className={`${styles.field} ${styles.rangeField}`}>
+                      <span>Outline width <b>{watermarkOutlineWidth}%</b></span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="20"
+                        value={watermarkOutlineWidth}
+                        onChange={(event) => {
+                          clearResults();
+                          setWatermarkOutlineWidth(Number(event.target.value));
+                        }}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <div className={styles.logoPicker}>
+                    <input
+                      ref={logoInputRef}
+                      className={styles.fileInput}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(event) => void chooseLogo(event.target.files?.[0])}
+                    />
+                    {logo ? (
+                      <div className={styles.logoPreview}>
+                        <img src={logo.previewUrl} alt="Selected watermark logo" />
+                        <div className={styles.logoMeta}>
+                          <strong>{logo.file.name}</strong>
+                          <span>
+                            {logo.width} × {logo.height}px · {formatImageBytes(logo.file.size)}
+                          </span>
+                          <div className={styles.logoActions}>
+                            <button type="button" onClick={() => logoInputRef.current?.click()}>
+                              Replace
+                            </button>
+                            <button type="button" onClick={removeLogo}>Remove</button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.logoChooseButton}
+                        onClick={() => logoInputRef.current?.click()}
+                      >
+                        Choose a transparent PNG, JPEG, or WebP logo
+                      </button>
+                    )}
+                    <small>Up to 10 MB and 10 megapixels. Transparent PNG works best.</small>
+                  </div>
+                )}
+
+                <div className={styles.dimensionGrid}>
+                  <label className={`${styles.field} ${styles.rangeField}`}>
+                    <span>Opacity <b>{watermarkOpacity}%</b></span>
+                    <input
+                      type="range"
+                      min="5"
+                      max="100"
+                      value={watermarkOpacity}
+                      onChange={(event) => {
+                        clearResults();
+                        setWatermarkOpacity(Number(event.target.value));
+                      }}
+                    />
+                  </label>
+                  <label className={`${styles.field} ${styles.rangeField}`}>
+                    <span>Size <b>{watermarkSize}%</b></span>
+                    <input
+                      type="range"
+                      min={watermarkMode === "text" ? 1 : 2}
+                      max={watermarkMode === "text" ? 40 : 90}
+                      value={watermarkSize}
+                      onChange={(event) => {
+                        clearResults();
+                        setWatermarkSize(Number(event.target.value));
+                      }}
+                    />
+                  </label>
+                  <label className={`${styles.field} ${styles.rangeField}`}>
+                    <span>Rotation <b>{watermarkRotation}°</b></span>
+                    <input
+                      type="range"
+                      min="-180"
+                      max="180"
+                      step="1"
+                      value={watermarkRotation}
+                      onChange={(event) => {
+                        clearResults();
+                        setWatermarkRotation(Number(event.target.value));
+                      }}
+                    />
+                  </label>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={watermarkTiled}
+                      onChange={(event) => {
+                        clearResults();
+                        setWatermarkTiled(event.target.checked);
+                      }}
+                    />
+                    Tile across image
+                  </label>
+                </div>
+
+                {watermarkTiled ? (
+                  <label className={`${styles.field} ${styles.rangeField}`}>
+                    <span>Tile gap <b>{watermarkGap}%</b></span>
+                    <input
+                      type="range"
+                      min="2"
+                      max="50"
+                      value={watermarkGap}
+                      onChange={(event) => {
+                        clearResults();
+                        setWatermarkGap(Number(event.target.value));
+                      }}
+                    />
+                  </label>
+                ) : (
+                  <div className={styles.watermarkPlacement}>
+                    <span className={styles.settingLabel}>Placement</span>
+                    <div className={styles.watermarkPositionGrid}>
+                      {watermarkPositions.map((position) => (
+                        <button
+                          type="button"
+                          aria-label={position.label}
+                          title={position.label}
+                          aria-pressed={watermarkPosition === position.value}
+                          onClick={() => {
+                            clearResults();
+                            setWatermarkPosition(position.value);
+                          }}
+                          key={position.value}
+                        >
+                          {position.symbol}
+                        </button>
+                      ))}
+                    </div>
+                    <label className={`${styles.field} ${styles.rangeField}`}>
+                      <span>Edge margin <b>{watermarkMargin}%</b></span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="25"
+                        value={watermarkMargin}
+                        onChange={(event) => {
+                          clearResults();
+                          setWatermarkMargin(Number(event.target.value));
+                        }}
+                      />
+                    </label>
+                  </div>
+                )}
               </div>
             )}
 
@@ -703,7 +1312,12 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
           <div className={styles.resultList}>
             {items.map((item) => (
               <article className={styles.resultItem} key={item.id}>
-                <img src={item.result?.previewUrl ?? item.previewUrl} alt={`Preview of ${item.file.name}`} />
+                <img
+                  src={item.result?.previewUrl ?? item.previewUrl}
+                  alt={`Preview of ${item.file.name}`}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div className={styles.resultMeta}>
                   <strong>{item.file.name}</strong>
                   <span>{item.width} × {item.height}px · {formatImageBytes(item.file.size)}</span>
@@ -741,7 +1355,7 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
             {isBusy ? (
               <button type="button" className={styles.secondaryButton} onClick={cancelProcessing}>Cancel processing</button>
             ) : (
-              <button type="button" className={styles.primaryButton} disabled={hasUnsupportedOutput || hasIncompatibleTarget} onClick={processImages}>{modeCopy[mode].action}</button>
+              <button type="button" className={styles.primaryButton} disabled={hasUnsupportedOutput || hasIncompatibleTarget || hasInvalidWatermark} onClick={processImages}>{modeCopy[mode].action}</button>
             )}
             {completedCount > 0 && !isBusy && (
               <button type="button" className={styles.secondaryButton} disabled={isCreatingZip} onClick={downloadZip}>
@@ -791,4 +1405,8 @@ export function ImageCompressor() {
 
 export function ImageFormatConverter() {
   return <ImageBatchTool mode="convert" />;
+}
+
+export function BatchWatermarkImages() {
+  return <ImageBatchTool mode="watermark" />;
 }

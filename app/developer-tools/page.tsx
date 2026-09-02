@@ -8,16 +8,18 @@ import { createPageMetadata, siteConfig } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Developer, CSS & Image Tools",
   description:
-    "Use free browser-based tools to convert HEIC photos, resize, compress, crop, convert formats, and remove image backgrounds, plus CSS and accessibility utilities.",
+    "Use free browser-based tools to watermark, convert, resize, compress, crop, and remove image backgrounds, plus CSS and accessibility utilities.",
   path: "/developer-tools",
   keywords: [
     "developer tools",
     "CSS tools",
+    "CSS corner shape generator",
     "image tools",
     "image resizer",
     "image compressor",
     "image cropper",
     "image format converter",
+    "batch watermark images",
     "HEIC to JPG converter",
     "background remover",
     "web design calculators",
@@ -100,8 +102,9 @@ export default function DeveloperToolsPage() {
               <h2>Tools for practical digital workflows</h2>
             </div>
             <p>
-              Resize, compress, crop, convert, and remove image backgrounds, then
-              generate production values and inspect context-dependent units.
+              Shape CSS corners, generate production values, inspect
+              context-dependent units, and process images directly in your
+              browser.
             </p>
           </div>
           <div className={styles.cardGrid}>

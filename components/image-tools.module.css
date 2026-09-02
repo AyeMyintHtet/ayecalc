@@ -199,6 +199,78 @@
   gap: 13px;
 }
 
+.watermarkLivePreview {
+  min-width: 0;
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+
+.watermarkPreviewHeader {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.watermarkPreviewHeader strong {
+  color: #173d30;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13px;
+}
+
+.watermarkPreviewHeader span {
+  overflow: hidden;
+  color: #71807a;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.watermarkPreviewViewport {
+  position: relative;
+  min-height: 260px;
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+  padding: 14px;
+  border: 1px solid #d4ded8;
+  border-radius: 10px;
+  background:
+    linear-gradient(45deg, #dfe6e1 25%, transparent 25%),
+    linear-gradient(-45deg, #dfe6e1 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #dfe6e1 75%),
+    linear-gradient(-45deg, transparent 75%, #dfe6e1 75%),
+    #f8faf8;
+  background-position: 0 0, 10px 10px, 10px -10px, -10px 0;
+  background-size: 20px 20px;
+}
+
+.watermarkPreviewCanvas {
+  max-width: 100%;
+  max-height: 430px;
+  display: block;
+  border-radius: 5px;
+  box-shadow: 0 10px 30px rgba(5, 31, 23, 0.17);
+}
+
+.watermarkPreviewAsset {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+
+.watermarkLivePreview figcaption {
+  color: #6c7a74;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
 .outputSettings:only-child {
   grid-column: 1 / -1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -208,6 +280,14 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 5px;
+}
+
+.watermarkModeControl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.watermarkModeControl button {
+  min-height: 44px;
 }
 
 .segmentedControl button,
@@ -365,6 +445,131 @@
 .checkboxRow input,
 .checkboxLabel input {
   accent-color: #21825e;
+}
+
+.logoPicker {
+  display: grid;
+  gap: 8px;
+}
+
+.logoPicker small {
+  color: #6c7a74;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.logoChooseButton {
+  min-height: 72px;
+  padding: 12px;
+  border: 1px dashed #9dbdaf;
+  border-radius: 8px;
+  color: #176348;
+  background: #f1faf5;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.logoPreview {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  padding: 9px;
+  border: 1px solid #d6e1da;
+  border-radius: 8px;
+  background: white;
+}
+
+.logoPreview > img {
+  width: 70px;
+  height: 62px;
+  display: block;
+  object-fit: contain;
+  border: 1px solid #dde5df;
+  border-radius: 6px;
+  background:
+    linear-gradient(45deg, #e6ece8 25%, transparent 25%),
+    linear-gradient(-45deg, #e6ece8 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e6ece8 75%),
+    linear-gradient(-45deg, transparent 75%, #e6ece8 75%),
+    #f8faf8;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+}
+
+.logoMeta {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.logoMeta strong {
+  overflow: hidden;
+  color: #263e35;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoMeta > span {
+  color: #73807b;
+  font-size: 8px;
+}
+
+.logoActions {
+  display: flex;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.logoActions button {
+  min-height: 44px;
+  padding: 0 9px;
+  border: 1px solid #d3ddd6;
+  border-radius: 6px;
+  color: #315b4d;
+  background: #f9fbf9;
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.watermarkPlacement {
+  display: grid;
+  gap: 10px;
+}
+
+.watermarkPositionGrid {
+  width: min(100%, 210px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.watermarkPositionGrid button {
+  min-height: 44px;
+  border: 1px solid #d3ddd6;
+  border-radius: 6px;
+  color: #52665e;
+  background: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.watermarkPositionGrid button[aria-pressed="true"] {
+  color: white;
+  border-color: #176f50;
+  background: #176f50;
+}
+
+.logoChooseButton:hover,
+.logoActions button:hover,
+.watermarkPositionGrid button:hover:not([aria-pressed="true"]) {
+  border-color: #8bb2a2;
+  background: #eaf7f0;
 }
 
 .targetControl {
@@ -794,6 +999,16 @@
 
   .cropOutputPreview {
     grid-template-columns: 1fr;
+  }
+
+  .watermarkPreviewHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .watermarkPreviewViewport {
+    min-height: 210px;
   }
 }
 

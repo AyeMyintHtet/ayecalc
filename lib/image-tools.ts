@@ -1,3 +1,5 @@
+import type { ImageWatermarkOptions } from "@/lib/image-watermark";
+
 export const MAX_IMAGE_FILE_BYTES = 100 * 1024 * 1024;
 export const MAX_IMAGE_PIXELS = 50_000_000;
 export const MAX_BACKGROUND_IMAGE_FILE_BYTES = 50 * 1024 * 1024;
@@ -16,7 +18,13 @@ export const SUPPORTED_IMAGE_MIME_TYPES = [
 
 export type SupportedImageMime = (typeof SUPPORTED_IMAGE_MIME_TYPES)[number];
 export type ImageOutputFormat = "original" | SupportedImageMime;
-export type ImageOperation = "resize" | "compress" | "crop" | "convert";
+
+export type ImageOperation =
+  | "resize"
+  | "compress"
+  | "crop"
+  | "convert"
+  | "watermark";
 export type ImageFileStatus =
   | "ready"
   | "queued"
@@ -55,6 +63,7 @@ export type ImageProcessingRequest = {
   output: ImageOutputOptions;
   resize?: { width: number; height: number };
   crop?: CropTransform;
+  watermark?: ImageWatermarkOptions;
 };
 
 export type ImageProcessingResult = {
@@ -206,6 +215,7 @@ export function createImageOutputName(
     compress: "compressed",
     crop: "cropped",
     convert: "converted",
+    watermark: "watermarked",
   };
   return `${safeImageBaseName(fileName)}-${suffix[operation]}.${extensionForMime(mimeType)}`;
 }

@@ -26,6 +26,84 @@ export type DeveloperToolDefinition = {
 
 export const developerTools: DeveloperToolDefinition[] = [
   {
+    slug: "css-corner-shape-generator",
+    title: "CSS Corner Shape Generator",
+    shortTitle: "CSS Corner Shape Generator",
+    seoTitle: "Free CSS Corner Shape Generator",
+    reviewed: "September 2, 2026",
+    lastModified: "2026-09-02T00:00:00.000Z",
+    searchTerms: [
+      "CSS corner shape generator",
+      "corner-shape CSS generator",
+      "CSS squircle generator",
+      "CSS bevel corners",
+      "CSS notch corners",
+      "CSS scoop corners",
+      "CSS superellipse generator",
+      "custom CSS corners",
+      "CSS corner shape playground",
+      "border radius shape generator",
+    ],
+    category: "CSS design",
+    description:
+      "Generate CSS corner-shape values with clickable demos, live per-corner controls, custom superellipse curves, and copy-ready CSS.",
+    introduction:
+      "Design corners beyond a standard border radius. Click a round, squircle, bevel, notch, or scoop demo, adjust all corners together or tune each corner independently, and copy the generated CSS.",
+    formula: "corner-shape: top-left top-right bottom-right bottom-left",
+    formulaNote:
+      "A visible corner shape also needs a border-radius greater than zero; one to four values follow the same corner order as border-radius.",
+    method:
+      "The generator maps each physical corner to a corner-shape value and a border radius. One value applies everywhere, two values pair opposite corners, three values share the second value across top-right and bottom-left, and four values control every corner clockwise from top-left. Custom curves use superellipse(K), where larger positive values become more square and negative values become concave.",
+    exampleTitle: "Mix a squircle, bevel, notch, and scoop on one card",
+    exampleText:
+      "Switch to Each corner, select squircle for top-left, bevel for top-right, notch for bottom-right, and scoop for bottom-left, then give each corner a visible radius. The result uses a four-value corner-shape declaration in the same order as border-radius.",
+    guidance:
+      "Start with a preset, increase the radius until the shape is easy to inspect, and then edit individual corners only where the design needs emphasis. Check content clipping, borders, shadows, focus indicators, and responsive widths in a browser that supports corner-shape before shipping it.",
+    limitation:
+      "The corner-shape property is newer than border-radius and may not render in every browser. Unsupported browsers ignore it and keep the border-radius fallback, so test support for the browsers required by the project.",
+    benefits: ["Five clickable demos", "Four-corner control", "Copy-ready CSS"],
+    codeSnippets: [
+      {
+        label: "Squircle card",
+        code: ".card {\n  border-radius: 48px;\n  corner-shape: squircle;\n  overflow: hidden;\n}",
+      },
+      {
+        label: "Mixed corners",
+        code: ".card {\n  border-radius: 56px 32px 72px 24px;\n  corner-shape: squircle bevel notch scoop;\n}",
+      },
+      {
+        label: "Feature query",
+        code: "@supports (corner-shape: squircle) {\n  .card { corner-shape: squircle; }\n}",
+      },
+    ],
+    faqs: [
+      {
+        question: "Why does corner-shape appear to do nothing?",
+        answer:
+          "The element needs a non-zero border-radius, and the browser must support corner-shape. Increase the radius and check the support badge in the live demo.",
+      },
+      {
+        question: "Can every corner use a different shape?",
+        answer:
+          "Yes. Choose Each corner to set an independent shape and radius for top-left, top-right, bottom-right, and bottom-left.",
+      },
+      {
+        question: "What does superellipse(K) control?",
+        answer:
+          "K controls the curve continuously. Positive values move from round toward square, zero produces a bevel, and negative values create increasingly concave corners.",
+      },
+      {
+        question: "What happens in an unsupported browser?",
+        answer:
+          "The browser ignores corner-shape but retains border-radius, giving the element a rounded fallback instead of the selected custom corner shape.",
+      },
+    ],
+    source: {
+      label: "CSS Borders and Box Decorations Module Level 4: corner shaping",
+      href: "https://drafts.csswg.org/css-borders-4/#corner-shaping",
+    },
+  },
+  {
     slug: "css-clamp-generator",
     title: "CSS Clamp Generator & Fluid Typography Calculator",
     shortTitle: "CSS Clamp Generator",
@@ -716,6 +794,88 @@ export const developerTools: DeveloperToolDefinition[] = [
     source: {
       label: "libheif: HEIF and AVIF codec library",
       href: "https://github.com/strukturag/libheif",
+    },
+  },
+  {
+    slug: "batch-watermark-images",
+    title: "Batch Watermark Images Online",
+    shortTitle: "Batch Watermark Images",
+    seoTitle: "Free Batch Watermark Images Online",
+    reviewed: "August 25, 2026",
+    lastModified: "2026-08-25T00:00:00.000Z",
+    searchTerms: [
+      "batch watermark images",
+      "batch watermark photos",
+      "add watermark to multiple images",
+      "bulk watermark images",
+      "watermark images online",
+      "add logo watermark to photos",
+      "add text watermark to photos",
+      "watermark multiple images",
+      "photo watermark maker",
+      "image watermark tool",
+      "tile watermark across image",
+      "private batch watermark tool",
+      "paste image watermark",
+    ],
+    category: "Image tools",
+    description:
+      "Batch watermark up to ten images with custom text or a logo, placement, tiling, opacity, size, rotation, and private browser processing.",
+    introduction:
+      "Add a text or logo watermark to multiple JPEG, PNG, or WebP images without uploading them. Paste, drag, or choose up to ten photos, then control placement, tiling, opacity, size, rotation, format, quality, and batch ZIP download.",
+    formula: "watermark size = image dimension × selected percentage",
+    formulaNote:
+      "Text size uses the image's shorter edge; logo width uses the image width while preserving the logo aspect ratio.",
+    method:
+      "The browser decodes each source image, draws it on a clean canvas, calculates the selected anchor or repeating tile positions, and overlays the text or raster logo with the chosen opacity, scale, margin, and rotation. It then encodes a new JPEG, PNG, or WebP file and keeps processing sequential so large batches use less memory.",
+    exampleTitle: "Add a bottom-right logo to a product photo batch",
+    exampleText:
+      "Choose a transparent PNG logo, set its size to 22%, opacity to 65%, position to bottom right, and edge margin to 3%. The logo is scaled for each photo while its aspect ratio is preserved, so mixed image dimensions receive a consistent relative treatment.",
+    guidance:
+      "Use a high-contrast logo or text that remains readable on both light and dark areas. Keep the mark large enough to survive responsive resizing, inspect every output near important subjects, and retain an unwatermarked master copy. Use descriptive filenames and accurate alt text when publishing the results; a watermark is not a substitute for useful page content or image accessibility.",
+    limitation:
+      "A visible watermark can be cropped, covered, or removed and does not prove ownership by itself. The tool accepts static raster images only, does not preserve animation or embedded metadata, and re-encoding can change color, quality, and file size. SVG logo upload is not supported.",
+    benefits: ["Text or logo watermark", "Batch up to 10 images", "Photos stay on device"],
+    codeSnippets: [
+      {
+        label: "Canvas logo watermark",
+        code: "context.globalAlpha = 0.65;\ncontext.drawImage(logo, x, y, width, height);\ncontext.globalAlpha = 1;",
+      },
+      {
+        label: "Published image",
+        code: '<img src="product-watermarked.webp" width="1600" height="1200" alt="Describe the product, not the watermark">',
+      },
+    ],
+    faqs: [
+      {
+        question: "Can I watermark several images at once?",
+        answer:
+          "Yes. Add up to ten JPEG, PNG, or WebP images, apply one watermark configuration to the batch, and download each result or a locally created ZIP archive.",
+      },
+      {
+        question: "Can I use text or a logo as the watermark?",
+        answer:
+          "Yes. Text mode provides font, weight, fill, outline, opacity, size, rotation, and placement controls. Logo mode accepts a static JPEG, PNG, or WebP file and preserves its aspect ratio; transparent PNG usually gives the cleanest overlay.",
+      },
+      {
+        question: "Are my photos or logo uploaded?",
+        answer:
+          "No. Image decoding, watermark rendering, output encoding, and ZIP creation happen in your browser. Selected files are not sent to AyeCalc for processing.",
+      },
+      {
+        question: "Can the watermark repeat across the whole image?",
+        answer:
+          "Yes. Enable tiling to repeat the selected text or logo in staggered rows, then adjust rotation, opacity, size, and the gap between marks.",
+      },
+      {
+        question: "Does watermarking preserve image metadata?",
+        answer:
+          "No. The generated file contains newly encoded pixels and omits EXIF, location, camera, and other embedded metadata from the source.",
+      },
+    ],
+    source: {
+      label: "MDN Canvas API",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API",
     },
   },
   {

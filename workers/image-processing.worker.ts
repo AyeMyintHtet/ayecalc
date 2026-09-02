@@ -52,6 +52,7 @@ workerScope.onmessage = async (event) => {
 
   respond({ type: "started", jobId: request.jobId, fileId: request.fileId });
   let bitmap: ImageBitmap | null = null;
+  let watermarkBitmap: ImageBitmap | null = null;
 
   try {
     respond({
@@ -65,6 +66,15 @@ workerScope.onmessage = async (event) => {
       new Blob([buffer], { type: request.inputMimeType }),
       { imageOrientation: "from-image" },
     );
+    if (
+      request.operation === "watermark" &&
+      request.watermark?.mode === "logo" &&
+      request.watermark.logoBlob
+    ) {
+      watermarkBitmap = await createImageBitmap(request.watermark.logoBlob, {
+        imageOrientation: "from-image",
+      });
+    }
 
     if (cancelledJobs.has(request.jobId)) {
       respond({ type: "cancelled", jobId: request.jobId, fileId: request.fileId });
@@ -78,7 +88,12 @@ workerScope.onmessage = async (event) => {
       progress: 45,
       stage: "drawing",
     });
-    const result = await processImageBitmap(bitmap, request, createOffscreenSurface);
+    const result = await processImageBitmap(
+      bitmap,
+      request,
+      createOffscreenSurface,
+      watermarkBitmap,
+    );
 
     if (cancelledJobs.has(request.jobId)) {
       respond({ type: "cancelled", jobId: request.jobId, fileId: request.fileId });
@@ -121,6 +136,7 @@ workerScope.onmessage = async (event) => {
     });
   } finally {
     bitmap?.close();
+    watermarkBitmap?.close();
     cancelledJobs.delete(request.jobId);
   }
 };

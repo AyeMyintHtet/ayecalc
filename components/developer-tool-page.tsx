@@ -25,6 +25,7 @@ export default function DeveloperToolPage({
   const isImageTool = tool.category === "Image tools";
   const isBackgroundRemover = tool.slug === "background-remover";
   const isHeicConverter = tool.slug === "heic-to-jpg";
+  const isCornerShapeGenerator = tool.slug === "css-corner-shape-generator";
   const relatedTools = [
     ...developerTools.filter(
       (candidate) =>
@@ -45,7 +46,9 @@ export default function DeveloperToolPage({
         name: tool.title,
         description: tool.description,
         keywords: tool.searchTerms?.join(", "),
+        dateModified: tool.lastModified,
         isPartOf: { "@id": `${siteConfig.url}/#website` },
+        mainEntity: { "@id": `${canonicalUrl}#application` },
         inLanguage: "en-US",
       },
       {
@@ -63,9 +66,12 @@ export default function DeveloperToolPage({
           ? "Modern browser with JavaScript; network access required for first-use model files"
           : isHeicConverter
             ? "Modern browser with JavaScript, Web Workers, WebAssembly, and OffscreenCanvas"
+          : isCornerShapeGenerator
+            ? "Modern browser with JavaScript and CSS corner-shape support for the live preview"
           : isImageTool
             ? "Modern browser with JavaScript and Canvas image encoding"
             : "JavaScript enabled for live calculations",
+        featureList: tool.benefits,
         offers: {
           "@type": "Offer",
           price: "0",
@@ -95,6 +101,19 @@ export default function DeveloperToolPage({
             item: canonicalUrl,
           },
         ],
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${canonicalUrl}#faq`,
+        url: `${canonicalUrl}#faq`,
+        mainEntity: tool.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
       },
     ],
   };

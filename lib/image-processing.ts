@@ -34,8 +34,23 @@ export async function processImageOnMainThread(
   request: ImageProcessingRequest,
 ): Promise<ImageProcessingResult> {
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  let watermarkBitmap: ImageBitmap | null = null;
   try {
-    const result = await processImageBitmap(bitmap, request, createHtmlCanvas);
+    if (
+      request.operation === "watermark" &&
+      request.watermark?.mode === "logo" &&
+      request.watermark.logoBlob
+    ) {
+      watermarkBitmap = await createImageBitmap(request.watermark.logoBlob, {
+        imageOrientation: "from-image",
+      });
+    }
+    const result = await processImageBitmap(
+      bitmap,
+      request,
+      createHtmlCanvas,
+      watermarkBitmap,
+    );
     return {
       fileId: request.fileId,
       blob: result.blob,
@@ -49,6 +64,7 @@ export async function processImageOnMainThread(
     };
   } finally {
     bitmap.close();
+    watermarkBitmap?.close();
   }
 }
 

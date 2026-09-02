@@ -8,8 +8,10 @@ import { siteConfig } from "@/lib/metadata";
 const lastModified = new Date("2026-08-18T00:00:00.000Z");
 
 const highPriorityDeveloperTools = new Set([
+  "css-corner-shape-generator",
   "css-clamp-generator",
   "background-remover",
+  "batch-watermark-images",
   "image-resizer",
   "image-compressor",
   "image-cropper",
@@ -27,13 +29,13 @@ const staticPages: Array<{
     path: "",
     changeFrequency: "weekly",
     priority: 1,
-    lastModified: new Date("2026-08-24T00:00:00.000Z"),
+    lastModified: new Date("2026-09-02T00:00:00.000Z"),
   },
   {
     path: "/developer-tools",
     changeFrequency: "weekly",
     priority: 0.9,
-    lastModified: new Date("2026-08-24T00:00:00.000Z"),
+    lastModified: new Date("2026-09-02T00:00:00.000Z"),
   },
   { path: "/unit-converters", changeFrequency: "weekly", priority: 0.9 },
   { path: "/guides", changeFrequency: "monthly", priority: 0.8 },
@@ -72,7 +74,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...infoPages.map((page) => ({
       url: `${siteConfig.url}/${page.slug}`,
-      lastModified,
+      lastModified: page.lastModified
+        ? new Date(page.lastModified)
+        : lastModified,
       changeFrequency: "yearly" as const,
       priority: page.slug === "methodology" || page.slug === "about" ? 0.6 : 0.3,
     })),

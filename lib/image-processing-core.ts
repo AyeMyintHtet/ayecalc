@@ -8,10 +8,24 @@ import {
   type ImageProcessingRequest,
   type SupportedImageMime,
 } from "@/lib/image-tools";
+import {
+  calculateTiledWatermarkPoints,
+  calculateWatermarkAnchor,
+  clampWatermarkNumber,
+  fitWatermarkLogoDimensions,
+  normalizeWatermarkText,
+  type ImageWatermarkOptions,
+} from "@/lib/image-watermark";
 
 type RenderingContext =
   | CanvasRenderingContext2D
   | OffscreenCanvasRenderingContext2D;
+
+type WatermarkImageSource =
+  | HTMLCanvasElement
+  | HTMLImageElement
+  | ImageBitmap
+  | OffscreenCanvas;
 
 export type ImageCanvasSurface = {
   canvas: HTMLCanvasElement | OffscreenCanvas;
@@ -56,6 +70,132 @@ function prepareContext(
   }
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
+}
+
+function drawWatermarkAt(
+  context: RenderingContext,
+  x: number,
+  y: number,
+  rotation: number,
+  opacity: number,
+  draw: () => void,
+) {
+  context.save();
+  context.translate(x, y);
+  context.rotate((rotation * Math.PI) / 180);
+  context.globalAlpha = clampWatermarkNumber(opacity, 0.05, 1);
+  draw();
+  context.restore();
+}
+
+export function drawImageWatermark(
+  surface: Pick<ImageCanvasSurface, "canvas" | "context">,
+  options: ImageWatermarkOptions,
+  logoSource?: WatermarkImageSource | null,
+) {
+  const { context, canvas } = surface;
+  const shortEdge = Math.min(canvas.width, canvas.height);
+  const rotation = clampWatermarkNumber(options.rotation, -180, 180);
+  let markWidth: number;
+  let markHeight: number;
+  let drawMark: () => void;
+
+  if (options.mode === "logo") {
+    if (!logoSource) throw new Error("Choose a logo image before processing.");
+    const logoWidth =
+      "naturalWidth" in logoSource ? logoSource.naturalWidth : logoSource.width;
+    const logoHeight =
+      "naturalHeight" in logoSource ? logoSource.naturalHeight : logoSource.height;
+    const dimensions = fitWatermarkLogoDimensions(
+      canvas.width,
+      canvas.height,
+      logoWidth,
+      logoHeight,
+      options.sizePercent,
+    );
+    markWidth = dimensions.width;
+    markHeight = dimensions.height;
+    drawMark = () => {
+      context.drawImage(
+        logoSource,
+        -markWidth / 2,
+        -markHeight / 2,
+        markWidth,
+        markHeight,
+      );
+    };
+  } else {
+    const text = normalizeWatermarkText(options.text);
+    if (!text) throw new Error("Enter watermark text before processing.");
+    let fontSize = Math.max(
+      8,
+      Math.round(
+        shortEdge *
+          (clampWatermarkNumber(options.sizePercent, 1, 40) / 100),
+      ),
+    );
+    const setFont = () => {
+      context.font = `${options.fontWeight} ${fontSize}px "${options.fontFamily}"`;
+    };
+    setFont();
+    let measuredWidth = context.measureText(text).width;
+    const maximumWidth = canvas.width * 0.9;
+    if (measuredWidth > maximumWidth) {
+      fontSize = Math.max(8, Math.floor(fontSize * (maximumWidth / measuredWidth)));
+      setFont();
+      measuredWidth = context.measureText(text).width;
+    }
+
+    const outlineWidth =
+      fontSize *
+      (clampWatermarkNumber(options.outlineWidthPercent, 0, 20) / 100);
+    markWidth = Math.max(1, measuredWidth + outlineWidth);
+    markHeight = Math.max(1, fontSize * 1.2 + outlineWidth);
+    drawMark = () => {
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.lineJoin = "round";
+      if (outlineWidth > 0) {
+        context.lineWidth = outlineWidth;
+        context.strokeStyle = options.outlineColor;
+        context.strokeText(text, 0, 0);
+      }
+      context.fillStyle = options.color;
+      context.fillText(text, 0, 0);
+    };
+  }
+
+  const points = options.tiled
+    ? calculateTiledWatermarkPoints(
+        canvas.width,
+        canvas.height,
+        markWidth,
+        markHeight,
+        rotation,
+        options.gapPercent,
+      )
+    : [
+        calculateWatermarkAnchor(
+          canvas.width,
+          canvas.height,
+          markWidth,
+          markHeight,
+          rotation,
+          options.position,
+          options.marginPercent,
+        ),
+      ];
+
+  for (const point of points) {
+    drawWatermarkAt(
+      context,
+      point.x,
+      point.y,
+      rotation,
+      options.opacity,
+      drawMark,
+    );
+  }
 }
 
 async function encodeSurface(
@@ -116,6 +256,7 @@ export async function processImageBitmap(
   bitmap: ImageBitmap,
   request: ImageProcessingRequest,
   createSurface: ImageCanvasFactory,
+  watermarkBitmap?: ImageBitmap | null,
 ): Promise<ImageCoreResult> {
   const mimeType = resolveOutputMime(request.inputMimeType, request.output.format);
   const maximumPixels = Math.min(
@@ -172,6 +313,10 @@ export async function processImageBitmap(
     surface = createSurface(outputWidth, outputHeight);
     prepareContext(surface, mimeType, request.output.backgroundColor);
     surface.context.drawImage(bitmap, 0, 0, outputWidth, outputHeight);
+    if (request.operation === "watermark") {
+      if (!request.watermark) throw new Error("Watermark settings are missing.");
+      drawImageWatermark(surface, request.watermark, watermarkBitmap);
+    }
   }
 
   const encoded = await encodeSurface(

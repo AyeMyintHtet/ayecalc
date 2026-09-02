@@ -15,6 +15,7 @@ export type InfoPageDefinition = {
   introduction: string;
   category: string;
   reviewed: string;
+  lastModified?: string;
   sections: InfoSection[];
 };
 
@@ -76,7 +77,8 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "This methodology explains how AyeCalc turns a formula, conversion factor, or transformation rule into an interactive tool and a useful reference page.",
     category: "Trust and accuracy",
-    reviewed: "August 18, 2026",
+    reviewed: "August 25, 2026",
+    lastModified: "2026-08-25T00:00:00.000Z",
     sections: [
       {
         id: "sources",
@@ -112,7 +114,7 @@ export const infoPages: InfoPageDefinition[] = [
         id: "image-processing",
         title: "Browser image-processing methodology",
         paragraphs: [
-          "The image resizer, compressor, cropper, and format converter decode supported files with browser image APIs, draw the requested pixels to a canvas, and encode a new JPEG, PNG, or WebP result. Batch work runs sequentially so several full-resolution images are not decoded at once, and completed items remain available when another file fails.",
+          "The HEIC converter, batch watermarker, image resizer, compressor, cropper, and format converter decode supported files with browser image APIs, draw the requested pixels to a canvas, and encode a new JPEG, PNG, or WebP result. Batch work runs sequentially so several full-resolution images are not decoded at once, and completed items remain available when another file fails.",
           "Generated files are new encodings and intentionally omit EXIF and other embedded metadata. This protects against carrying location and camera details into the result, but it also removes orientation, resolution, authorship, and similar metadata. Canvas decoding and encoding can also normalize or change embedded color-profile information, so color-critical output should be reviewed in its destination workflow.",
         ],
         bullets: [
@@ -144,7 +146,8 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "AyeCalc is designed so ordinary calculator and converter inputs can be processed in the browser without being submitted to an AyeCalc calculation API.",
     category: "Privacy",
-    reviewed: "August 18, 2026",
+    reviewed: "August 25, 2026",
+    lastModified: "2026-08-25T00:00:00.000Z",
     sections: [
       {
         id: "inputs",
@@ -152,7 +155,7 @@ export const infoPages: InfoPageDefinition[] = [
         paragraphs: [
           "The current calculators and developer tools perform their arithmetic in browser memory. Values entered into those tool fields are not intentionally transmitted to AyeCalc for calculation or stored in a user profile.",
           "The background remover passes the selected image to a worker inside the browser. The selected image is not intentionally uploaded to AyeCalc, Hugging Face, or jsDelivr for processing, and the generated PNG remains a local browser object unless the visitor chooses to download it.",
-          "The image resizer, compressor, cropper, and format converter decode and generate selected images in browser memory. Selected files, previews, completed images, and ZIP archives are not intentionally transmitted to AyeCalc for processing and remain temporary browser objects unless the visitor chooses to download them.",
+          "The HEIC converter, batch watermarker, image resizer, compressor, cropper, and format converter decode and generate selected images in browser memory. Selected files, watermark logos, previews, completed images, and ZIP archives are not intentionally transmitted to AyeCalc for processing and remain temporary browser objects unless the visitor chooses to download them.",
           "Every generated image is a new browser encoding that intentionally removes EXIF and other embedded metadata, including metadata that may contain location or camera details. Removed metadata cannot be restored from the generated file, and browser canvas processing may normalize or change embedded color profiles.",
           "Do not enter confidential, personal, regulated, or security-sensitive information into a public web tool unless the page explicitly supports that use and explains the handling involved.",
         ],
