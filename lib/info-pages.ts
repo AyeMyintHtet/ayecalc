@@ -77,8 +77,8 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "This methodology explains how AyeCalc turns a formula, conversion factor, or transformation rule into an interactive tool and a useful reference page.",
     category: "Trust and accuracy",
-    reviewed: "August 25, 2026",
-    lastModified: "2026-08-25T00:00:00.000Z",
+    reviewed: "September 2, 2026",
+    lastModified: "2026-09-02T00:00:00.000Z",
     sections: [
       {
         id: "sources",
@@ -116,6 +116,7 @@ export const infoPages: InfoPageDefinition[] = [
         paragraphs: [
           "The HEIC converter, batch watermarker, image resizer, compressor, cropper, and format converter decode supported files with browser image APIs, draw the requested pixels to a canvas, and encode a new JPEG, PNG, or WebP result. Batch work runs sequentially so several full-resolution images are not decoded at once, and completed items remain available when another file fails.",
           "Generated files are new encodings and intentionally omit EXIF and other embedded metadata. This protects against carrying location and camera details into the result, but it also removes orientation, resolution, authorship, and similar metadata. Canvas decoding and encoding can also normalize or change embedded color-profile information, so color-critical output should be reviewed in its destination workflow.",
+          "The AI image scanner runs a quantized classifier in a dedicated browser worker and reports cautious likelihood bands instead of verified authorship. Its output reflects patterns learned from a limited training dataset and can fail on edited, compressed, unfamiliar, or human-made images, so an inconclusive range and visible limitations are part of the method.",
         ],
         bullets: [
           "Validate file type, file size, decoded dimensions, animation, and batch limits before processing.",
@@ -146,8 +147,8 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "AyeCalc is designed so ordinary calculator and converter inputs can be processed in the browser without being submitted to an AyeCalc calculation API.",
     category: "Privacy",
-    reviewed: "August 25, 2026",
-    lastModified: "2026-08-25T00:00:00.000Z",
+    reviewed: "September 2, 2026",
+    lastModified: "2026-09-02T00:00:00.000Z",
     sections: [
       {
         id: "inputs",
@@ -155,6 +156,7 @@ export const infoPages: InfoPageDefinition[] = [
         paragraphs: [
           "The current calculators and developer tools perform their arithmetic in browser memory. Values entered into those tool fields are not intentionally transmitted to AyeCalc for calculation or stored in a user profile.",
           "The background remover passes the selected image to a worker inside the browser. The selected image is not intentionally uploaded to AyeCalc, Hugging Face, or jsDelivr for processing, and the generated PNG remains a local browser object unless the visitor chooses to download it.",
+          "The AI image scanner passes the selected image to a classifier worker inside the browser. The image is not intentionally uploaded to AyeCalc or Hugging Face for inference, and its temporary preview remains a local browser object while the page is open.",
           "The HEIC converter, batch watermarker, image resizer, compressor, cropper, and format converter decode and generate selected images in browser memory. Selected files, watermark logos, previews, completed images, and ZIP archives are not intentionally transmitted to AyeCalc for processing and remain temporary browser objects unless the visitor chooses to download them.",
           "Every generated image is a new browser encoding that intentionally removes EXIF and other embedded metadata, including metadata that may contain location or camera details. Removed metadata cannot be restored from the generated file, and browser canvas processing may normalize or change embedded color profiles.",
           "Do not enter confidential, personal, regulated, or security-sensitive information into a public web tool unless the page explicitly supports that use and explains the handling involved.",
@@ -173,7 +175,7 @@ export const infoPages: InfoPageDefinition[] = [
         title: "Analytics, advertising, and third parties",
         paragraphs: [
           "The current application code does not include live advertising or analytics integrations. External reference links lead to third-party websites with their own privacy practices.",
-          "When a visitor starts the background remover, the browser downloads machine-learning model files from Hugging Face and WebAssembly runtime files from jsDelivr. Those asset requests can expose standard request information such as IP address, browser details, referrer, and request time to those providers, but AyeCalc does not intentionally include the selected image in the requests.",
+          "When a visitor starts the background remover or AI image scanner, the browser downloads machine-learning model files from Hugging Face and WebAssembly runtime files from jsDelivr. Those asset requests can expose standard request information such as IP address, browser details, referrer, and request time to those providers, but AyeCalc does not intentionally include the selected image in the requests.",
           "If analytics, advertising, affiliate tracking, consent management, or another third-party service is enabled later, AyeCalc must update the relevant disclosures and consent behavior before or alongside that launch.",
         ],
       },
@@ -195,14 +197,15 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "The current AyeCalc application does not intentionally set non-essential cookies for calculator inputs, advertising, or behavioral analytics.",
     category: "Privacy",
-    reviewed: "August 18, 2026",
+    reviewed: "September 2, 2026",
+    lastModified: "2026-09-02T00:00:00.000Z",
     sections: [
       {
         id: "current-use",
         title: "Current use of cookies",
         paragraphs: [
           "Calculator values are held in temporary component state while the page is open. The current tool implementation does not require a user account or a persistent calculation-history cookie.",
-          "After the background remover is started, the browser may store downloaded model and runtime files in its cache so they do not need to be downloaded for every image. This functional cache contains software assets rather than the selected image or generated PNG and can be cleared through browser site-data controls.",
+          "After the background remover or AI image scanner is started, the browser may store downloaded model and runtime files in its cache so they do not need to be downloaded for every image. This functional cache contains software assets rather than selected images or generated files and can be cleared through browser site-data controls.",
           "The image tools use temporary in-memory state and browser object URLs for selected files, previews, generated images, and on-demand ZIP archives. These objects are released when files are removed, results are cleared, or the page is closed; the tools do not use a cookie to retain image history.",
           "The production hosting platform or security layer may use strictly necessary technical mechanisms for delivery, abuse prevention, load management, or security. Those mechanisms should be documented here when the final production configuration is confirmed.",
         ],
@@ -282,7 +285,8 @@ export const infoPages: InfoPageDefinition[] = [
     introduction:
       "AyeCalc provides informational calculations and technical examples. Its outputs are not professional financial, medical, tax, legal, engineering, accessibility-certification, or other regulated advice.",
     category: "Disclaimer",
-    reviewed: "August 17, 2026",
+    reviewed: "September 2, 2026",
+    lastModified: "2026-09-02T00:00:00.000Z",
     sections: [
       {
         id: "results",
@@ -299,6 +303,7 @@ export const infoPages: InfoPageDefinition[] = [
           "Generated CSS and code snippets are starting points. Browser support, framework versions, inheritance, build configuration, content, and user settings can change the rendered result.",
           "A passing color ratio or generated fluid type value is not an accessibility certification. Evaluate the complete interface against applicable WCAG requirements and real interaction conditions.",
           "Automatic background removal is an estimated segmentation result. Review fine edges, transparent materials, shadows, and missing foreground detail before publishing or relying on the generated image.",
+          "AI image scanning is a probabilistic classifier estimate, not proof of authorship, authenticity, deception, or which tool created an image. Do not use it as the sole basis for accusations, moderation, legal evidence, or another consequential decision.",
         ],
       },
       {

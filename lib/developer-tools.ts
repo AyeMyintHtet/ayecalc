@@ -1179,6 +1179,87 @@ export const developerTools: DeveloperToolDefinition[] = [
     },
   },
   {
+    slug: "ai-image-scanner",
+    title: "AI Image Scanner: Check If an Image Is AI-Generated",
+    shortTitle: "AI Image Scanner",
+    seoTitle: "Free AI Image Scanner & Detector",
+    reviewed: "September 2, 2026",
+    lastModified: "2026-09-02T00:00:00.000Z",
+    searchTerms: [
+      "AI image scanner",
+      "AI image detector",
+      "AI generated image detector",
+      "check if image is AI generated",
+      "detect AI image",
+      "AI photo detector",
+      "fake image detector",
+      "synthetic image detector",
+      "is this image AI",
+      "AI art detector",
+      "browser AI image checker",
+      "free AI image detection tool",
+    ],
+    category: "Image tools",
+    description:
+      "Scan a JPEG, PNG, or WebP for AI-generated visual patterns with private browser processing, cautious likelihood scores, and no image upload.",
+    introduction:
+      "Check whether an image contains visual patterns associated with AI generation. The scanner runs a quantized image-classification model in your browser, shows separate AI and real-image likelihood scores, and returns an inconclusive result when the signal is too close to call.",
+    formula: "verdict = threshold(model AI-class score)",
+    formulaNote:
+      "Scores of 70% or more are labeled likely AI-generated, 30% or less likely real, and the middle range inconclusive.",
+    method:
+      "After you start a scan, the browser downloads and caches a quantized Vision Transformer model, decodes the selected image locally, resizes and normalizes it for the model, and compares its output scores for the REAL and FAKE classes. A dedicated Web Worker runs the inference away from the main interface. The result is a classifier estimate based on learned pixel patterns, not verified authorship or provenance.",
+    exampleTitle: "Scan a compressed image downloaded from social media",
+    exampleText:
+      "Choose the image and start the scan. If the AI score is 58% and the real-image score is 42%, the tool reports Inconclusive rather than turning a narrow model difference into a confident claim. Compression and resizing may have removed signals the classifier learned during training.",
+    guidance:
+      "Use the original, highest-quality image when possible. Treat the scanner as one signal alongside Content Credentials, source history, reverse-image search, contextual verification, and human review. Never accuse a creator, reject evidence, or make a consequential moderation decision from this score alone.",
+    limitation:
+      "AI-image detectors can misclassify real photos, human-made digital art, edited images, screenshots, compressed files, and outputs from generators not represented in training. Metadata removal or the absence of Content Credentials does not prove an image is real or synthetic. The displayed scores are model outputs, not calibrated probabilities of authorship.",
+    benefits: ["Image stays local", "Cautious three-way verdict", "No account"],
+    codeSnippets: [
+      {
+        label: "Conservative thresholds",
+        code: "const verdict = aiScore >= 0.70\n  ? 'likely-ai'\n  : aiScore <= 0.30\n    ? 'likely-real'\n    : 'inconclusive';",
+      },
+      {
+        label: "Feature disclosure",
+        code: "<p>AI detection is an estimate, not proof of how an image was created.</p>",
+      },
+    ],
+    faqs: [
+      {
+        question: "Can an AI image detector be 100% accurate?",
+        answer:
+          "No. Detection models can produce false positives and false negatives, especially for edited, compressed, resized, or unfamiliar images. This scanner deliberately reports an inconclusive middle range.",
+      },
+      {
+        question: "Does AyeCalc upload the image I scan?",
+        answer:
+          "No. The selected image is passed to a worker inside your browser for inference. The browser separately downloads model and runtime files on first use, but the selected image is not intentionally included in those requests.",
+      },
+      {
+        question: "Why does the first scan take longer?",
+        answer:
+          "The first scan downloads a quantized model of about 11 MB plus browser runtime files. The browser can cache those files, so later scans may start faster.",
+      },
+      {
+        question: "What does Inconclusive mean?",
+        answer:
+          "It means the model's AI score is between 30% and 70%, where the signal is not strong enough for this tool to label the image likely AI-generated or likely real.",
+      },
+      {
+        question: "Can the scanner identify which AI generator made an image?",
+        answer:
+          "No. This version estimates only whether the image resembles the model's real or AI-generated training classes. It does not reliably identify Midjourney, DALL-E, Stable Diffusion, or another specific source.",
+      },
+    ],
+    source: {
+      label: "Hugging Face ONNX Community: distilled AI image detection model",
+      href: "https://huggingface.co/onnx-community/ai-image-detect-distilled-ONNX",
+    },
+  },
+  {
     slug: "background-remover",
     title: "Free Background Remover Online",
     shortTitle: "Background Remover",

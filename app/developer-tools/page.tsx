@@ -8,12 +8,14 @@ import { createPageMetadata, siteConfig } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Developer, CSS & Image Tools",
   description:
-    "Use free browser-based tools to watermark, convert, resize, compress, crop, and remove image backgrounds, plus CSS and accessibility utilities.",
+    "Use free browser-based tools to scan for AI-image patterns, watermark, convert, resize, compress, crop, remove backgrounds, and generate CSS.",
   path: "/developer-tools",
   keywords: [
     "developer tools",
     "CSS tools",
     "CSS corner shape generator",
+    "AI image scanner",
+    "AI image detector",
     "image tools",
     "image resizer",
     "image compressor",
@@ -83,8 +85,9 @@ export default function DeveloperToolsPage() {
           <span className={styles.eyebrow}>Browser-based utilities</span>
           <h1>Free developer, CSS, and image tools</h1>
           <p className={styles.heroLead}>
-            Build responsive interfaces, check accessibility, and process images
-            with focused tools that explain their methods and privacy behavior.
+            Build responsive interfaces, check accessibility, detect AI-image
+            patterns, and process images with focused tools that explain their
+            methods and privacy behavior.
           </p>
           <div className={styles.heroMeta}>
             <span>No account</span>
@@ -102,9 +105,9 @@ export default function DeveloperToolsPage() {
               <h2>Tools for practical digital workflows</h2>
             </div>
             <p>
-              Shape CSS corners, generate production values, inspect
-              context-dependent units, and process images directly in your
-              browser.
+              Scan for AI-image patterns, shape CSS corners, generate production
+              values, inspect context-dependent units, and process images
+              directly in your browser.
             </p>
           </div>
           <div className={styles.cardGrid}>

@@ -7,7 +7,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Online Calculators & Tools for Everyday Decisions",
   description:
-    "Use AyeCalc's free loan calculator, unit converters, private browser image tools, CSS developer tools, and practical guides.",
+    "Use AyeCalc's free calculators, unit converters, private AI image scanner, browser image tools, CSS generators, and practical guides.",
   path: "/",
   keywords: [
     "online calculator",
@@ -17,6 +17,7 @@ export const metadata = createPageMetadata({
     "financial calculator",
     "developer tools",
     "image tools",
+    "AI image scanner",
     "image resizer",
     "image compressor",
     "image cropper",
@@ -337,8 +338,9 @@ export default function Home() {
                 <h2 id="developer-tools-title">Useful tools for real workflows</h2>
               </div>
               <p>
-                Shape CSS corners, generate fluid values, compare units, and
-                process images with clear privacy and method notes.
+                Scan for AI-image patterns, shape CSS corners, generate fluid
+                values, compare units, and process images with clear privacy
+                and method notes.
               </p>
             </div>
 

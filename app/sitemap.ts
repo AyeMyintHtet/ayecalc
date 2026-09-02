@@ -8,6 +8,7 @@ import { siteConfig } from "@/lib/metadata";
 const lastModified = new Date("2026-08-18T00:00:00.000Z");
 
 const highPriorityDeveloperTools = new Set([
+  "ai-image-scanner",
   "css-corner-shape-generator",
   "css-clamp-generator",
   "background-remover",

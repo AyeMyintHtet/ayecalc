@@ -26,6 +26,7 @@ export default function DeveloperToolPage({
   const isBackgroundRemover = tool.slug === "background-remover";
   const isHeicConverter = tool.slug === "heic-to-jpg";
   const isCornerShapeGenerator = tool.slug === "css-corner-shape-generator";
+  const isAiImageScanner = tool.slug === "ai-image-scanner";
   const relatedTools = [
     ...developerTools.filter(
       (candidate) =>
@@ -68,6 +69,8 @@ export default function DeveloperToolPage({
             ? "Modern browser with JavaScript, Web Workers, WebAssembly, and OffscreenCanvas"
           : isCornerShapeGenerator
             ? "Modern browser with JavaScript and CSS corner-shape support for the live preview"
+          : isAiImageScanner
+            ? "Modern browser with JavaScript, Web Workers, and WebAssembly; network access required for first-use model files"
           : isImageTool
             ? "Modern browser with JavaScript and Canvas image encoding"
             : "JavaScript enabled for live calculations",

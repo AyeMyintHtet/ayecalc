@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     "unit converter",
     "CSS calculator",
     "developer tools",
+    "AI image detector",
     "background remover",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
