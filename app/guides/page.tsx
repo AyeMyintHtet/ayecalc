@@ -21,6 +21,7 @@ const jsonLd = {
       name: "AyeCalc CSS and Developer Guides",
       description:
         "Practical guides for CSS units, responsive typography, and developer workflows.",
+      dateModified: "2026-08-17",
     },
     {
       "@type": "BreadcrumbList",

@@ -1,32 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import SiteHeader from "@/components/site-header";
 import styles from "@/app/content.module.css";
-
-export function ContentHeader() {
-  return (
-    <header className={styles.header}>
-      <div className={styles.headerInner}>
-        <Link className={styles.brand} href="/" aria-label="AyeCalc home">
-          <span className={styles.brandMark} aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
-          <span>AyeCalc</span>
-        </Link>
-        <nav className={styles.nav} aria-label="Primary navigation">
-          <Link href="/developer-tools">Developer tools</Link>
-          <Link href="/unit-converters">Converters</Link>
-          <Link href="/guides">Guides</Link>
-          <Link href="/methodology">Methodology</Link>
-        </nav>
-        <Link className={styles.headerCta} href="/developer-tools">
-          Explore tools
-        </Link>
-      </div>
-    </header>
-  );
-}
 
 export function ContentFooter() {
   return (
@@ -62,7 +37,7 @@ export function ContentFooter() {
 export function ContentPage({ children }: { children: ReactNode }) {
   return (
     <>
-      <ContentHeader />
+      <SiteHeader />
       <main className={styles.page}>{children}</main>
       <ContentFooter />
     </>

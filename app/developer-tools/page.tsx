@@ -8,7 +8,7 @@ import { createPageMetadata, siteConfig } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Free Developer, CSS & Image Tools",
   description:
-    "Use free browser-based tools to scan for AI-image patterns, watermark, convert, resize, compress, crop, remove backgrounds, and generate CSS.",
+    "Use free browser-based tools to inspect Content Credentials and image metadata, scan AI patterns, process images, check accessibility, and generate CSS.",
   path: "/developer-tools",
   keywords: [
     "developer tools",
@@ -16,6 +16,10 @@ export const metadata = createPageMetadata({
     "CSS corner shape generator",
     "AI image scanner",
     "AI image detector",
+    "Content Credentials inspector",
+    "C2PA image checker",
+    "image metadata inspector",
+    "EXIF metadata viewer",
     "image tools",
     "image resizer",
     "image compressor",
@@ -37,6 +41,7 @@ const jsonLd = {
       name: "AyeCalc Developer Tools",
       description:
         "Browser-based developer, CSS, accessibility, and image utilities with visible methods and practical guidance.",
+      dateModified: "2026-09-11",
       mainEntity: {
         "@type": "ItemList",
         numberOfItems: developerTools.length,
@@ -85,9 +90,9 @@ export default function DeveloperToolsPage() {
           <span className={styles.eyebrow}>Browser-based utilities</span>
           <h1>Free developer, CSS, and image tools</h1>
           <p className={styles.heroLead}>
-            Build responsive interfaces, check accessibility, detect AI-image
-            patterns, and process images with focused tools that explain their
-            methods and privacy behavior.
+            Build responsive interfaces, check accessibility, inspect image
+            provenance and metadata, detect AI-image patterns, and process images
+            with focused tools that explain their methods and privacy behavior.
           </p>
           <div className={styles.heroMeta}>
             <span>No account</span>
@@ -105,9 +110,9 @@ export default function DeveloperToolsPage() {
               <h2>Tools for practical digital workflows</h2>
             </div>
             <p>
-              Scan for AI-image patterns, shape CSS corners, generate production
-              values, inspect context-dependent units, and process images
-              directly in your browser.
+              Validate Content Credentials, inspect image metadata, scan for
+              AI-image patterns, shape CSS corners, generate production values,
+              and process images directly in your browser.
             </p>
           </div>
           <div className={styles.cardGrid}>

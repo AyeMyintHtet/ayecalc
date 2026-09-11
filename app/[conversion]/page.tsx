@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CopyCode from "@/components/copy-code";
+import SiteHeader from "@/components/site-header";
 import UnitConverter from "@/components/unit-converter";
 import { convertValue, formatConversionNumber } from "@/lib/conversion-math";
 import {
@@ -12,7 +13,11 @@ import {
   getDefaultContext,
   getExample,
 } from "@/lib/converters";
-import { createPageMetadata, siteConfig } from "@/lib/metadata";
+import {
+  createPageMetadata,
+  getDateModified,
+  siteConfig,
+} from "@/lib/metadata";
 import styles from "@/components/tool-page.module.css";
 
 type ConverterPageProps = {
@@ -101,6 +106,7 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
         alternateName: converter.searchTerms,
         description: converter.description,
         keywords: converter.searchTerms?.join(", "),
+        dateModified: getDateModified(converter.lastModified),
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         inLanguage: "en-US",
       },
@@ -157,26 +163,7 @@ export default async function ConverterPage({ params }: ConverterPageProps) {
         dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
 
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <Link className={styles.brand} href="/" aria-label="AyeCalc home">
-            <span className={styles.brandMark} aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-            <span>AyeCalc</span>
-          </Link>
-          <nav className={styles.headerNav} aria-label="Converter navigation">
-            <Link href="/unit-converters">All converters</Link>
-            <Link href="#formula">Formula</Link>
-            <Link href="#conversion-table">Table</Link>
-          </nav>
-          <Link className={styles.headerCta} href="/developer-tools">
-            Explore tools <span aria-hidden="true">↗</span>
-          </Link>
-        </div>
-      </header>
+      <SiteHeader currentSlug={converter.slug} />
 
       <main>
         <section className={styles.hero}>

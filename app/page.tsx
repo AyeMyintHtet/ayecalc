@@ -1,11 +1,13 @@
 import Calculator from "@/components/calculator";
+import ScrollToTop from "@/components/scroll-to-top";
+import SiteHeader from "@/components/site-header";
 import { converterDefinitions } from "@/lib/converters";
 import { developerTools } from "@/lib/developer-tools";
 import { guides } from "@/lib/guides";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Free Online Calculators & Tools for Everyday Decisions",
+  title: "Free Online Calculators, Converters & Image Tools",
   description:
     "Use AyeCalc's free calculators, unit converters, private AI image scanner, browser image tools, CSS generators, and practical guides.",
   path: "/",
@@ -34,43 +36,58 @@ export const metadata = createPageMetadata({
 const categories = [
   {
     icon: "↗",
-    title: "Finance",
-    description: "Estimate a monthly loan payment with visible assumptions.",
+    title: "Calculators",
+    description: "Work through everyday numbers with clear inputs and visible assumptions.",
     tools: "Try calculator",
     href: "#calculator",
     accent: "mint",
   },
   {
-    icon: "⌘",
-    title: "Developer Units",
-    description: "Move between PX, REM, and EM for CSS workflows.",
+    icon: "↔",
+    title: "Unit Converters",
+    description: "Convert common measurements and CSS units with dependable factors.",
     tools: "Browse converters",
-    href: "/developer-tools",
+    href: "/unit-converters",
     accent: "yellow",
   },
   {
-    icon: "↔",
-    title: "Weight",
-    description: "Convert pounds and kilograms with an exact factor.",
-    tools: "Browse converters",
-    href: "/unit-converters",
+    icon: "⌁",
+    title: "Image Tools",
+    description: "Inspect, resize, compress, crop, convert, and watermark images in your browser.",
+    tools: "Explore image tools",
+    href: "/developer-tools",
     accent: "coral",
   },
   {
-    icon: "⌁",
-    title: "Length",
-    description: "Convert centimeters and inches for everyday measurements.",
-    tools: "Browse converters",
-    href: "/unit-converters",
+    icon: "⌘",
+    title: "Developer & CSS",
+    description: "Generate CSS, check accessibility, and solve common front-end tasks.",
+    tools: "Explore developer tools",
+    href: "/developer-tools",
     accent: "blue",
   },
 ];
 
 const popularQueryDestinations = [
   {
-    label: "Color contrast checker",
-    aliases: "WCAG color contrast checker",
-    href: "/contrast-checker",
+    label: "Loan payment calculator",
+    aliases: "Monthly payment estimate",
+    href: "#calculator",
+  },
+  {
+    label: "AI image scanner",
+    aliases: "Check if an image may be AI-generated",
+    href: "/ai-image-scanner",
+  },
+  {
+    label: "Image compressor",
+    aliases: "Reduce image file size in your browser",
+    href: "/image-compressor",
+  },
+  {
+    label: "Content Credentials inspector",
+    aliases: "Check C2PA credentials and image metadata",
+    href: "/content-credentials-inspector",
   },
   {
     label: "PX to REM",
@@ -78,42 +95,27 @@ const popularQueryDestinations = [
     href: "/px-to-rem",
   },
   {
-    label: "REM to PX",
-    aliases: "1 REM to PX · REM to PX converter",
-    href: "/rem-to-px",
-  },
-  {
-    label: "EM to PX",
-    aliases: "EM PX · 1 EM to PX",
-    href: "/em-to-px",
-  },
-  {
-    label: "Aspect ratio calculator",
-    aliases: "Size ratio calculator",
-    href: "/aspect-ratio-calculator",
-  },
-  {
-    label: "REM vs EM",
-    aliases: "EM vs REM guide",
-    href: "/guides/rem-vs-em",
+    label: "Pounds to kilograms",
+    aliases: "LB to KG converter",
+    href: "/lb-to-kg",
   },
 ];
 
 const faqs = [
   {
-    question: "Are AyeCalc calculators free to use?",
+    question: "Are all AyeCalc tools free to use?",
     answer:
-      "Yes. Every AyeCalc calculator is free to use, with no account, subscription, or download required.",
+      "Yes. AyeCalc calculators, converters, image utilities, developer tools, and guides are free to use without an account or subscription.",
   },
   {
-    question: "Are my calculations saved?",
+    question: "Do my files or inputs leave my device?",
     answer:
-      "No. Calculations happen in your browser and are not stored or connected to a personal profile.",
+      "AyeCalc is browser-first. Calculations and supported image processing happen locally and are not connected to a personal profile. Each tool explains any network requirement it may have.",
   },
   {
-    question: "How accurate are the results?",
+    question: "How should I use the results?",
     answer:
-      "AyeCalc uses established formulas and clearly shows assumptions. Results are estimates and should not replace professional financial or medical advice.",
+      "AyeCalc shows formulas, assumptions, settings, and limitations where they matter. Calculations are estimates, and image analysis provides evidence rather than absolute certainty.",
   },
 ];
 
@@ -125,8 +127,11 @@ const jsonLd = {
       "@id": "https://www.ayecalc.com/#website",
       url: "https://www.ayecalc.com/",
       name: "AyeCalc",
-      description: "Free online calculators for smarter everyday decisions.",
+      alternateName: "ayecalc.com",
+      description:
+        "Free online calculators, unit converters, browser image utilities, developer and CSS tools, and practical guides.",
       inLanguage: "en-US",
+      dateModified: "2026-09-11",
     },
     {
       "@type": "WebApplication",
@@ -142,6 +147,7 @@ const jsonLd = {
       ],
       description:
         "Estimate a monthly principal-and-interest payment from a loan amount, annual interest rate, and loan term.",
+      dateModified: "2026-08-18",
       applicationCategory: "FinanceApplication",
       operatingSystem: "Any",
       browserRequirements: "JavaScript enabled for live calculations",
@@ -162,29 +168,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <header className="site-header">
-        <div className="container nav-wrap">
-          <a className="brand" href="#top" aria-label="AyeCalc home">
-            <span className="brand-mark" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-            <span>AyeCalc</span>
-          </a>
-
-          <nav className="desktop-nav" aria-label="Primary navigation">
-            <a href="/developer-tools">Developer tools</a>
-            <a href="/unit-converters">Converters</a>
-            <a href="/guides">Guides</a>
-          </nav>
-
-          <a className="nav-cta" href="/developer-tools">
-            Explore tools
-            <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
@@ -194,20 +178,20 @@ export default function Home() {
             <div className="hero-copy">
               <div className="eyebrow">
                 <span className="eyebrow-dot" />
-                Simple tools. Clear answers.
+                Calculators, converters, image tools &amp; more
               </div>
               <h1 id="hero-title">
-                Make numbers
+                Everyday tools
                 <br />
-                <em>make sense.</em>
+                <em>made simple.</em>
               </h1>
               <p className="hero-lead">
-                Free, accurate calculators designed to make everyday decisions
-                feel a little easier.
+                Calculate, convert units, inspect or edit images, generate CSS,
+                and learn with practical guides—all in one clear, browser-friendly place.
               </p>
               <div className="hero-actions">
-                <a className="button button-primary" href="/developer-tools">
-                  Explore developer tools
+                <a className="button button-primary" href="#tools">
+                  Explore all tools
                   <span aria-hidden="true">→</span>
                 </a>
                 <a className="text-link" href="#why-ayecalc">
@@ -241,11 +225,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="popular-searches" aria-labelledby="popular-searches-title">
+        <section className="popular-searches" id="tools" aria-labelledby="popular-searches-title">
           <div className="container popular-searches-inner">
             <div className="popular-searches-heading">
               <span className="kicker">Popular searches</span>
-              <h2 id="popular-searches-title">Go directly to the right tool</h2>
+              <h2 id="popular-searches-title">Find a tool for the task at hand</h2>
             </div>
             <nav className="popular-search-grid" aria-label="Popular tools and guides">
               {popularQueryDestinations.map((destination) => (
@@ -259,16 +243,16 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="categories section" id="calculators" aria-labelledby="categories-title">
+        <section className="categories section" id="tool-categories" aria-labelledby="categories-title">
           <div className="container">
             <div className="section-heading">
               <div>
-                <span className="kicker">Find your calculator</span>
-                <h2 id="categories-title">A useful tool for every number</h2>
+                <span className="kicker">Explore by category</span>
+                <h2 id="categories-title">What can you do with AyeCalc?</h2>
               </div>
               <p>
-                From quick everyday math to bigger life decisions, get a clear
-                answer without the clutter.
+                Calculate, convert, inspect, create, and learn with focused tools
+                that explain their results without unnecessary clutter.
               </p>
             </div>
 
@@ -299,7 +283,7 @@ export default function Home() {
             <div className="section-heading">
               <div>
                 <span className="kicker">Instant converters</span>
-                <h2 id="converters-title">Move between units without the guesswork</h2>
+                <h2 id="converters-title">Convert common units with confidence</h2>
               </div>
               <p>
                 Fast browser-based conversions with visible formulas, adjustable
@@ -335,7 +319,7 @@ export default function Home() {
             <div className="section-heading">
               <div>
                 <span className="kicker">Browser toolbox</span>
-                <h2 id="developer-tools-title">Useful tools for real workflows</h2>
+                <h2 id="developer-tools-title">Browser tools for images, code, and the web</h2>
               </div>
               <p>
                 Scan for AI-image patterns, shape CSS corners, generate fluid
@@ -364,8 +348,8 @@ export default function Home() {
               <div className="orbit orbit-two" />
               <div className="visual-center">
                 <span className="visual-check">✓</span>
-                <strong>Clear by design</strong>
-                <small>No jargon. No hidden steps.</small>
+                <strong>Useful by design</strong>
+                <small>Clear guidance. No hidden steps.</small>
               </div>
               <span className="visual-chip chip-one">Clear</span>
               <span className="visual-chip chip-two">Fast</span>
@@ -374,11 +358,11 @@ export default function Home() {
 
             <div className="why-copy">
               <span className="kicker light">Why AyeCalc</span>
-              <h2 id="why-title">Confidence in every calculation.</h2>
+              <h2 id="why-title">Clear tools. Useful results. Better privacy.</h2>
               <p>
-                Numbers should help you decide, not leave you second-guessing.
-                Every tool is built to be understandable, dependable, and kind
-                to your privacy.
+                From a quick conversion to image inspection and CSS generation,
+                every AyeCalc tool is built to be understandable, dependable,
+                and respectful of your privacy.
               </p>
               <ul className="feature-list">
                 <li>
@@ -391,15 +375,15 @@ export default function Home() {
                 <li>
                   <span>02</span>
                   <div>
-                    <strong>Formulas you can trust</strong>
-                    <p>Carefully tested calculations with assumptions made visible.</p>
+                    <strong>Methods you can inspect</strong>
+                    <p>Formulas, settings, evidence, and limitations are made visible.</p>
                   </div>
                 </li>
                 <li>
                   <span>03</span>
                   <div>
-                    <strong>Your numbers stay yours</strong>
-                    <p>No accounts and no personal calculation history stored.</p>
+                    <strong>Your work stays yours</strong>
+                    <p>No accounts, with supported calculations and image tasks handled locally.</p>
                   </div>
                 </li>
               </ul>
@@ -412,7 +396,7 @@ export default function Home() {
             <div className="section-heading">
               <div>
                 <span className="kicker">Practical guides</span>
-                <h2 id="home-guides-title">Understand the method behind the value</h2>
+                <h2 id="home-guides-title">Learn how the tools and methods work</h2>
               </div>
               <p>
                 Learn how relative units, design handoff, framework spacing, and
@@ -439,7 +423,7 @@ export default function Home() {
           <div className="container narrow">
             <div className="center-heading">
               <span className="kicker">Good to know</span>
-              <h2 id="guides-title">Answers before you calculate</h2>
+              <h2 id="guides-title">Helpful answers before you begin</h2>
             </div>
             <div className="faq-list">
               {faqs.map((faq, index) => (
@@ -455,14 +439,14 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="closing-cta" aria-label="Start calculating">
+        <section className="closing-cta" aria-label="Explore AyeCalc tools">
           <div className="container closing-inner">
             <div>
               <span className="kicker light">Ready when you are</span>
-              <h2>One less thing to overthink.</h2>
+              <h2>Your next useful tool is ready.</h2>
             </div>
-            <a className="button button-light" href="#calculator">
-              Start calculating <span aria-hidden="true">→</span>
+            <a className="button button-light" href="#tools">
+              Explore all tools <span aria-hidden="true">→</span>
             </a>
           </div>
         </section>
@@ -493,6 +477,7 @@ export default function Home() {
           <p className="copyright">© {new Date().getFullYear()} AyeCalc. All rights reserved.</p>
         </div>
       </footer>
+      <ScrollToTop />
     </>
   );
 }

@@ -2,9 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "AyeCalc — Free Online Calculators",
+    name: "AyeCalc — Free Online Tools",
     short_name: "AyeCalc",
-    description: "Fast, free, and private calculators for everyday decisions.",
+    description:
+      "Free calculators, unit converters, image utilities, developer tools, and practical guides.",
     start_url: "/",
     display: "standalone",
     background_color: "#fffefa",

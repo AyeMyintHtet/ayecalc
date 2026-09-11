@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "AyeCalc — Numbers, made human";
+export const alt = "AyeCalc — Everyday tools made simple";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -68,12 +68,12 @@ export default function OpenGraphImage() {
               letterSpacing: -4,
             }}
           >
-            Make numbers
+            Everyday tools
             <br />
-            <span style={{ color: "#67e5b4" }}>make sense.</span>
+            <span style={{ color: "#67e5b4" }}>made simple.</span>
           </div>
           <div style={{ marginTop: 32, color: "rgba(255,255,255,.68)", fontSize: 26 }}>
-            Free, accurate calculators for everyday decisions.
+            Calculators, converters, image tools, CSS utilities, and guides.
           </div>
         </div>
       </div>

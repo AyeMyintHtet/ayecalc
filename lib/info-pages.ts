@@ -15,7 +15,7 @@ export type InfoPageDefinition = {
   introduction: string;
   category: string;
   reviewed: string;
-  lastModified?: string;
+  lastModified: string;
   sections: InfoSection[];
 };
 
@@ -29,6 +29,7 @@ export const infoPages: InfoPageDefinition[] = [
       "AyeCalc is a collection of free calculators, converters, developer utilities, and practical guides designed to turn a numerical task into a clear, understandable result.",
     category: "About the site",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "mission",
@@ -237,6 +238,7 @@ export const infoPages: InfoPageDefinition[] = [
       "These terms describe the general conditions for using AyeCalc. By using the site, you agree to use its tools and content lawfully and to apply independent judgment to the results.",
     category: "Terms",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "service",
@@ -329,6 +331,7 @@ export const infoPages: InfoPageDefinition[] = [
       "AyeCalc does not currently include live advertising or affiliate integrations in the application code. This disclosure describes the standards that apply if monetization is introduced later.",
     category: "Transparency",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "current-status",

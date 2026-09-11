@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import CopyCode from "@/components/copy-code";
+import SiteHeader from "@/components/site-header";
 import styles from "@/components/tool-page.module.css";
 import {
   developerTools,
   type DeveloperToolDefinition,
 } from "@/lib/developer-tools";
-import { siteConfig } from "@/lib/metadata";
+import { getDateModified, siteConfig } from "@/lib/metadata";
 
 type DeveloperToolPageProps = {
   tool: DeveloperToolDefinition;
@@ -27,14 +28,27 @@ export default function DeveloperToolPage({
   const isHeicConverter = tool.slug === "heic-to-jpg";
   const isCornerShapeGenerator = tool.slug === "css-corner-shape-generator";
   const isAiImageScanner = tool.slug === "ai-image-scanner";
+  const isCredentialInspector = tool.slug === "content-credentials-inspector";
+  const priorityRelatedSlugs = isCredentialInspector
+    ? ["ai-image-scanner", "image-format-converter", "image-compressor", "batch-watermark-images"]
+    : isAiImageScanner
+      ? ["content-credentials-inspector"]
+      : [];
   const relatedTools = [
+    ...priorityRelatedSlugs
+      .map((slug) => developerTools.find((candidate) => candidate.slug === slug))
+      .filter((candidate): candidate is DeveloperToolDefinition => Boolean(candidate)),
     ...developerTools.filter(
       (candidate) =>
-        candidate.slug !== tool.slug && candidate.category === tool.category,
+        candidate.slug !== tool.slug &&
+        !priorityRelatedSlugs.includes(candidate.slug) &&
+        candidate.category === tool.category,
     ),
     ...developerTools.filter(
       (candidate) =>
-        candidate.slug !== tool.slug && candidate.category !== tool.category,
+        candidate.slug !== tool.slug &&
+        !priorityRelatedSlugs.includes(candidate.slug) &&
+        candidate.category !== tool.category,
     ),
   ].slice(0, 4);
   const jsonLd = {
@@ -47,7 +61,7 @@ export default function DeveloperToolPage({
         name: tool.title,
         description: tool.description,
         keywords: tool.searchTerms?.join(", "),
-        dateModified: tool.lastModified,
+        dateModified: getDateModified(tool.lastModified),
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         mainEntity: { "@id": `${canonicalUrl}#application` },
         inLanguage: "en-US",
@@ -71,6 +85,8 @@ export default function DeveloperToolPage({
             ? "Modern browser with JavaScript and CSS corner-shape support for the live preview"
           : isAiImageScanner
             ? "Modern browser with JavaScript, Web Workers, and WebAssembly; network access required for first-use model files"
+          : isCredentialInspector
+            ? "Modern browser with JavaScript, Web Workers, and WebAssembly"
           : isImageTool
             ? "Modern browser with JavaScript and Canvas image encoding"
             : "JavaScript enabled for live calculations",
@@ -128,26 +144,7 @@ export default function DeveloperToolPage({
         dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
 
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <Link className={styles.brand} href="/" aria-label="AyeCalc home">
-            <span className={styles.brandMark} aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </span>
-            <span>AyeCalc</span>
-          </Link>
-          <nav className={styles.headerNav} aria-label="Tool navigation">
-            <Link href="/developer-tools">Developer tools</Link>
-            <Link href="#formula">Method</Link>
-            <Link href="#faq">FAQ</Link>
-          </nav>
-          <Link className={styles.headerCta} href="/unit-converters">
-            Unit converters <span aria-hidden="true">↗</span>
-          </Link>
-        </div>
-      </header>
+      <SiteHeader currentSlug={tool.slug} />
 
       <main>
         <section className={styles.hero}>
@@ -213,11 +210,17 @@ export default function DeveloperToolPage({
               <span className={styles.sectionNumber}>03</span>
               <div>
                 <span className={styles.sectionKicker}>
-                  {isImageTool ? "Output" : "Implementation"}
+                  {isCredentialInspector
+                    ? "Evidence"
+                    : isImageTool
+                      ? "Output"
+                      : "Implementation"}
                 </span>
                 <h2>
                   {isBackgroundRemover
                     ? "Using the transparent PNG"
+                    : isCredentialInspector
+                      ? "Reading the evidence report"
                     : isImageTool
                       ? "Using the processed image"
                       : "Copyable code examples"}
@@ -225,6 +228,8 @@ export default function DeveloperToolPage({
                 <p>
                   {isBackgroundRemover
                     ? "Preserve the PNG alpha channel and provide accurate dimensions and alternative text when adding the result to a page."
+                    : isCredentialInspector
+                      ? "Read credential validation, AI disclosures, attribution, rights, capture, and privacy fields as separate signals. Save the JSON report when a technical record is useful."
                     : isImageTool
                       ? "Keep the exported dimensions, format, transparency, and compression level appropriate for where the image will be used."
                       : "Use these examples as a starting point, then match the values and assumptions to the rendered project."}
@@ -252,7 +257,16 @@ export default function DeveloperToolPage({
                   <p>{tool.limitation}</p>
                 </div>
                 <p className={styles.sourceLine}>
-                  Reference: <a href={tool.source.href}>{tool.source.label}</a>.
+                  References:{" "}
+                  {[tool.source, ...(tool.additionalSources ?? [])].map(
+                    (source, index) => (
+                      <span key={source.href}>
+                        {index > 0 ? " · " : ""}
+                        <a href={source.href}>{source.label}</a>
+                      </span>
+                    ),
+                  )}
+                  .
                 </p>
               </div>
             </section>

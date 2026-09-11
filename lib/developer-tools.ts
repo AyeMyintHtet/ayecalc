@@ -22,6 +22,7 @@ export type DeveloperToolDefinition = {
   codeSnippets: Array<{ label: string; code: string }>;
   faqs: Array<{ question: string; answer: string }>;
   source: { label: string; href: string };
+  additionalSources?: Array<{ label: string; href: string }>;
 };
 
 export const developerTools: DeveloperToolDefinition[] = [
@@ -107,6 +108,7 @@ export const developerTools: DeveloperToolDefinition[] = [
     slug: "css-clamp-generator",
     title: "CSS Clamp Generator & Fluid Typography Calculator",
     shortTitle: "CSS Clamp Generator",
+    seoTitle: "Free CSS Clamp Generator & Fluid Typography Tool",
     searchTerms: [
       "CSS clamp calculator",
       "CSS clamp maker",
@@ -1177,6 +1179,104 @@ export const developerTools: DeveloperToolDefinition[] = [
       label: "MDN HTMLCanvasElement toBlob()",
       href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob",
     },
+  },
+  {
+    slug: "content-credentials-inspector",
+    title: "Content Credentials & Image Metadata Inspector",
+    shortTitle: "Content Credentials Inspector",
+    seoTitle: "Free Content Credentials & Image Metadata Inspector",
+    reviewed: "September 11, 2026",
+    lastModified: "2026-09-11T00:00:00.000Z",
+    searchTerms: [
+      "Content Credentials inspector",
+      "C2PA image checker",
+      "Content Credentials checker",
+      "image metadata inspector",
+      "EXIF metadata viewer",
+      "IPTC metadata viewer",
+      "XMP metadata viewer",
+      "AI image metadata checker",
+      "check image provenance",
+      "image authenticity metadata",
+      "photo metadata checker",
+      "C2PA validator online",
+      "view image GPS metadata",
+      "AI content disclosure checker",
+    ],
+    category: "Image tools",
+    description:
+      "Inspect embedded C2PA Content Credentials, validation results, AI disclosures, EXIF, IPTC, XMP, ICC, rights, and GPS metadata privately in your browser.",
+    introduction:
+      "Check the evidence embedded in an image without uploading it. Validate C2PA Content Credentials, review recorded provenance actions and AI source disclosures, find attribution or licensing details, and search EXIF, IPTC, XMP, ICC, and GPS metadata in one readable report.",
+    formula: "evidence report = C2PA validation + embedded image metadata",
+    formulaNote:
+      "A valid credential confirms that signed provenance data remains bound to the file; it does not prove that every claim or visible scene is true.",
+    method:
+      "After you select Inspect image, the official C2PA Web SDK reads the file in a browser worker and verifies its embedded manifest, content binding, signature, and available trust state. A separate local parser organizes EXIF, IPTC-IIM, XMP, ICC, TIFF, and format-header fields. Remote manifests and online certificate revocation requests are disabled so the selected file and its embedded URLs are not sent to another service.",
+    exampleTitle: "Review an image that declares generative AI use",
+    exampleText:
+      "An image may contain a valid C2PA manifest with a Created action, a claim generator, a signer, and the IPTC digital source type Created using generative AI. The inspector shows the validation state separately from the AI disclosure, then lists rights, creator, camera, editing software, and GPS fields when those values are embedded.",
+    guidance:
+      "Start with the original file because screenshots, social platforms, recompression, and metadata-stripping exports can remove credentials and other fields. Read Trusted, Valid, and Invalid states carefully; compare the signer, actions, dates, source types, rights information, and known source context. Check the privacy result before sharing an image that may contain location data.",
+    limitation:
+      "Content Credentials are tamper-evident provenance claims, not a truth detector. A trusted signature does not guarantee that the depicted scene or every assertion is accurate, while missing credentials or metadata do not prove that an image is fake, real, human-made, or AI-generated. This local mode does not fetch remote manifests or perform live OCSP revocation checks.",
+    benefits: ["Official C2PA validation", "EXIF, IPTC & XMP", "Image stays local"],
+    codeSnippets: [
+      {
+        label: "Read an embedded manifest",
+        code: "const reader = await c2pa.reader.fromBlob(file.type, file);\nconst store = reader ? await reader.manifestStore() : null;\nawait reader?.free();",
+      },
+      {
+        label: "Interpret validation separately",
+        code: "if (!store) return 'No credentials found';\nif (store.validation_state === 'Trusted') return 'Trusted credentials';\nif (store.validation_state === 'Valid') return 'Valid signature';\nreturn 'Review validation failures';",
+      },
+    ],
+    faqs: [
+      {
+        question: "Are images uploaded when I inspect them?",
+        answer:
+          "No. The selected image is read by JavaScript and WebAssembly in your browser. The inspector disables remote-manifest fetching and online certificate revocation requests, and it does not send the image to AyeCalc or an analysis API.",
+      },
+      {
+        question: "What does Trusted Content Credentials mean?",
+        answer:
+          "It means the manifest is valid and the signing credential chains to a trust anchor recognized by the validator. It authenticates the signed provenance record and its binding to the file, not the truth of everything depicted or claimed.",
+      },
+      {
+        question: "Does no Content Credentials mean an image is fake?",
+        answer:
+          "No. Adding credentials is optional, and credentials can be removed by screenshots, social platforms, format conversion, or metadata-stripping exports. No credentials found is a neutral result.",
+      },
+      {
+        question: "Can this inspector tell whether an image was made with AI?",
+        answer:
+          "It can surface an explicit C2PA or IPTC disclosure such as Created using generative AI or Edited using generative AI. If no disclosure appears, the tool cannot conclude that the image is human-made because labels may never have been added or may have been removed.",
+      },
+      {
+        question: "Which image metadata can I view?",
+        answer:
+          "The report can organize readable EXIF and TIFF capture data, IPTC attribution and rights fields, XMP namespaces, ICC color-profile information, file headers, software details, AI fields from IPTC Photo Metadata 2025.1, and GPS coordinates when present.",
+      },
+      {
+        question: "Which image formats are supported?",
+        answer:
+          "You can select JPEG, PNG, WebP, AVIF, HEIC, HEIF, TIFF, or GIF files up to 100 MB. Browser preview and the exact metadata fields available vary by format and browser support.",
+      },
+    ],
+    source: {
+      label: "C2PA Technical Specification: validation states and process",
+      href: "https://spec.c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html#_validation_states",
+    },
+    additionalSources: [
+      {
+        label: "IPTC Photo Metadata Standard 2025.1",
+        href: "https://iptc.org/standards/photo-metadata/iptc-standard/",
+      },
+      {
+        label: "Google Search Central: image metadata in Google Images",
+        href: "https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata",
+      },
+    ],
   },
   {
     slug: "ai-image-scanner",

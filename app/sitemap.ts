@@ -3,83 +3,61 @@ import { converterDefinitions } from "@/lib/converters";
 import { developerTools } from "@/lib/developer-tools";
 import { guides } from "@/lib/guides";
 import { infoPages } from "@/lib/info-pages";
-import { siteConfig } from "@/lib/metadata";
+import { defaultContentLastModified, siteConfig } from "@/lib/metadata";
 
-const lastModified = new Date("2026-08-18T00:00:00.000Z");
-
-const highPriorityDeveloperTools = new Set([
-  "ai-image-scanner",
-  "css-corner-shape-generator",
-  "css-clamp-generator",
-  "background-remover",
-  "batch-watermark-images",
-  "image-resizer",
-  "image-compressor",
-  "image-cropper",
-  "image-format-converter",
-  "heic-to-jpg",
-]);
+const fallbackLastModified = new Date(defaultContentLastModified);
 
 const staticPages: Array<{
   path: string;
-  changeFrequency: "weekly" | "monthly" | "yearly";
-  priority: number;
-  lastModified?: Date;
+  lastModified: Date;
 }> = [
   {
     path: "",
-    changeFrequency: "weekly",
-    priority: 1,
-    lastModified: new Date("2026-09-02T00:00:00.000Z"),
+    lastModified: new Date("2026-09-11T00:00:00.000Z"),
   },
   {
     path: "/developer-tools",
-    changeFrequency: "weekly",
-    priority: 0.9,
-    lastModified: new Date("2026-09-02T00:00:00.000Z"),
+    lastModified: new Date("2026-09-11T00:00:00.000Z"),
   },
-  { path: "/unit-converters", changeFrequency: "weekly", priority: 0.9 },
-  { path: "/guides", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/contact", changeFrequency: "yearly", priority: 0.5 },
+  {
+    path: "/unit-converters",
+    lastModified: new Date("2026-08-18T00:00:00.000Z"),
+  },
+  {
+    path: "/guides",
+    lastModified: new Date("2026-08-17T00:00:00.000Z"),
+  },
+  {
+    path: "/contact",
+    lastModified: new Date("2026-08-17T00:00:00.000Z"),
+  },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticPages.map((page) => ({
       url: `${siteConfig.url}${page.path}`,
-      lastModified: page.lastModified ?? lastModified,
-      changeFrequency: page.changeFrequency,
-      priority: page.priority,
+      lastModified: page.lastModified,
     })),
     ...converterDefinitions.map((converter) => ({
       url: `${siteConfig.url}/${converter.slug}`,
       lastModified: converter.lastModified
         ? new Date(converter.lastModified)
-        : lastModified,
-      changeFrequency: "monthly" as const,
-      priority: converter.slug === "px-to-rem" ? 0.9 : 0.8,
+        : fallbackLastModified,
     })),
     ...developerTools.map((tool) => ({
       url: `${siteConfig.url}/${tool.slug}`,
       lastModified: tool.lastModified
         ? new Date(tool.lastModified)
-        : lastModified,
-      changeFrequency: "monthly" as const,
-      priority: highPriorityDeveloperTools.has(tool.slug) ? 0.9 : 0.8,
+        : fallbackLastModified,
     })),
     ...guides.map((guide) => ({
       url: `${siteConfig.url}/guides/${guide.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.75,
+      lastModified: new Date(guide.lastModified),
     })),
     ...infoPages.map((page) => ({
       url: `${siteConfig.url}/${page.slug}`,
-      lastModified: page.lastModified
-        ? new Date(page.lastModified)
-        : lastModified,
-      changeFrequency: "yearly" as const,
-      priority: page.slug === "methodology" || page.slug === "about" ? 0.6 : 0.3,
+      lastModified: new Date(page.lastModified),
     })),
   ];
 }

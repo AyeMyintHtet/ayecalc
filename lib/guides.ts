@@ -17,6 +17,7 @@ export type GuideDefinition = {
   introduction: string;
   category: string;
   reviewed: string;
+  lastModified: string;
   sections: GuideSection[];
   sources: Array<{ label: string; href: string }>;
   relatedToolSlugs: string[];
@@ -42,6 +43,7 @@ export const guides: GuideDefinition[] = [
       "REM and EM are both font-relative CSS length units, but they preserve different relationships. REM follows the document root; EM follows the relevant element context. That difference matters more than memorizing a default pixel conversion.",
     category: "CSS units guide",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "definitions",
@@ -114,6 +116,7 @@ export const guides: GuideDefinition[] = [
       "REM conversion is simple only after the computed root font size is known. This guide explains where that value comes from, how project CSS can change it, and why accessibility testing matters.",
     category: "CSS typography guide",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "root",
@@ -186,6 +189,7 @@ export const guides: GuideDefinition[] = [
       "Figma commonly presents dimensions as pixel values, while production CSS may use rem. A good handoff converts relationships and tokens—not every visible number mechanically.",
     category: "Design handoff guide",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "baseline",
@@ -258,6 +262,7 @@ export const guides: GuideDefinition[] = [
       "Tailwind CSS v4 derives many numeric spacing utilities from one theme variable. The arithmetic is simple, but custom themes and different utility families make context important.",
     category: "Tailwind CSS guide",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "model",
@@ -334,6 +339,7 @@ export const guides: GuideDefinition[] = [
       "Fluid type can reduce abrupt breakpoint changes, but a smooth formula is not automatically readable or accessible. The minimum, preferred expression, maximum, and surrounding layout must work together.",
     category: "Accessibility guide",
     reviewed: "August 17, 2026",
+    lastModified: "2026-08-17T00:00:00.000Z",
     sections: [
       {
         id: "formula",

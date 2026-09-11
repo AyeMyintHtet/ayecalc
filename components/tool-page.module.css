@@ -1,26 +1,7 @@
 .pageContainer,
-.headerInner,
 .footerInner {
   width: min(1120px, calc(100% - 48px));
   margin-inline: auto;
-}
-
-.header {
-  position: absolute;
-  z-index: 20;
-  top: 0;
-  left: 0;
-  width: 100%;
-  color: white;
-}
-
-.headerInner {
-  min-height: 82px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
 }
 
 .brand {
@@ -66,44 +47,14 @@
   height: 15px;
 }
 
-.headerNav {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.headerNav a,
-.headerCta,
 .footer a {
   transition: color 180ms ease, background 180ms ease;
 }
 
-.headerNav a:hover,
 .footer a:hover {
   color: var(--mint-bright);
 }
 
-.headerCta {
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-  padding: 0 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 750;
-}
-
-.headerCta:hover {
-  color: var(--green-950);
-  background: white;
-}
-
-.header a:focus-visible,
 .footer a:focus-visible,
 .relatedSection a:focus-visible,
 .sideRail a:focus-visible,
@@ -1099,23 +1050,8 @@
 
 @media (max-width: 760px) {
   .pageContainer,
-  .headerInner,
   .footerInner {
     width: min(100% - 34px, 620px);
-  }
-
-  .headerInner {
-    min-height: 72px;
-  }
-
-  .headerNav {
-    display: none;
-  }
-
-  .headerCta {
-    min-height: 38px;
-    padding-inline: 12px;
-    font-size: 10px;
   }
 
   .hero {
@@ -1325,8 +1261,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .headerNav a,
-  .headerCta,
   .footer a,
   .copyButton,
   .relatedGrid > a,

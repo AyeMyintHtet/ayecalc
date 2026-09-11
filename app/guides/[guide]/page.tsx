@@ -55,7 +55,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
         keywords: guide.searchTerms?.join(", "),
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         inLanguage: "en-US",
-        dateModified: "2026-08-17",
+        dateModified: guide.lastModified.slice(0, 10),
       },
       {
         "@type": "BreadcrumbList",

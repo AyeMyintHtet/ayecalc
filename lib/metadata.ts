@@ -8,6 +8,12 @@ export const siteConfig = {
     "Use free calculators, unit converters, CSS developer tools, image tools, and practical guides with visible methods and browser-based processing.",
 } as const;
 
+export const defaultContentLastModified = "2026-08-18T00:00:00.000Z";
+
+export function getDateModified(lastModified?: string) {
+  return (lastModified ?? defaultContentLastModified).slice(0, 10);
+}
+
 type PageMetadataOptions = {
   title: string;
   description: string;

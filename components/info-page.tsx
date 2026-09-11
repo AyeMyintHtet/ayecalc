@@ -21,7 +21,7 @@ export default function InfoPage({ page }: { page: InfoPageDefinition }) {
         description: page.description,
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         inLanguage: "en-US",
-        dateModified: "2026-08-17",
+        dateModified: page.lastModified.slice(0, 10),
       },
       {
         "@type": "BreadcrumbList",

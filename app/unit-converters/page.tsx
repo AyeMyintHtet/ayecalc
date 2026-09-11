@@ -21,6 +21,7 @@ const jsonLd = {
       name: "AyeCalc Unit Converters",
       description:
         "Unit converters with visible formulas, adjustable assumptions, and reference tables.",
+      dateModified: "2026-08-18",
       mainEntity: {
         "@type": "ItemList",
         numberOfItems: converterDefinitions.length,
