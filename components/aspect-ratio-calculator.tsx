@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import CopyOutputButton from "@/components/copy-output-button";
 import styles from "@/components/developer-tools.module.css";
-import { formatConversionNumber } from "@/lib/conversion-math";
+import {
+  formatCodeNumber,
+  formatConversionNumber,
+} from "@/lib/conversion-math";
 import {
   calculateProportionalHeight,
   simplifyAspectRatio,
@@ -28,27 +31,38 @@ export default function AspectRatioCalculator() {
       numericHeight <= 0 ||
       numericTarget <= 0
     ) {
-      return { error: "Enter positive width, height, and target width values.", result: null };
+      return {
+        error: "Enter positive width, height, and target width values.",
+        result: null,
+      };
     }
 
-    return {
-      error: "",
-      result: {
-        ratio: simplifyAspectRatio(numericWidth, numericHeight),
-        targetHeight: calculateProportionalHeight(
-          numericWidth,
-          numericHeight,
-          numericTarget,
-        ),
-      },
-    };
+    try {
+      return {
+        error: "",
+        result: {
+          ratio: simplifyAspectRatio(numericWidth, numericHeight),
+          targetHeight: calculateProportionalHeight(
+            numericWidth,
+            numericHeight,
+            numericTarget,
+          ),
+        },
+      };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Enter supported values.",
+        result: null,
+      };
+    }
   }, [height, targetWidth, width]);
 
   const ratioText = calculation.result
     ? `${formatConversionNumber(calculation.result.ratio.width)}:${formatConversionNumber(calculation.result.ratio.height)}`
     : "—";
   const cssValue = calculation.result
-    ? `aspect-ratio: ${formatConversionNumber(calculation.result.ratio.width)} / ${formatConversionNumber(calculation.result.ratio.height)};`
+    ? `aspect-ratio: ${formatCodeNumber(calculation.result.ratio.width)} / ${formatCodeNumber(calculation.result.ratio.height)};`
     : "";
 
   return (
@@ -64,18 +78,33 @@ export default function AspectRatioCalculator() {
       <div className={styles.ratioLayout}>
         <div>
           <div className={styles.fieldGrid}>
-            <RatioField label="Original width" value={width} onChange={setWidth} />
-            <RatioField label="Original height" value={height} onChange={setHeight} />
+            <RatioField
+              label="Original width"
+              value={width}
+              onChange={setWidth}
+            />
+            <RatioField
+              label="Original height"
+              value={height}
+              onChange={setHeight}
+            />
             <RatioField
               label="Target width"
               value={targetWidth}
               onChange={setTargetWidth}
             />
           </div>
-          <p className={styles.error} role={calculation.error ? "alert" : undefined}>
+          <p
+            className={styles.error}
+            role={calculation.error ? "alert" : undefined}
+          >
             {calculation.error}
           </p>
-          <div className={styles.resultGrid} aria-live="polite" aria-atomic="true">
+          <div
+            className={styles.resultGrid}
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <div className={styles.resultItem}>
               <span>Simplified</span>
               <strong>{ratioText}</strong>
@@ -121,7 +150,9 @@ export default function AspectRatioCalculator() {
           <span>CSS declaration</span>
           <CopyOutputButton value={cssValue} disabled={!calculation.result} />
         </div>
-        <code className={styles.codeValue}>{cssValue || "Enter valid values"}</code>
+        <code className={styles.codeValue}>
+          {cssValue || "Enter valid values"}
+        </code>
       </div>
     </div>
   );

@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import CopyOutputButton from "@/components/copy-output-button";
 import styles from "@/components/developer-tools.module.css";
-import { formatConversionNumber } from "@/lib/conversion-math";
+import {
+  formatCodeNumber,
+  formatConversionNumber,
+} from "@/lib/conversion-math";
 import { convertPixelsToViewportUnits } from "@/lib/developer-math";
 
 export default function ViewportUnitConverter() {
@@ -24,21 +27,32 @@ export default function ViewportUnitConverter() {
       numericWidth <= 0 ||
       numericHeight <= 0
     ) {
-      return { error: "Enter a valid pixel value and positive viewport dimensions.", result: null };
+      return {
+        error: "Enter a valid pixel value and positive viewport dimensions.",
+        result: null,
+      };
     }
 
-    return {
-      error: "",
-      result: convertPixelsToViewportUnits(
-        numericPixels,
-        numericWidth,
-        numericHeight,
-      ),
-    };
+    try {
+      return {
+        error: "",
+        result: convertPixelsToViewportUnits(
+          numericPixels,
+          numericWidth,
+          numericHeight,
+        ),
+      };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Enter supported values.",
+        result: null,
+      };
+    }
   }, [pixels, viewportHeight, viewportWidth]);
 
   const cssValue = calculation.result
-    ? `width: ${formatConversionNumber(calculation.result.vw)}vw;`
+    ? `width: ${formatCodeNumber(calculation.result.vw)}vw;`
     : "";
 
   return (
@@ -52,7 +66,11 @@ export default function ViewportUnitConverter() {
       </div>
 
       <div className={`${styles.fieldGrid} ${styles.fieldGridThree}`}>
-        <ViewportField label="Pixel value" value={pixels} onChange={setPixels} />
+        <ViewportField
+          label="Pixel value"
+          value={pixels}
+          onChange={setPixels}
+        />
         <ViewportField
           label="Viewport width"
           value={viewportWidth}
@@ -65,7 +83,10 @@ export default function ViewportUnitConverter() {
         />
       </div>
 
-      <p className={styles.error} role={calculation.error ? "alert" : undefined}>
+      <p
+        className={styles.error}
+        role={calculation.error ? "alert" : undefined}
+      >
         {calculation.error}
       </p>
 
@@ -88,7 +109,9 @@ export default function ViewportUnitConverter() {
           <span>Width-relative CSS</span>
           <CopyOutputButton value={cssValue} disabled={!calculation.result} />
         </div>
-        <code className={styles.codeValue}>{cssValue || "Enter valid values"}</code>
+        <code className={styles.codeValue}>
+          {cssValue || "Enter valid values"}
+        </code>
       </div>
     </div>
   );

@@ -5,31 +5,15 @@ import { developerTools } from "@/lib/developer-tools";
 import { guides } from "@/lib/guides";
 import { createPageMetadata, siteConfig } from "@/lib/metadata";
 
+const codeTools = developerTools.filter(
+  (tool) => tool.category !== "Image tools",
+);
+
 export const metadata = createPageMetadata({
-  title: "Free Developer, CSS & Image Tools",
+  title: "Free CSS & Developer Tools",
   description:
-    "Use free browser-based tools to inspect Content Credentials and image metadata, scan AI patterns, process images, check accessibility, and generate CSS.",
+    "Generate CSS, convert units and colors, build Tailwind grids, and check text contrast with free browser-based developer tools.",
   path: "/developer-tools",
-  keywords: [
-    "developer tools",
-    "CSS tools",
-    "CSS corner shape generator",
-    "AI image scanner",
-    "AI image detector",
-    "Content Credentials inspector",
-    "C2PA image checker",
-    "image metadata inspector",
-    "EXIF metadata viewer",
-    "image tools",
-    "image resizer",
-    "image compressor",
-    "image cropper",
-    "image format converter",
-    "batch watermark images",
-    "HEIC to JPG converter",
-    "background remover",
-    "web design calculators",
-  ],
 });
 
 const jsonLd = {
@@ -40,12 +24,12 @@ const jsonLd = {
       url: `${siteConfig.url}/developer-tools`,
       name: "AyeCalc Developer Tools",
       description:
-        "Browser-based developer, CSS, accessibility, and image utilities with visible methods and practical guidance.",
-      dateModified: "2026-09-11",
+        "CSS generators, layout calculators, color converters, and accessibility utilities with visible methods.",
+      dateModified: "2026-09-18",
       mainEntity: {
         "@type": "ItemList",
-        numberOfItems: developerTools.length,
-        itemListElement: developerTools.map((tool, index) => ({
+        numberOfItems: codeTools.length,
+        itemListElement: codeTools.map((tool, index) => ({
           "@type": "ListItem",
           position: index + 1,
           name: tool.title,
@@ -88,11 +72,11 @@ export default function DeveloperToolsPage() {
             <span aria-current="page">Developer tools</span>
           </nav>
           <span className={styles.eyebrow}>Browser-based utilities</span>
-          <h1>Free developer, CSS, and image tools</h1>
+          <h1>Free CSS and developer tools</h1>
           <p className={styles.heroLead}>
-            Build responsive interfaces, check accessibility, inspect image
-            provenance and metadata, detect AI-image patterns, and process images
-            with focused tools that explain their methods and privacy behavior.
+            Build responsive interfaces, generate CSS, convert color formats,
+            and check text contrast. These tools run in your browser and explain
+            their formulas and assumptions.
           </p>
           <div className={styles.heroMeta}>
             <span>No account</span>
@@ -107,17 +91,24 @@ export default function DeveloperToolsPage() {
           <div className={styles.sectionHeading}>
             <div>
               <span className={styles.sectionKicker}>Toolbox</span>
-              <h2>Tools for practical digital workflows</h2>
+              <h2>Tools for CSS, layout, and accessibility</h2>
             </div>
             <p>
-              Validate Content Credentials, inspect image metadata, scan for
-              AI-image patterns, shape CSS corners, generate production values,
-              and process images directly in your browser.
+              Choose a CSS or layout tool below. For photo enhancement,
+              background removal, compression, and conversion, explore our
+              dedicated image tools.
             </p>
           </div>
+          <p>
+            <Link href="/image-tools">Browse all image tools →</Link>
+          </p>
           <div className={styles.cardGrid}>
-            {developerTools.map((tool) => (
-              <Link className={styles.card} href={`/${tool.slug}`} key={tool.slug}>
+            {codeTools.map((tool) => (
+              <Link
+                className={styles.card}
+                href={`/${tool.slug}`}
+                key={tool.slug}
+              >
                 <span>{tool.category}</span>
                 <strong>{tool.shortTitle}</strong>
                 <p>{tool.description}</p>
@@ -136,13 +127,17 @@ export default function DeveloperToolsPage() {
               <h2>Guides that explain the tradeoffs</h2>
             </div>
             <p>
-              Conversion numbers are useful only when the CSS context and intended
-              behavior are understood.
+              Conversion numbers are useful only when the CSS context and
+              intended behavior are understood.
             </p>
           </div>
           <div className={styles.cardGrid}>
             {guides.slice(0, 3).map((guide) => (
-              <Link className={styles.card} href={`/guides/${guide.slug}`} key={guide.slug}>
+              <Link
+                className={styles.card}
+                href={`/guides/${guide.slug}`}
+                key={guide.slug}
+              >
                 <span>{guide.category}</span>
                 <strong>{guide.title}</strong>
                 <p>{guide.description}</p>

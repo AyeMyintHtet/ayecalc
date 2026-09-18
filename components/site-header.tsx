@@ -2,9 +2,17 @@ import Link from "next/link";
 import AllToolsMenu from "@/components/all-tools-menu";
 import styles from "@/components/site-header.module.css";
 
-export default function SiteHeader({ currentSlug }: { currentSlug?: string }) {
+export default function SiteHeader({
+  currentSlug,
+  appearance = "dark",
+}: {
+  currentSlug?: string;
+  appearance?: "dark" | "light";
+}) {
   return (
-    <header className={styles.header}>
+    <header
+      className={`${styles.header} ${appearance === "light" ? styles.light : ""}`}
+    >
       <div className={styles.inner}>
         <Link className={styles.brand} href="/" aria-label="AyeCalc home">
           <span className={styles.brandMark} aria-hidden="true">
@@ -15,12 +23,13 @@ export default function SiteHeader({ currentSlug }: { currentSlug?: string }) {
           <span>AyeCalc</span>
         </Link>
         <nav className={styles.nav} aria-label="Primary navigation">
+          <Link href="/image-tools">Image tools</Link>
           <Link href="/developer-tools">Developer tools</Link>
           <Link href="/unit-converters">Converters</Link>
           <Link href="/guides">Guides</Link>
           <Link href="/methodology">Methodology</Link>
         </nav>
-        <AllToolsMenu currentSlug={currentSlug} />
+        <AllToolsMenu currentSlug={currentSlug} appearance={appearance} />
       </div>
     </header>
   );

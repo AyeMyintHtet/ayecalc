@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import CopyOutputButton from "@/components/copy-output-button";
 import styles from "@/components/developer-tools.module.css";
-import { formatConversionNumber } from "@/lib/conversion-math";
 import {
-  convertCssUnitMatrix,
-  type CssUnit,
-} from "@/lib/developer-math";
+  formatCodeNumber,
+  formatConversionNumber,
+} from "@/lib/conversion-math";
+import { convertCssUnitMatrix, type CssUnit } from "@/lib/developer-math";
 
 export default function CssUnitMatrix() {
   const [value, setValue] = useState("24");
@@ -28,17 +28,28 @@ export default function CssUnitMatrix() {
       root <= 0 ||
       element <= 0
     ) {
-      return { error: "Enter a valid value and positive font sizes.", result: null };
+      return {
+        error: "Enter a valid value and positive font sizes.",
+        result: null,
+      };
     }
 
-    return {
-      error: "",
-      result: convertCssUnitMatrix(numericValue, sourceUnit, root, element),
-    };
+    try {
+      return {
+        error: "",
+        result: convertCssUnitMatrix(numericValue, sourceUnit, root, element),
+      };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Enter supported values.",
+        result: null,
+      };
+    }
   }, [elementFontSize, rootFontSize, sourceUnit, value]);
 
   const token = calculation.result
-    ? `--size: ${formatConversionNumber(calculation.result.rem)}rem;`
+    ? `--size: ${formatCodeNumber(calculation.result.rem)}rem;`
     : "";
 
   return (
@@ -89,7 +100,10 @@ export default function CssUnitMatrix() {
         />
       </div>
 
-      <p className={styles.error} role={calculation.error ? "alert" : undefined}>
+      <p
+        className={styles.error}
+        role={calculation.error ? "alert" : undefined}
+      >
         {calculation.error}
       </p>
 
@@ -102,7 +116,9 @@ export default function CssUnitMatrix() {
                 ? formatConversionNumber(calculation.result[unit])
                 : "—"}
             </strong>
-            <small>{unit === "px" ? "absolute reference" : "relative unit"}</small>
+            <small>
+              {unit === "px" ? "absolute reference" : "relative unit"}
+            </small>
           </div>
         ))}
       </div>
@@ -112,7 +128,9 @@ export default function CssUnitMatrix() {
           <span>CSS token</span>
           <CopyOutputButton value={token} disabled={!calculation.result} />
         </div>
-        <code className={styles.codeValue}>{token || "Enter valid values"}</code>
+        <code className={styles.codeValue}>
+          {token || "Enter valid values"}
+        </code>
       </div>
     </div>
   );

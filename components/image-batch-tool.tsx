@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -20,9 +21,7 @@ import {
   resolveOutputMime,
   validateImageFileBasics,
   type ImageFileRecord,
-  type ImageOperation,
   type ImageOutputFormat,
-  type ImageProcessingRequest,
   type ImageProcessingResult,
   type SupportedImageMime,
 } from "@/lib/image-tools";
@@ -41,11 +40,17 @@ import {
 import { drawImageWatermark } from "@/lib/image-processing-core";
 import styles from "@/components/image-tools.module.css";
 
-type BatchMode = Extract<
-  ImageOperation,
-  "resize" | "compress" | "convert" | "watermark"
->;
-type ResizeMode = "width" | "height" | "percentage" | "exact";
+import {
+  createBatchRequest,
+  isBatchSettings,
+  type BatchMode,
+  type BatchSettings,
+  type ResizeMode,
+} from "@/lib/image-batch";
+import BatchOutputSettings from "@/components/image-batch-output-settings";
+import ImageBatchResults from "@/components/image-batch-results";
+import SavedToolSettings from "@/components/saved-tool-settings";
+import { takeStagedImage, type ImageDestination } from "@/lib/image-handoff";
 
 type LogoFileRecord = {
   file: File;
@@ -57,7 +62,10 @@ type LogoFileRecord = {
 const MAX_WATERMARK_LOGO_BYTES = 10 * 1024 * 1024;
 const MAX_WATERMARK_LOGO_PIXELS = 10_000_000;
 
-const modeCopy: Record<BatchMode, { eyebrow: string; title: string; action: string }> = {
+const modeCopy: Record<
+  BatchMode,
+  { eyebrow: string; title: string; action: string }
+> = {
   resize: {
     eyebrow: "Private batch image resizer",
     title: "Resize images in your browser",
@@ -79,13 +87,6 @@ const modeCopy: Record<BatchMode, { eyebrow: string; title: string; action: stri
     action: "Watermark images",
   },
 };
-
-const outputFormats: Array<{ value: ImageOutputFormat; label: string }> = [
-  { value: "original", label: "Keep original" },
-  { value: "image/jpeg", label: "JPEG" },
-  { value: "image/png", label: "PNG" },
-  { value: "image/webp", label: "WebP" },
-];
 
 const watermarkPositions: Array<{
   value: WatermarkPosition;
@@ -163,9 +164,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   const [resizePercentage, setResizePercentage] = useState(50);
   const [aspectLocked, setAspectLocked] = useState(true);
   const [preventUpscale, setPreventUpscale] = useState(true);
-  const [supportedOutputs, setSupportedOutputs] = useState<SupportedImageMime[]>([
-    "image/png",
-  ]);
+  const [supportedOutputs, setSupportedOutputs] = useState<
+    SupportedImageMime[]
+  >(["image/png"]);
   const [isCreatingZip, setIsCreatingZip] = useState(false);
   const [imagePixelLimit, setImagePixelLimit] = useState(MAX_IMAGE_PIXELS);
   const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("text");
@@ -204,24 +205,99 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   logoRef.current = logo;
   isBusyRef.current = isBusy;
 
-  const watermarkOptions: ImageWatermarkOptions = {
-    mode: watermarkMode,
-    text: normalizeWatermarkText(watermarkText),
-    fontFamily: watermarkFont,
-    fontWeight: watermarkWeight,
-    color: watermarkColor,
-    outlineColor: watermarkOutlineColor,
-    outlineWidthPercent: watermarkOutlineWidth,
-    opacity: watermarkOpacity / 100,
-    sizePercent: watermarkSize,
-    rotation: watermarkRotation,
-    position: watermarkPosition,
-    marginPercent: watermarkMargin,
-    tiled: watermarkTiled,
-    gapPercent: watermarkGap,
-    logoBlob: watermarkMode === "logo" ? logo?.file : undefined,
-  };
+  const watermarkOptions: ImageWatermarkOptions = useMemo(
+    () => ({
+      mode: watermarkMode,
+      text: normalizeWatermarkText(watermarkText),
+      fontFamily: watermarkFont,
+      fontWeight: watermarkWeight,
+      color: watermarkColor,
+      outlineColor: watermarkOutlineColor,
+      outlineWidthPercent: watermarkOutlineWidth,
+      opacity: watermarkOpacity / 100,
+      sizePercent: watermarkSize,
+      rotation: watermarkRotation,
+      position: watermarkPosition,
+      marginPercent: watermarkMargin,
+      tiled: watermarkTiled,
+      gapPercent: watermarkGap,
+      logoBlob: watermarkMode === "logo" ? logo?.file : undefined,
+    }),
+    [
+      watermarkMode,
+      watermarkText,
+      watermarkFont,
+      watermarkWeight,
+      watermarkColor,
+      watermarkOutlineColor,
+      watermarkOutlineWidth,
+      watermarkOpacity,
+      watermarkSize,
+      watermarkRotation,
+      watermarkPosition,
+      watermarkMargin,
+      watermarkTiled,
+      watermarkGap,
+      logo?.file,
+    ],
+  );
   const watermarkPreviewItem = mode === "watermark" ? items[0] : undefined;
+  const hasItems = items.length > 0;
+  const destination: ImageDestination | undefined =
+    mode === "resize"
+      ? "/image-resizer"
+      : mode === "compress"
+        ? "/image-compressor"
+        : mode === "convert"
+          ? "/image-format-converter"
+          : undefined;
+  const batchSettings: BatchSettings = {
+    outputFormat,
+    quality,
+    backgroundColor,
+    targetEnabled,
+    targetKilobytes,
+    resizeMode,
+    resizeWidth,
+    resizeHeight,
+    resizePercentage,
+    aspectLocked,
+    preventUpscale,
+  };
+
+  function updateBatchSettings(update: Partial<BatchSettings>) {
+    clearResults();
+    if (update.outputFormat !== undefined)
+      setOutputFormat(
+        mode === "convert" && update.outputFormat === "original"
+          ? "image/webp"
+          : update.outputFormat,
+      );
+    if (update.quality !== undefined) setQuality(update.quality);
+    if (update.backgroundColor !== undefined)
+      setBackgroundColor(update.backgroundColor);
+    if (update.targetEnabled !== undefined)
+      setTargetEnabled(update.targetEnabled);
+    if (update.targetKilobytes !== undefined)
+      setTargetKilobytes(update.targetKilobytes);
+    if (update.resizeMode !== undefined) setResizeMode(update.resizeMode);
+    if (update.resizeWidth !== undefined) setResizeWidth(update.resizeWidth);
+    if (update.resizeHeight !== undefined) setResizeHeight(update.resizeHeight);
+    if (update.resizePercentage !== undefined)
+      setResizePercentage(update.resizePercentage);
+    if (update.aspectLocked !== undefined) setAspectLocked(update.aspectLocked);
+    if (update.preventUpscale !== undefined)
+      setPreventUpscale(update.preventUpscale);
+  }
+
+  useEffect(() => {
+    if (!destination) return;
+    const frame = requestAnimationFrame(() => {
+      const file = takeStagedImage(destination);
+      if (file) addFilesRef.current([file]);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [destination]);
 
   useEffect(() => {
     setImagePixelLimit(getRuntimeImagePixelLimit());
@@ -259,27 +335,31 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   }, []);
 
   useEffect(() => {
-    if (items.length === 0) return;
+    if (!hasItems) return;
     let active = true;
-    void import("@/lib/image-processing").then(async ({ browserSupportsImageEncoding }) => {
-      const checks = await Promise.all(
-        (["image/png", "image/jpeg", "image/webp"] as SupportedImageMime[]).map(
-          async (mimeType) => ({
+    void import("@/lib/image-processing").then(
+      async ({ browserSupportsImageEncoding }) => {
+        const checks = await Promise.all(
+          (
+            ["image/png", "image/jpeg", "image/webp"] as SupportedImageMime[]
+          ).map(async (mimeType) => ({
             mimeType,
             supported: await browserSupportsImageEncoding(mimeType),
-          }),
-        ),
-      );
-      if (active) {
-        setSupportedOutputs(
-          checks.filter((check) => check.supported).map((check) => check.mimeType),
+          })),
         );
-      }
-    });
+        if (active) {
+          setSupportedOutputs(
+            checks
+              .filter((check) => check.supported)
+              .map((check) => check.mimeType),
+          );
+        }
+      },
+    );
     return () => {
       active = false;
     };
-  }, [items.length > 0]);
+  }, [hasItems]);
 
   useEffect(() => {
     if (mode !== "watermark" || !watermarkPreviewItem) return;
@@ -313,23 +393,10 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     }
   }, [
     mode,
-    watermarkPreviewItem?.id,
-    watermarkPreviewItem?.previewUrl,
+    watermarkPreviewItem,
     watermarkPreviewRevision,
     watermarkMode,
-    watermarkText,
-    watermarkFont,
-    watermarkWeight,
-    watermarkColor,
-    watermarkOutlineColor,
-    watermarkOutlineWidth,
-    watermarkOpacity,
-    watermarkSize,
-    watermarkRotation,
-    watermarkPosition,
-    watermarkMargin,
-    watermarkTiled,
-    watermarkGap,
+    watermarkOptions,
     logo?.previewUrl,
   ]);
 
@@ -339,7 +406,12 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     setItems((current) =>
       current.map((item) => {
         if (item.result) URL.revokeObjectURL(item.result.previewUrl);
-        return { ...item, result: undefined, error: undefined, status: "ready" };
+        return {
+          ...item,
+          result: undefined,
+          error: undefined,
+          status: "ready",
+        };
       }),
     );
     setProgress(0);
@@ -353,12 +425,17 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     const accepted: ImageFileRecord[] = [];
     const errors: string[] = [];
     const currentItems = itemsRef.current;
-    let totalBytes = currentItems.reduce((total, item) => total + item.file.size, 0);
+    let totalBytes = currentItems.reduce(
+      (total, item) => total + item.file.size,
+      0,
+    );
     let remainingSlots = Math.max(0, MAX_BATCH_FILES - currentItems.length);
 
     for (const file of candidates) {
       if (remainingSlots === 0) {
-        errors.push(`${file.name}: only ${MAX_BATCH_FILES} images can be processed at once.`);
+        errors.push(
+          `${file.name}: only ${MAX_BATCH_FILES} images can be processed at once.`,
+        );
         continue;
       }
       const basicError = validateImageFileBasics(file);
@@ -378,7 +455,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
           errors.push(`${file.name}: animated images are not supported.`);
           continue;
         }
-        const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+        const bitmap = await createImageBitmap(file, {
+          imageOrientation: "from-image",
+        });
         try {
           const dimensions = { width: bitmap.width, height: bitmap.height };
           if (
@@ -418,9 +497,16 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       if (mode === "resize" && currentItems.length === 0) {
         const suggestedWidth = Math.min(1280, first.width);
         setResizeWidth(suggestedWidth);
-        setResizeHeight(Math.max(1, Math.round((first.height / first.width) * suggestedWidth)));
+        setResizeHeight(
+          Math.max(
+            1,
+            Math.round((first.height / first.width) * suggestedWidth),
+          ),
+        );
       }
-      setMessage(`${accepted.length} image${accepted.length === 1 ? "" : "s"} ready to process.`);
+      setMessage(
+        `${accepted.length} image${accepted.length === 1 ? "" : "s"} ready to process.`,
+      );
     }
     setRejections(errors);
     if (inputRef.current) inputRef.current.value = "";
@@ -464,7 +550,10 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       }
 
       if (files.length) await addFiles(files);
-      else setRejections(["The clipboard does not contain a JPEG, PNG, or WebP image."]);
+      else
+        setRejections([
+          "The clipboard does not contain a JPEG, PNG, or WebP image.",
+        ]);
     } catch {
       setRejections([
         "Clipboard permission was not granted. Drag images here or choose them from your device.",
@@ -488,10 +577,14 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         setRejections(["Watermark logo: animated images are not supported."]);
         return;
       }
-      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      const bitmap = await createImageBitmap(file, {
+        imageOrientation: "from-image",
+      });
       try {
         if (bitmap.width * bitmap.height > MAX_WATERMARK_LOGO_PIXELS) {
-          setRejections(["Watermark logo: use an image no larger than 10 megapixels."]);
+          setRejections([
+            "Watermark logo: use an image no larger than 10 megapixels.",
+          ]);
           return;
         }
         const previewUrl = URL.createObjectURL(file);
@@ -510,7 +603,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         bitmap.close();
       }
     } catch {
-      setRejections(["Watermark logo: the browser could not decode this image."]);
+      setRejections([
+        "Watermark logo: the browser could not decode this image.",
+      ]);
     } finally {
       if (logoInputRef.current) logoInputRef.current.value = "";
     }
@@ -567,64 +662,13 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     setMessage("Processing cancelled. Completed results were kept.");
   }
 
-  function getResizeDimensions(item: ImageFileRecord) {
-    let width = item.width;
-    let height = item.height;
-    if (resizeMode === "percentage") {
-      width = Math.round(item.width * (resizePercentage / 100));
-      height = Math.round(item.height * (resizePercentage / 100));
-    } else if (resizeMode === "width") {
-      width = resizeWidth;
-      height = Math.round((item.height / item.width) * width);
-    } else if (resizeMode === "height") {
-      height = resizeHeight;
-      width = Math.round((item.width / item.height) * height);
-    } else if (aspectLocked) {
-      width = resizeWidth;
-      height = Math.round((item.height / item.width) * width);
-    } else {
-      width = resizeWidth;
-      height = resizeHeight;
-    }
-
-    if (preventUpscale) {
-      const scale = Math.min(1, item.width / width, item.height / height);
-      width = Math.max(1, Math.round(width * scale));
-      height = Math.max(1, Math.round(height * scale));
-    }
-    return { width: Math.max(1, width), height: Math.max(1, height) };
-  }
-
-  function createRequest(item: ImageFileRecord, jobId: string): ImageProcessingRequest {
-    const resolvedMime = resolveOutputMime(item.mimeType, outputFormat);
-    const useTarget =
-      mode === "compress" &&
-      targetEnabled &&
-      (resolvedMime === "image/jpeg" || resolvedMime === "image/webp");
-    return {
-      jobId,
-      fileId: item.id,
-      operation: mode,
-      fileName: item.file.name,
-      inputMimeType: item.mimeType,
-      inputBytes: item.file.size,
-      sourceWidth: item.width,
-      sourceHeight: item.height,
-      maxPixels: imagePixelLimit,
-      output: {
-        format: outputFormat,
-        quality: quality / 100,
-        backgroundColor,
-        targetBytes: useTarget ? Math.max(1, targetKilobytes) * 1024 : undefined,
-      },
-      resize: mode === "resize" ? getResizeDimensions(item) : undefined,
-      watermark: mode === "watermark" ? watermarkOptions : undefined,
-    };
-  }
-
   async function processImages() {
     if (!items.length || isBusy) return;
-    if (mode === "watermark" && watermarkMode === "text" && !normalizeWatermarkText(watermarkText)) {
+    if (
+      mode === "watermark" &&
+      watermarkMode === "text" &&
+      !normalizeWatermarkText(watermarkText)
+    ) {
       setMessage("Enter watermark text before processing.");
       return;
     }
@@ -635,7 +679,10 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     if (
       mode === "compress" &&
       targetEnabled &&
-      items.some((item) => resolveOutputMime(item.mimeType, outputFormat) === "image/png")
+      items.some(
+        (item) =>
+          resolveOutputMime(item.mimeType, outputFormat) === "image/png",
+      )
     ) {
       setMessage("Target-size compression requires JPEG or WebP output.");
       return;
@@ -646,11 +693,18 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     setIsBusy(true);
     setRejections([]);
     setProgress(0);
-    setMessage(`Preparing ${queue.length} image${queue.length === 1 ? "" : "s"}…`);
+    setMessage(
+      `Preparing ${queue.length} image${queue.length === 1 ? "" : "s"}…`,
+    );
     setItems((current) =>
       current.map((item) => {
         if (item.result) URL.revokeObjectURL(item.result.previewUrl);
-        return { ...item, result: undefined, error: undefined, status: "queued" };
+        return {
+          ...item,
+          result: undefined,
+          error: undefined,
+          status: "queued",
+        };
       }),
     );
 
@@ -660,18 +714,33 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       const jobId = createJobId();
       setItems((current) =>
         current.map((candidate) =>
-          candidate.id === item.id ? { ...candidate, status: "processing" } : candidate,
+          candidate.id === item.id
+            ? { ...candidate, status: "processing" }
+            : candidate,
         ),
       );
       setMessage(`Processing ${item.file.name}…`);
-      const request = createRequest(item, jobId);
-
       try {
+        const request = createBatchRequest(
+          item,
+          jobId,
+          mode,
+          batchSettings,
+          imagePixelLimit,
+          watermarkOptions,
+        );
         let result: ImageProcessingResult;
         try {
-          result = await processImageWithWorker(item.file, request, workerRef, (fileProgress) => {
-            setProgress(((completed + fileProgress / 100) / queue.length) * 100);
-          });
+          result = await processImageWithWorker(
+            item.file,
+            request,
+            workerRef,
+            (fileProgress) => {
+              setProgress(
+                ((completed + fileProgress / 100) / queue.length) * 100,
+              );
+            },
+          );
         } catch (error) {
           if (run !== runRef.current) return;
           if (
@@ -680,7 +749,8 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
           ) {
             throw error;
           }
-          const { processImageOnMainThread } = await import("@/lib/image-processing");
+          const { processImageOnMainThread } =
+            await import("@/lib/image-processing");
           result = await processImageOnMainThread(item.file, request);
         }
 
@@ -689,7 +759,11 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
         setItems((current) =>
           current.map((candidate) =>
             candidate.id === item.id
-              ? { ...candidate, status: "complete", result: { ...result, previewUrl } }
+              ? {
+                  ...candidate,
+                  status: "complete",
+                  result: { ...result, previewUrl },
+                }
               : candidate,
           ),
         );
@@ -701,7 +775,10 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
               ? {
                   ...candidate,
                   status: "error",
-                  error: error instanceof Error ? error.message : "The image could not be processed.",
+                  error:
+                    error instanceof Error
+                      ? error.message
+                      : "The image could not be processed.",
                 }
               : candidate,
           ),
@@ -714,7 +791,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
 
     if (run === runRef.current) {
       setIsBusy(false);
-      setMessage("Processing complete. Inspect each result before downloading.");
+      setMessage(
+        "Processing complete. Inspect each result before downloading.",
+      );
     }
   }
 
@@ -747,7 +826,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch {
-      setMessage("The ZIP could not be created. Download the results individually.");
+      setMessage(
+        "The ZIP could not be created. Download the results individually.",
+      );
     } finally {
       setIsCreatingZip(false);
     }
@@ -757,10 +838,14 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
   const showQuality =
     outputFormat === "image/jpeg" ||
     outputFormat === "image/webp" ||
-    (outputFormat === "original" && items.some((item) => item.mimeType !== "image/png"));
+    (outputFormat === "original" &&
+      items.some((item) => item.mimeType !== "image/png"));
   const showBackground = outputFormat === "image/jpeg";
-  const hasUnsupportedOutput = items.some((item) =>
-    !supportedOutputs.includes(resolveOutputMime(item.mimeType, outputFormat)),
+  const hasUnsupportedOutput = items.some(
+    (item) =>
+      !supportedOutputs.includes(
+        resolveOutputMime(item.mimeType, outputFormat),
+      ),
   );
   const hasIncompatibleTarget =
     mode === "compress" &&
@@ -770,9 +855,7 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
     );
   const hasInvalidWatermark =
     mode === "watermark" &&
-    (watermarkMode === "text"
-      ? !normalizeWatermarkText(watermarkText)
-      : !logo);
+    (watermarkMode === "text" ? !normalizeWatermarkText(watermarkText) : !logo);
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
@@ -811,13 +894,17 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
             if (event.target.files) void addFiles(event.target.files);
           }}
         />
-        <span className={styles.uploadIcon} aria-hidden="true">↑</span>
+        <span className={styles.uploadIcon} aria-hidden="true">
+          ↑
+        </span>
         <strong>{items.length ? "Add more images" : "Drop images here"}</strong>
         <p>
           {mode === "watermark"
             ? "Paste, drop, or upload JPEG, PNG, or WebP"
-            : "JPEG, PNG, or WebP"} · up to {MAX_BATCH_FILES} files, {formatImageBytes(MAX_IMAGE_FILE_BYTES)} each,
-          and {formatImageMegapixels(imagePixelLimit)}
+            : "JPEG, PNG, or WebP"}{" "}
+          · up to {MAX_BATCH_FILES} files,{" "}
+          {formatImageBytes(MAX_IMAGE_FILE_BYTES)} each, and{" "}
+          {formatImageMegapixels(imagePixelLimit)}
           {imagePixelLimit < MAX_IMAGE_PIXELS ? " on this device" : ""}
         </p>
         <div className={styles.dropActions}>
@@ -833,7 +920,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
             <button
               type="button"
               className={styles.chooseButton}
-              disabled={isBusy || isReadingClipboard || items.length >= MAX_BATCH_FILES}
+              disabled={
+                isBusy || isReadingClipboard || items.length >= MAX_BATCH_FILES
+              }
               onClick={() => void pasteImages()}
             >
               {isReadingClipboard ? "Reading clipboard…" : "Paste images"}
@@ -845,7 +934,11 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
       {rejections.length > 0 && (
         <div className={styles.errorList} role="alert">
           <strong>Some files were not added</strong>
-          <ul>{rejections.map((error) => <li key={error}>{error}</li>)}</ul>
+          <ul>
+            {rejections.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -877,7 +970,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                     src={watermarkPreviewItem.previewUrl}
                     alt=""
                     aria-hidden="true"
-                    onLoad={() => setWatermarkPreviewRevision((current) => current + 1)}
+                    onLoad={() =>
+                      setWatermarkPreviewRevision((current) => current + 1)
+                    }
                   />
                   {logo && (
                     <img
@@ -886,12 +981,15 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                       src={logo.previewUrl}
                       alt=""
                       aria-hidden="true"
-                      onLoad={() => setWatermarkPreviewRevision((current) => current + 1)}
+                      onLoad={() =>
+                        setWatermarkPreviewRevision((current) => current + 1)
+                      }
                     />
                   )}
                 </div>
                 <figcaption>
-                  Preview only. The same settings are applied to every image when you process the batch.
+                  Preview only. The same settings are applied to every image
+                  when you process the batch.
                 </figcaption>
               </figure>
             )}
@@ -900,7 +998,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
               <div className={styles.settingGroup}>
                 <span className={styles.settingLabel}>Resize method</span>
                 <div className={styles.segmentedControl}>
-                  {(["width", "height", "percentage", "exact"] as ResizeMode[]).map((value) => (
+                  {(
+                    ["width", "height", "percentage", "exact"] as ResizeMode[]
+                  ).map((value) => (
                     <button
                       type="button"
                       aria-pressed={resizeMode === value}
@@ -910,56 +1010,111 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                       }}
                       key={value}
                     >
-                      {value === "percentage" ? "Percent" : value[0].toUpperCase() + value.slice(1)}
+                      {value === "percentage"
+                        ? "Percent"
+                        : value[0].toUpperCase() + value.slice(1)}
                     </button>
                   ))}
                 </div>
                 <div className={styles.dimensionGrid}>
                   {(resizeMode === "width" || resizeMode === "exact") && (
-                    <NumberField label="Width" value={resizeWidth} unit="px" onChange={(value) => {
-                      clearResults();
-                      setResizeWidth(Math.max(1, value));
-                      if (aspectLocked && items[0]) {
-                        setResizeHeight(Math.max(1, Math.round((items[0].height / items[0].width) * value)));
-                      }
-                    }} />
+                    <NumberField
+                      label="Width"
+                      value={resizeWidth}
+                      unit="px"
+                      onChange={(value) => {
+                        clearResults();
+                        setResizeWidth(Math.max(1, value));
+                        if (aspectLocked && items[0]) {
+                          setResizeHeight(
+                            Math.max(
+                              1,
+                              Math.round(
+                                (items[0].height / items[0].width) * value,
+                              ),
+                            ),
+                          );
+                        }
+                      }}
+                    />
                   )}
                   {(resizeMode === "height" || resizeMode === "exact") && (
-                    <NumberField label="Height" value={resizeHeight} unit="px" onChange={(value) => {
-                      clearResults();
-                      setResizeHeight(Math.max(1, value));
-                      if (aspectLocked && resizeMode === "exact" && items[0]) {
-                        setResizeWidth(Math.max(1, Math.round((items[0].width / items[0].height) * value)));
-                      }
-                    }} />
+                    <NumberField
+                      label="Height"
+                      value={resizeHeight}
+                      unit="px"
+                      onChange={(value) => {
+                        clearResults();
+                        setResizeHeight(Math.max(1, value));
+                        if (
+                          aspectLocked &&
+                          resizeMode === "exact" &&
+                          items[0]
+                        ) {
+                          setResizeWidth(
+                            Math.max(
+                              1,
+                              Math.round(
+                                (items[0].width / items[0].height) * value,
+                              ),
+                            ),
+                          );
+                        }
+                      }}
+                    />
                   )}
                   {resizeMode === "percentage" && (
-                    <NumberField label="Scale" value={resizePercentage} unit="%" onChange={(value) => {
-                      clearResults();
-                      setResizePercentage(Math.max(1, Math.min(500, value)));
-                    }} />
+                    <NumberField
+                      label="Scale"
+                      value={resizePercentage}
+                      unit="%"
+                      onChange={(value) => {
+                        clearResults();
+                        setResizePercentage(Math.max(1, Math.min(500, value)));
+                      }}
+                    />
                   )}
                 </div>
                 <div className={styles.presetRow} aria-label="Resize presets">
                   {[320, 640, 1280, 1920].map((width) => (
-                    <button type="button" onClick={() => {
-                      clearResults();
-                      setResizeMode("width");
-                      setResizeWidth(width);
-                    }} key={width}>{width}px</button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearResults();
+                        setResizeMode("width");
+                        setResizeWidth(width);
+                      }}
+                      key={width}
+                    >
+                      {width}px
+                    </button>
                   ))}
                 </div>
                 <div className={styles.checkboxRow}>
                   {resizeMode === "exact" && (
-                    <label><input type="checkbox" checked={aspectLocked} onChange={(event) => {
-                      clearResults();
-                      setAspectLocked(event.target.checked);
-                    }} /> Lock aspect ratio</label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={aspectLocked}
+                        onChange={(event) => {
+                          clearResults();
+                          setAspectLocked(event.target.checked);
+                        }}
+                      />{" "}
+                      Lock aspect ratio
+                    </label>
                   )}
-                  <label><input type="checkbox" checked={preventUpscale} onChange={(event) => {
-                    clearResults();
-                    setPreventUpscale(event.target.checked);
-                  }} /> Prevent upscaling</label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={preventUpscale}
+                      onChange={(event) => {
+                        clearResults();
+                        setPreventUpscale(event.target.checked);
+                      }}
+                    />{" "}
+                    Prevent upscaling
+                  </label>
                 </div>
               </div>
             )}
@@ -967,7 +1122,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
             {mode === "watermark" && (
               <div className={styles.settingGroup}>
                 <span className={styles.settingLabel}>Watermark</span>
-                <div className={`${styles.segmentedControl} ${styles.watermarkModeControl}`}>
+                <div
+                  className={`${styles.segmentedControl} ${styles.watermarkModeControl}`}
+                >
                   {(["text", "logo"] as WatermarkMode[]).map((value) => (
                     <button
                       type="button"
@@ -1006,7 +1163,10 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                         }}
                       />
                       {!normalizeWatermarkText(watermarkText) && (
-                        <small id="watermark-text-error" className={styles.formatWarning}>
+                        <small
+                          id="watermark-text-error"
+                          className={styles.formatWarning}
+                        >
                           Enter text before watermarking the images.
                         </small>
                       )}
@@ -1018,7 +1178,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                           value={watermarkFont}
                           onChange={(event) => {
                             clearResults();
-                            setWatermarkFont(event.target.value as WatermarkFontFamily);
+                            setWatermarkFont(
+                              event.target.value as WatermarkFontFamily,
+                            );
                           }}
                         >
                           <option value="Arial">Arial</option>
@@ -1033,7 +1195,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                           value={watermarkWeight}
                           onChange={(event) => {
                             clearResults();
-                            setWatermarkWeight(Number(event.target.value) as 400 | 600 | 700);
+                            setWatermarkWeight(
+                              Number(event.target.value) as 400 | 600 | 700,
+                            );
                           }}
                         >
                           <option value="400">Regular</option>
@@ -1071,7 +1235,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                       </label>
                     </div>
                     <label className={`${styles.field} ${styles.rangeField}`}>
-                      <span>Outline width <b>{watermarkOutlineWidth}%</b></span>
+                      <span>
+                        Outline width <b>{watermarkOutlineWidth}%</b>
+                      </span>
                       <input
                         type="range"
                         min="0"
@@ -1091,21 +1257,32 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                       className={styles.fileInput}
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
-                      onChange={(event) => void chooseLogo(event.target.files?.[0])}
+                      onChange={(event) =>
+                        void chooseLogo(event.target.files?.[0])
+                      }
                     />
                     {logo ? (
                       <div className={styles.logoPreview}>
-                        <img src={logo.previewUrl} alt="Selected watermark logo" />
+                        <img
+                          src={logo.previewUrl}
+                          alt="Selected watermark logo"
+                        />
                         <div className={styles.logoMeta}>
                           <strong>{logo.file.name}</strong>
                           <span>
-                            {logo.width} × {logo.height}px · {formatImageBytes(logo.file.size)}
+                            {logo.width} × {logo.height}px ·{" "}
+                            {formatImageBytes(logo.file.size)}
                           </span>
                           <div className={styles.logoActions}>
-                            <button type="button" onClick={() => logoInputRef.current?.click()}>
+                            <button
+                              type="button"
+                              onClick={() => logoInputRef.current?.click()}
+                            >
                               Replace
                             </button>
-                            <button type="button" onClick={removeLogo}>Remove</button>
+                            <button type="button" onClick={removeLogo}>
+                              Remove
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1118,13 +1295,17 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                         Choose a transparent PNG, JPEG, or WebP logo
                       </button>
                     )}
-                    <small>Up to 10 MB and 10 megapixels. Transparent PNG works best.</small>
+                    <small>
+                      Up to 10 MB and 10 megapixels. Transparent PNG works best.
+                    </small>
                   </div>
                 )}
 
                 <div className={styles.dimensionGrid}>
                   <label className={`${styles.field} ${styles.rangeField}`}>
-                    <span>Opacity <b>{watermarkOpacity}%</b></span>
+                    <span>
+                      Opacity <b>{watermarkOpacity}%</b>
+                    </span>
                     <input
                       type="range"
                       min="5"
@@ -1137,7 +1318,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                     />
                   </label>
                   <label className={`${styles.field} ${styles.rangeField}`}>
-                    <span>Size <b>{watermarkSize}%</b></span>
+                    <span>
+                      Size <b>{watermarkSize}%</b>
+                    </span>
                     <input
                       type="range"
                       min={watermarkMode === "text" ? 1 : 2}
@@ -1150,7 +1333,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                     />
                   </label>
                   <label className={`${styles.field} ${styles.rangeField}`}>
-                    <span>Rotation <b>{watermarkRotation}°</b></span>
+                    <span>
+                      Rotation <b>{watermarkRotation}°</b>
+                    </span>
                     <input
                       type="range"
                       min="-180"
@@ -1178,7 +1363,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
 
                 {watermarkTiled ? (
                   <label className={`${styles.field} ${styles.rangeField}`}>
-                    <span>Tile gap <b>{watermarkGap}%</b></span>
+                    <span>
+                      Tile gap <b>{watermarkGap}%</b>
+                    </span>
                     <input
                       type="range"
                       min="2"
@@ -1211,7 +1398,9 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
                       ))}
                     </div>
                     <label className={`${styles.field} ${styles.rangeField}`}>
-                      <span>Edge margin <b>{watermarkMargin}%</b></span>
+                      <span>
+                        Edge margin <b>{watermarkMargin}%</b>
+                      </span>
                       <input
                         type="range"
                         min="0"
@@ -1228,124 +1417,63 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
               </div>
             )}
 
-            <div className={styles.outputSettings}>
-              <label className={styles.field}>
-                <span>Output format</span>
-                <select value={outputFormat} onChange={(event) => {
-                  clearResults();
-                  setOutputFormat(event.target.value as ImageOutputFormat);
-                }}>
-                  {outputFormats
-                    .filter((format) => mode !== "convert" || format.value !== "original")
-                    .map((format) => (
-                      <option
-                        value={format.value}
-                        disabled={format.value !== "original" && !supportedOutputs.includes(format.value)}
-                        key={format.value}
-                      >
-                        {format.label}
-                      </option>
-                    ))}
-                </select>
-                {hasUnsupportedOutput && (
-                  <small className={styles.formatWarning}>
-                    Choose an output format this browser can encode.
-                  </small>
-                )}
-              </label>
-              {showQuality && (
-                <label className={`${styles.field} ${styles.rangeField}`}>
-                  <span>Quality <b>{quality}%</b></span>
-                  <input type="range" min="10" max="95" value={quality} onChange={(event) => {
-                    clearResults();
-                    setQuality(Number(event.target.value));
-                  }} />
-                </label>
-              )}
-              {showBackground && (
-                <label className={styles.field}>
-                  <span>JPEG background</span>
-                  <span className={styles.colorControl}>
-                    <input type="color" value={backgroundColor} onChange={(event) => {
-                      clearResults();
-                      setBackgroundColor(event.target.value);
-                    }} />
-                    <code>{backgroundColor}</code>
-                  </span>
-                </label>
-              )}
-              {mode === "compress" && (
-                <div className={styles.targetControl}>
-                  <label className={styles.checkboxLabel}>
-                    <input type="checkbox" checked={targetEnabled} onChange={(event) => {
-                      clearResults();
-                      setTargetEnabled(event.target.checked);
-                    }} />
-                    Target file size
-                  </label>
-                  {targetEnabled && (
-                    <>
-                      <NumberField label="Target" value={targetKilobytes} unit="KB" onChange={(value) => {
-                        clearResults();
-                        setTargetKilobytes(Math.max(1, value));
-                      }} />
-                      {hasIncompatibleTarget && (
-                        <small className={styles.formatWarning}>
-                          Target size is available only for JPEG and WebP output.
-                        </small>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+            <BatchOutputSettings
+              mode={mode}
+              settings={batchSettings}
+              onChange={updateBatchSettings}
+              supportedOutputs={supportedOutputs}
+              showQuality={showQuality}
+              showBackground={showBackground}
+              hasUnsupportedOutput={hasUnsupportedOutput}
+              hasIncompatibleTarget={hasIncompatibleTarget}
+            />
+            <SavedToolSettings
+              tool={`image-${mode}`}
+              value={batchSettings}
+              validate={isBatchSettings}
+              onRestore={updateBatchSettings}
+            />
           </fieldset>
 
           <div className={styles.batchHeader}>
             <div>
-              <strong>{items.length} image{items.length === 1 ? "" : "s"}</strong>
-              <span>{formatImageBytes(items.reduce((total, item) => total + item.file.size, 0))} total</span>
+              <strong>
+                {items.length} image{items.length === 1 ? "" : "s"}
+              </strong>
+              <span>
+                {formatImageBytes(
+                  items.reduce((total, item) => total + item.file.size, 0),
+                )}{" "}
+                total
+              </span>
             </div>
-            <button type="button" onClick={resetTool} disabled={isBusy}>Clear all</button>
+            <button type="button" onClick={resetTool} disabled={isBusy}>
+              Clear all
+            </button>
           </div>
 
-          <div className={styles.resultList}>
-            {items.map((item) => (
-              <article className={styles.resultItem} key={item.id}>
-                <img
-                  src={item.result?.previewUrl ?? item.previewUrl}
-                  alt={`Preview of ${item.file.name}`}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className={styles.resultMeta}>
-                  <strong>{item.file.name}</strong>
-                  <span>{item.width} × {item.height}px · {formatImageBytes(item.file.size)}</span>
-                  {item.result && (
-                    <span className={styles.resultSuccess}>
-                      {item.result.width} × {item.result.height}px · {formatImageBytes(item.result.bytes)}
-                    </span>
-                  )}
-                  {item.status === "processing" && <span>Processing…</span>}
-                  {item.error && <span className={styles.resultError}>{item.error}</span>}
-                  {item.result?.warning && <span className={styles.resultWarning}>{item.result.warning}</span>}
-                </div>
-                <div className={styles.itemActions}>
-                  {item.result ? (
-                    <a href={item.result.previewUrl} download={item.result.fileName}>Download</a>
-                  ) : (
-                    <span className={styles.statusPill}>{item.status}</span>
-                  )}
-                  <button type="button" aria-label={`Remove ${item.file.name}`} disabled={isBusy} onClick={() => removeItem(item.id)}>×</button>
-                </div>
-              </article>
-            ))}
-          </div>
+          <ImageBatchResults
+            items={items}
+            isBusy={isBusy}
+            onRemove={removeItem}
+            current={destination}
+          />
 
-          <div className={styles.statusArea} aria-live="polite" aria-atomic="true">
+          <div
+            className={styles.statusArea}
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <p>{message}</p>
             {isBusy && (
-              <div className={styles.progressTrack} role="progressbar" aria-label="Batch progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
+              <div
+                className={styles.progressTrack}
+                role="progressbar"
+                aria-label="Batch progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(progress)}
+              >
                 <span style={{ width: `${progress}%` }} />
               </div>
             )}
@@ -1353,19 +1481,44 @@ export default function ImageBatchTool({ mode }: { mode: BatchMode }) {
 
           <div className={styles.actions}>
             {isBusy ? (
-              <button type="button" className={styles.secondaryButton} onClick={cancelProcessing}>Cancel processing</button>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={cancelProcessing}
+              >
+                Cancel processing
+              </button>
             ) : (
-              <button type="button" className={styles.primaryButton} disabled={hasUnsupportedOutput || hasIncompatibleTarget || hasInvalidWatermark} onClick={processImages}>{modeCopy[mode].action}</button>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                disabled={
+                  hasUnsupportedOutput ||
+                  hasIncompatibleTarget ||
+                  hasInvalidWatermark
+                }
+                onClick={processImages}
+              >
+                {modeCopy[mode].action}
+              </button>
             )}
             {completedCount > 0 && !isBusy && (
-              <button type="button" className={styles.secondaryButton} disabled={isCreatingZip} onClick={downloadZip}>
-                {isCreatingZip ? "Creating ZIP…" : `Download ${completedCount} as ZIP`}
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                disabled={isCreatingZip}
+                onClick={downloadZip}
+              >
+                {isCreatingZip
+                  ? "Creating ZIP…"
+                  : `Download ${completedCount} as ZIP`}
               </button>
             )}
           </div>
 
           <p className={styles.privacyNote}>
-            Processing happens in this browser. Generated files remove EXIF and other embedded metadata; JPEG and WebP size can vary by browser.
+            Processing happens in this browser. Generated files remove EXIF and
+            other embedded metadata; JPEG and WebP size can vary by browser.
           </p>
         </>
       )}
@@ -1388,7 +1541,12 @@ function NumberField({
     <label className={styles.field}>
       <span>{label}</span>
       <span className={styles.numberControl}>
-        <input type="number" min="1" value={value} onChange={(event) => onChange(Number(event.target.value))} />
+        <input
+          type="number"
+          min="1"
+          value={value}
+          onChange={(event) => onChange(Number(event.target.value))}
+        />
         <b>{unit}</b>
       </span>
     </label>

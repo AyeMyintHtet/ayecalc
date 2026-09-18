@@ -1,121 +1,150 @@
+import Link from "next/link";
 import Calculator from "@/components/calculator";
-import ScrollToTop from "@/components/scroll-to-top";
+import HomeQuickConverter from "@/components/home-quick-converter";
+import HomeToolDirectory, {
+  type HomeTool,
+} from "@/components/home-tool-directory";
 import SiteHeader from "@/components/site-header";
+import ToolIcon, { type ToolIconName } from "@/components/tool-icon";
 import { converterDefinitions } from "@/lib/converters";
 import { developerTools } from "@/lib/developer-tools";
 import { guides } from "@/lib/guides";
-import { createPageMetadata } from "@/lib/metadata";
+import { createPageMetadata, siteConfig } from "@/lib/metadata";
+import styles from "./home.module.css";
+
+const description =
+  "Free online calculators, unit converters, image tools, and CSS utilities. Find your tool, get clear results, and keep going. No account needed.";
 
 export const metadata = createPageMetadata({
   title: "Free Online Calculators, Converters & Image Tools",
-  description:
-    "Use AyeCalc's free calculators, unit converters, private AI image scanner, browser image tools, CSS generators, and practical guides.",
+  description,
   path: "/",
-  keywords: [
-    "online calculator",
-    "free calculator",
-    "online tools",
-    "unit converter",
-    "financial calculator",
-    "developer tools",
-    "image tools",
-    "AI image scanner",
-    "image resizer",
-    "image compressor",
-    "image cropper",
-    "image converter",
-    "loan payment calculator",
-    "monthly loan calculator",
-    "loan repayment calculator",
-    "mortgage payment calculator",
-    "personal loan calculator",
-    "principal and interest calculator",
-  ],
 });
 
-const categories = [
-  {
-    icon: "↗",
-    title: "Calculators",
-    description: "Work through everyday numbers with clear inputs and visible assumptions.",
-    tools: "Try calculator",
-    href: "#calculator",
-    accent: "mint",
+const toolPresentation: Record<
+  string,
+  { description: string; icon: ToolIconName }
+> = {
+  "ai-image-upscaler": {
+    description: "Enhance a small photo with private 2× AI upscaling.",
+    icon: "spark",
   },
-  {
-    icon: "↔",
-    title: "Unit Converters",
-    description: "Convert common measurements and CSS units with dependable factors.",
-    tools: "Browse converters",
-    href: "/unit-converters",
-    accent: "yellow",
+  "image-compressor": {
+    description: "Smaller image files. More room for what matters.",
+    icon: "image",
   },
-  {
-    icon: "⌁",
-    title: "Image Tools",
-    description: "Inspect, resize, compress, crop, convert, and watermark images in your browser.",
-    tools: "Explore image tools",
-    href: "/developer-tools",
-    accent: "coral",
+  "background-remover": {
+    description: "Remove an image background right in your browser.",
+    icon: "spark",
   },
-  {
-    icon: "⌘",
-    title: "Developer & CSS",
-    description: "Generate CSS, check accessibility, and solve common front-end tasks.",
-    tools: "Explore developer tools",
-    href: "/developer-tools",
-    accent: "blue",
+  "css-clamp-generator": {
+    description: "Make your typography scale smoothly across screens.",
+    icon: "code",
   },
+  "ai-image-scanner": {
+    description: "Explore signs that an image may be AI-generated.",
+    icon: "scan",
+  },
+  "contrast-checker": {
+    description: "Check text and background colors for readability.",
+    icon: "color",
+  },
+  "image-resizer": {
+    description: "Give your images the dimensions they need.",
+    icon: "crop",
+  },
+  "image-cropper": {
+    description: "Find the right frame with precise image cropping.",
+    icon: "crop",
+  },
+  "color-converter": {
+    description: "Move between HEX, RGB, and HSL color formats.",
+    icon: "color",
+  },
+  "tailwind-grid-guide": {
+    description: "Build a responsive grid and copy the Tailwind classes.",
+    icon: "grid",
+  },
+  "content-credentials-inspector": {
+    description: "Inspect image provenance, C2PA credentials, and metadata.",
+    icon: "shield",
+  },
+};
+
+const featuredHrefs = [
+  "/ai-image-upscaler",
+  "/image-compressor",
+  "/px-to-rem",
+  "/background-remover",
+  "/css-clamp-generator",
+  "/ai-image-scanner",
+  "/contrast-checker",
+  "/lb-to-kg",
+  "/image-resizer",
+  "/loan-calculator",
 ];
 
-const popularQueryDestinations = [
+const allTools: HomeTool[] = [
+  ...developerTools.map((tool): HomeTool => ({
+    href: `/${tool.slug}`,
+    title: tool.shortTitle,
+    description: toolPresentation[tool.slug]?.description ?? tool.description,
+    category: tool.category === "Image tools" ? "Images" : "Developer",
+    icon:
+      toolPresentation[tool.slug]?.icon ??
+      (tool.category === "Image tools" ? "image" : "code"),
+    keywords: `${tool.category} ${tool.searchTerms?.join(" ") ?? ""}`,
+  })),
+  ...converterDefinitions.map((converter): HomeTool => ({
+    href: `/${converter.slug}`,
+    title: converter.title,
+    description:
+      converter.slug === "px-to-rem"
+        ? "Turn pixels into relative units, without the mental math."
+        : converter.slug === "lb-to-kg"
+          ? "Convert pounds to kilograms with a clear, exact factor."
+          : `Convert ${converter.fromName.toLowerCase()} to ${converter.toName.toLowerCase()} with formulas and examples.`,
+    category: "Converters",
+    icon: converter.category === "Length" ? "ruler" : "swap",
+    keywords: `${converter.category} ${converter.fromSymbol} ${converter.toSymbol} ${converter.searchTerms?.join(" ") ?? ""}`,
+  })),
   {
-    label: "Loan payment calculator",
-    aliases: "Monthly payment estimate",
-    href: "#calculator",
-  },
-  {
-    label: "AI image scanner",
-    aliases: "Check if an image may be AI-generated",
-    href: "/ai-image-scanner",
-  },
-  {
-    label: "Image compressor",
-    aliases: "Reduce image file size in your browser",
-    href: "/image-compressor",
-  },
-  {
-    label: "Content Credentials inspector",
-    aliases: "Check C2PA credentials and image metadata",
-    href: "/content-credentials-inspector",
-  },
-  {
-    label: "PX to REM",
-    aliases: "Pixels to REM converter",
-    href: "/px-to-rem",
-  },
-  {
-    label: "Pounds to kilograms",
-    aliases: "LB to KG converter",
-    href: "/lb-to-kg",
-  },
+    href: "/loan-calculator",
+    title: "Loan Payment Calculator",
+    description: "Get a monthly payment estimate with clear assumptions.",
+    category: "Calculators",
+    icon: "calculator",
+    keywords: "loan mortgage finance principal interest monthly repayment",
+  } satisfies HomeTool,
+].map((tool) => ({ ...tool, featured: featuredHrefs.includes(tool.href) }));
+
+const tools = [
+  ...featuredHrefs.flatMap((href) =>
+    allTools.filter((tool) => tool.href === href),
+  ),
+  ...allTools.filter((tool) => !tool.featured),
 ];
 
 const faqs = [
   {
-    question: "Are all AyeCalc tools free to use?",
+    question: "Is AyeCalc really free?",
     answer:
-      "Yes. AyeCalc calculators, converters, image utilities, developer tools, and guides are free to use without an account or subscription.",
+      "Yes. All calculators, converters, image tools, developer utilities, and guides are free to use. You do not need an account or subscription.",
   },
   {
-    question: "Do my files or inputs leave my device?",
+    question: "What happens to my files and inputs?",
     answer:
-      "AyeCalc is browser-first. Calculations and supported image processing happen locally and are not connected to a personal profile. Each tool explains any network requirement it may have.",
+      "Calculations and supported image processing happen in your browser. Some tools download a processing library or AI model before running locally. Each tool explains its network requirements and limitations, and our privacy policy describes how the site handles data.",
   },
   {
-    question: "How should I use the results?",
+    question: "Can I use these tools on my phone?",
     answer:
-      "AyeCalc shows formulas, assumptions, settings, and limitations where they matter. Calculations are estimates, and image analysis provides evidence rather than absolute certainty.",
+      "Yes. The tools are designed for phones, tablets, and desktop browsers. Some image and AI tasks need a recent browser and enough device memory; individual tool pages explain any requirements.",
+  },
+  {
+    question: "How do I know what a result means?",
+    answer:
+      "Tool pages explain their formulas, settings, examples, and limitations. Loan payments are estimates, and image analysis provides evidence rather than certainty. Check the method and assumptions before relying on a result.",
   },
 ];
 
@@ -124,360 +153,446 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://www.ayecalc.com/#website",
-      url: "https://www.ayecalc.com/",
+      "@id": `${siteConfig.url}/#website`,
+      url: `${siteConfig.url}/`,
       name: "AyeCalc",
       alternateName: "ayecalc.com",
-      description:
-        "Free online calculators, unit converters, browser image utilities, developer and CSS tools, and practical guides.",
+      description,
       inLanguage: "en-US",
-      dateModified: "2026-09-11",
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/#webpage`,
+      url: `${siteConfig.url}/`,
+      name: "Free Online Calculators, Converters & Image Tools",
+      description,
+      isPartOf: { "@id": `${siteConfig.url}/#website` },
+      inLanguage: "en-US",
+      dateModified: "2026-09-18",
+      mentions: { "@id": `${siteConfig.url}/loan-calculator#application` },
     },
     {
       "@type": "WebApplication",
-      "@id": "https://www.ayecalc.com/#loan-calculator",
-      url: "https://www.ayecalc.com/#calculator",
+      "@id": `${siteConfig.url}/loan-calculator#application`,
+      url: `${siteConfig.url}/loan-calculator`,
       name: "Loan Payment Calculator",
-      alternateName: [
-        "Monthly Loan Calculator",
-        "Loan Repayment Calculator",
-        "Mortgage Payment Calculator",
-        "Personal Loan Calculator",
-        "Principal and Interest Calculator",
-      ],
       description:
         "Estimate a monthly principal-and-interest payment from a loan amount, annual interest rate, and loan term.",
-      dateModified: "2026-08-18",
       applicationCategory: "FinanceApplication",
       operatingSystem: "Any",
       browserRequirements: "JavaScript enabled for live calculations",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
   ],
 };
 
 export default function Home() {
   return (
-    <>
+    <div className={styles.home} id="top">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
-
-      <SiteHeader />
-
-      <main id="top">
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-glow hero-glow-one" />
-          <div className="hero-glow hero-glow-two" />
-          <div className="container hero-grid">
-            <div className="hero-copy">
-              <div className="eyebrow">
-                <span className="eyebrow-dot" />
-                Calculators, converters, image tools &amp; more
-              </div>
+      <a className={styles.skipLink} href="#main-content">
+        Skip to content
+      </a>
+      <SiteHeader appearance="light" />
+      <main id="main-content" tabIndex={-1}>
+        <section className={styles.hero} aria-labelledby="hero-title">
+          <div className={`${styles.container} ${styles.heroGrid}`}>
+            <div className={styles.heroCopy}>
+              <span className={styles.eyebrow}>
+                <span className={styles.statusDot} /> A little help for your
+                everyday
+              </span>
               <h1 id="hero-title">
-                Everyday tools
+                Your everyday
                 <br />
-                <em>made simple.</em>
+                tools, <span>simplified.</span>
               </h1>
-              <p className="hero-lead">
-                Calculate, convert units, inspect or edit images, generate CSS,
-                and learn with practical guides—all in one clear, browser-friendly place.
+              <p>
+                Convert a value. Perfect an image. Figure things out. Free
+                calculators, converters, and web tools that help you get on with
+                your day.
               </p>
-              <div className="hero-actions">
-                <a className="button button-primary" href="#tools">
-                  Explore all tools
-                  <span aria-hidden="true">→</span>
+              <div className={styles.heroActions}>
+                <a className={styles.primaryButton} href="#tools">
+                  Find your tool <ToolIcon name="arrow" />
                 </a>
-                <a className="text-link" href="#why-ayecalc">
-                  Why people choose us
-                </a>
+                <Link className={styles.secondaryLink} href="/guides">
+                  Explore the guides <span aria-hidden="true">↗</span>
+                </Link>
               </div>
-              <div className="trust-line" aria-label="AyeCalc benefits">
-                <span>✓ No sign-up</span>
-                <span>✓ Always free</span>
-                <span>✓ Privacy-first</span>
+              <div className={styles.heroBenefits}>
+                <span>
+                  <ToolIcon name="check" /> Free to use
+                </span>
+                <span>
+                  <ToolIcon name="check" /> No sign-up
+                </span>
+                <span>
+                  <ToolIcon name="check" /> Works in your browser
+                </span>
               </div>
             </div>
-
-            <div className="hero-calculator" id="calculator">
-              <div className="card-float card-float-top" aria-hidden="true">
-                <span>⌁</span>
-                <div>
-                  <strong>Instant results</strong>
-                  <small>As you type</small>
-                </div>
+            <div className={styles.heroWorkspace}>
+              <div className={styles.workspaceCaption}>
+                <span>
+                  <ToolIcon name="spark" /> Little tools. Big help.
+                </span>
+                <span>TRY ONE NOW ↓</span>
               </div>
-              <Calculator />
-              <div className="card-float card-float-bottom" aria-hidden="true">
-                <span>✓</span>
-                <div>
-                  <strong>Private by default</strong>
-                  <small>browser-based calculations</small>
-                </div>
+              <HomeQuickConverter />
+              <div className={styles.miniTools}>
+                <Link
+                  href="/image-compressor"
+                  prefetch={false}
+                  className={styles.miniImageTool}
+                >
+                  <span className={styles.miniArtwork} aria-hidden="true">
+                    <span />
+                    <span />
+                    <ToolIcon name="image" />
+                  </span>
+                  <span>
+                    <strong>
+                      Less size.
+                      <br />
+                      More possibility.
+                    </strong>
+                    <small>
+                      Image compressor <span aria-hidden="true">↗</span>
+                    </small>
+                  </span>
+                </Link>
+                <Link
+                  href="/css-clamp-generator"
+                  prefetch={false}
+                  className={styles.miniCodeTool}
+                >
+                  <span className={styles.codeArtwork} aria-hidden="true">
+                    Aa<span>↗</span>
+                  </span>
+                  <span>
+                    <strong>
+                      Type that
+                      <br />
+                      finds its flow.
+                    </strong>
+                    <small>
+                      CSS clamp generator <span aria-hidden="true">↗</span>
+                    </small>
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="popular-searches" id="tools" aria-labelledby="popular-searches-title">
-          <div className="container popular-searches-inner">
-            <div className="popular-searches-heading">
-              <span className="kicker">Popular searches</span>
-              <h2 id="popular-searches-title">Find a tool for the task at hand</h2>
-            </div>
-            <nav className="popular-search-grid" aria-label="Popular tools and guides">
-              {popularQueryDestinations.map((destination) => (
-                <a href={destination.href} key={destination.href}>
-                  <strong>{destination.label}</strong>
-                  <span>{destination.aliases}</span>
-                  <b aria-hidden="true">↗</b>
-                </a>
-              ))}
+        <div className={styles.utilityStrip}>
+          <div className={styles.container}>
+            <span>
+              <strong>{tools.length}</strong> useful tools, one happy tab.
+            </span>
+            <nav aria-label="Explore tool collections">
+              <a href="#tools">
+                <ToolIcon name="swap" /> Convert
+              </a>
+              <Link href="/image-tools">
+                <ToolIcon name="image" /> Create
+              </Link>
+              <Link href="/loan-calculator">
+                <ToolIcon name="calculator" /> Calculate
+              </Link>
+              <Link href="/guides">
+                <ToolIcon name="code" /> Learn
+              </Link>
             </nav>
           </div>
-        </section>
+        </div>
 
-        <section className="categories section" id="tool-categories" aria-labelledby="categories-title">
-          <div className="container">
-            <div className="section-heading">
-              <div>
-                <span className="kicker">Explore by category</span>
-                <h2 id="categories-title">What can you do with AyeCalc?</h2>
-              </div>
+        <div className={styles.container}>
+          <HomeToolDirectory tools={tools} />
+        </div>
+
+        <section
+          className={styles.whySection}
+          id="why-ayecalc"
+          aria-labelledby="why-title"
+        >
+          <div className={`${styles.container} ${styles.whyGrid}`}>
+            <div className={styles.whyIntro}>
+              <span className={styles.eyebrow}>Less fuss. More useful.</span>
+              <h2 id="why-title">
+                Good tools should
+                <br />
+                make life simpler.
+              </h2>
+              <Link href="/about">
+                A little about AyeCalc <ToolIcon name="arrow" />
+              </Link>
+            </div>
+            <div className={styles.reason}>
+              <span className={styles.reasonIcon}>
+                <ToolIcon name="spark" />
+              </span>
+              <h3>Open. Use. Done.</h3>
               <p>
-                Calculate, convert, inspect, create, and learn with focused tools
-                that explain their results without unnecessary clutter.
+                No account to create. No software to install. Just the tool you
+                came for.
               </p>
             </div>
+            <div className={styles.reason}>
+              <span className={styles.reasonIcon}>
+                <ToolIcon name="shield" />
+              </span>
+              <h3>Your work stays yours.</h3>
+              <p>
+                Browser-based processing, with clear privacy notes and network
+                requirements on each tool.
+              </p>
+            </div>
+            <div className={styles.reason}>
+              <span className={styles.reasonIcon}>
+                <ToolIcon name="check" />
+              </span>
+              <h3>Clarity comes standard.</h3>
+              <p>
+                Understand the result with visible formulas, helpful examples,
+                and honest limitations.
+              </p>
+            </div>
+          </div>
+        </section>
 
-            <div className="category-grid">
-              {categories.map((category) => (
-                <a className="category-card" href={category.href} key={category.title}>
-                  <span className={`category-icon ${category.accent}`} aria-hidden="true">
-                    {category.icon}
-                  </span>
-                  <h3>{category.title}</h3>
-                  <p>{category.description}</p>
-                  <span className="category-meta">
-                    {category.tools}
-                    <b aria-hidden="true">→</b>
-                  </span>
-                </a>
+        <section
+          className={`${styles.container} ${styles.calculatorSection}`}
+          id="calculator"
+          aria-labelledby="calculator-title"
+        >
+          <div className={styles.calculatorCopy}>
+            <span className={styles.eyebrow}>Make the numbers make sense</span>
+            <h2 id="calculator-title">
+              A little clarity for
+              <br />
+              your next big decision.
+            </h2>
+            <p>
+              Try the loan payment calculator. Adjust the amount, annual
+              interest rate, and term to see an estimated monthly payment in US
+              dollars.
+            </p>
+            <ul>
+              <li>
+                <ToolIcon name="check" /> See your estimate as you type
+              </li>
+              <li>
+                <ToolIcon name="check" /> Compare different amounts and terms
+              </li>
+              <li>
+                <ToolIcon name="check" /> Calculate directly in your browser
+              </li>
+            </ul>
+            <details className={styles.loanMethod} id="loan-method">
+              <summary>
+                How is the payment calculated? <span aria-hidden="true">+</span>
+              </summary>
+              <div>
+                <p>
+                  For a fixed-rate loan with equal monthly payments,{" "}
+                  <code>
+                    M = P × r ÷ (1 − (1 + r)<sup>−n</sup>)
+                  </code>
+                  . P is the principal, r is the annual interest rate (as a
+                  percentage) divided by 1,200, and n is the term in years
+                  multiplied by 12. At 0% interest, the payment is P ÷ n.
+                </p>
+                <p>
+                  For example, $250,000 at 6.5% over 30 years is approximately
+                  $1,580 per month, rounded to the nearest dollar. This estimate
+                  includes principal and interest only. Taxes, insurance, fees,
+                  and lender-specific terms are excluded.
+                </p>
+                <Link href="/methodology">
+                  Read our methodology <span aria-hidden="true">↗</span>
+                </Link>
+              </div>
+            </details>
+          </div>
+          <div className={styles.calculatorPanel}>
+            <Calculator />
+            <p className={styles.calculatorDisclaimer}>
+              For planning and comparison. Actual lender payments may differ.
+            </p>
+          </div>
+        </section>
+
+        <section
+          className={styles.guideSection}
+          id="guides"
+          aria-labelledby="guides-title"
+        >
+          <div className={styles.container}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <span className={styles.eyebrow}>
+                  A little know-how goes a long way
+                </span>
+                <h2 id="guides-title">Go beyond the quick answer.</h2>
+                <p>Practical guides to help you understand the why.</p>
+              </div>
+              <Link className={styles.secondaryLink} href="/guides">
+                All guides <ToolIcon name="arrow" />
+              </Link>
+            </div>
+            <div className={styles.guideGrid}>
+              {guides.slice(0, 3).map((guide, index) => (
+                <Link
+                  key={guide.slug}
+                  href={`/guides/${guide.slug}`}
+                  className={styles.guideCard}
+                >
+                  <div
+                    className={styles.guideArtwork}
+                    data-artwork={index}
+                    aria-hidden="true"
+                  >
+                    {index === 0 ? (
+                      <>
+                        <span className={styles.unitTile}>rem</span>
+                        <span className={styles.unitConnector}>vs</span>
+                        <span className={styles.unitTile}>em</span>
+                      </>
+                    ) : index === 1 ? (
+                      <>
+                        <span className={styles.typeScale}>
+                          A
+                          <span>
+                            A<span>A</span>
+                          </span>
+                        </span>
+                        <span className={styles.baseline} />
+                      </>
+                    ) : (
+                      <>
+                        <span className={styles.pixelGrid}>px</span>
+                        <ToolIcon name="arrow" />
+                        <span className={styles.remTile}>rem</span>
+                      </>
+                    )}
+                  </div>
+                  <div className={styles.guideContent}>
+                    <span className={styles.miniLabel}>{guide.category}</span>
+                    <h3>{guide.title}</h3>
+                    <span className={styles.readGuide}>
+                      Read the guide <ToolIcon name="arrow" />
+                    </span>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
         </section>
 
         <section
-          className="converter-directory section"
-          id="converters"
-          aria-labelledby="converters-title"
+          className={`${styles.container} ${styles.faqSection}`}
+          aria-labelledby="faq-title"
         >
-          <div className="container">
-            <div className="section-heading">
-              <div>
-                <span className="kicker">Instant converters</span>
-                <h2 id="converters-title">Convert common units with confidence</h2>
-              </div>
-              <p>
-                Fast browser-based conversions with visible formulas, adjustable
-                assumptions, examples, and reference tables.
-              </p>
-            </div>
-
-            <div className="converter-directory-grid">
-              {converterDefinitions.map((converter) => (
-                <a
-                  className="converter-directory-card"
-                  href={`/${converter.slug}`}
-                  key={converter.slug}
-                >
-                  <span className="converter-card-category">{converter.category}</span>
-                  <strong>
-                    {converter.fromSymbol}
-                    <span aria-hidden="true">→</span>
-                    {converter.toSymbol}
-                  </strong>
-                  <h3>{converter.title}</h3>
-                  <span className="converter-card-action">
-                    Open converter <b aria-hidden="true">↗</b>
-                  </span>
-                </a>
-              ))}
-            </div>
+          <div>
+            <span className={styles.eyebrow}>Good questions</span>
+            <h2 id="faq-title">
+              A few things
+              <br />
+              you might wonder.
+            </h2>
+            <p>
+              Still curious?{" "}
+              <Link href="/contact">
+                Get in touch <span aria-hidden="true">↗</span>
+              </Link>
+            </p>
+          </div>
+          <div className={styles.faqList}>
+            {faqs.map((faq) => (
+              <details key={faq.question}>
+                <summary>
+                  {faq.question}
+                  <span aria-hidden="true">+</span>
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
           </div>
         </section>
 
-        <section className="resource-directory section" aria-labelledby="developer-tools-title">
-          <div className="container">
-            <div className="section-heading">
-              <div>
-                <span className="kicker">Browser toolbox</span>
-                <h2 id="developer-tools-title">Browser tools for images, code, and the web</h2>
-              </div>
-              <p>
-                Scan for AI-image patterns, shape CSS corners, generate fluid
-                values, compare units, and process images with clear privacy
-                and method notes.
-              </p>
-            </div>
-
-            <div className="resource-grid">
-              {developerTools.map((tool) => (
-                <a className="resource-card" href={`/${tool.slug}`} key={tool.slug}>
-                  <span>{tool.category}</span>
-                  <h3>{tool.shortTitle}</h3>
-                  <p>{tool.description}</p>
-                  <small>Open tool ↗</small>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="why section" id="why-ayecalc" aria-labelledby="why-title">
-          <div className="container why-grid">
-            <div className="why-visual" aria-hidden="true">
-              <div className="orbit orbit-one" />
-              <div className="orbit orbit-two" />
-              <div className="visual-center">
-                <span className="visual-check">✓</span>
-                <strong>Useful by design</strong>
-                <small>Clear guidance. No hidden steps.</small>
-              </div>
-              <span className="visual-chip chip-one">Clear</span>
-              <span className="visual-chip chip-two">Fast</span>
-              <span className="visual-chip chip-three">Private</span>
-            </div>
-
-            <div className="why-copy">
-              <span className="kicker light">Why AyeCalc</span>
-              <h2 id="why-title">Clear tools. Useful results. Better privacy.</h2>
-              <p>
-                From a quick conversion to image inspection and CSS generation,
-                every AyeCalc tool is built to be understandable, dependable,
-                and respectful of your privacy.
-              </p>
-              <ul className="feature-list">
-                <li>
-                  <span>01</span>
-                  <div>
-                    <strong>Built for clarity</strong>
-                    <p>Plain language, helpful context, and results you can act on.</p>
-                  </div>
-                </li>
-                <li>
-                  <span>02</span>
-                  <div>
-                    <strong>Methods you can inspect</strong>
-                    <p>Formulas, settings, evidence, and limitations are made visible.</p>
-                  </div>
-                </li>
-                <li>
-                  <span>03</span>
-                  <div>
-                    <strong>Your work stays yours</strong>
-                    <p>No accounts, with supported calculations and image tasks handled locally.</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section className="resource-directory resource-guides section" aria-labelledby="home-guides-title">
-          <div className="container">
-            <div className="section-heading">
-              <div>
-                <span className="kicker">Practical guides</span>
-                <h2 id="home-guides-title">Learn how the tools and methods work</h2>
-              </div>
-              <p>
-                Learn how relative units, design handoff, framework spacing, and
-                fluid typography behave before choosing a production value.
-              </p>
-            </div>
-            <div className="resource-grid">
-              {guides.slice(0, 3).map((guide) => (
-                <a className="resource-card" href={`/guides/${guide.slug}`} key={guide.slug}>
-                  <span>{guide.category}</span>
-                  <h3>{guide.title}</h3>
-                  <p>{guide.description}</p>
-                  <small>Read guide ↗</small>
-                </a>
-              ))}
-            </div>
-            <a className="directory-link" href="/guides">
-              View all guides <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </section>
-
-        <section className="guides section" id="guides" aria-labelledby="guides-title">
-          <div className="container narrow">
-            <div className="center-heading">
-              <span className="kicker">Good to know</span>
-              <h2 id="guides-title">Helpful answers before you begin</h2>
-            </div>
-            <div className="faq-list">
-              {faqs.map((faq, index) => (
-                <details key={faq.question} open={index === 0}>
-                  <summary>
-                    {faq.question}
-                    <span aria-hidden="true">+</span>
-                  </summary>
-                  <p>{faq.answer}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="closing-cta" aria-label="Explore AyeCalc tools">
-          <div className="container closing-inner">
+        <section className={styles.closing} aria-labelledby="closing-title">
+          <div className={styles.container}>
+            <span className={styles.closingSpark} aria-hidden="true">
+              ✳
+            </span>
             <div>
-              <span className="kicker light">Ready when you are</span>
-              <h2>Your next useful tool is ready.</h2>
+              <h2 id="closing-title">One less thing to figure out.</h2>
+              <p>Your next useful tool is right here.</p>
             </div>
-            <a className="button button-light" href="#tools">
-              Explore all tools <span aria-hidden="true">→</span>
+            <a className={styles.primaryButton} href="#tools">
+              Explore the toolbox <ToolIcon name="arrow" />
             </a>
           </div>
         </section>
       </main>
-
-      <footer>
-        <div className="container footer-grid">
-          <div>
-            <a className="brand footer-brand" href="#top" aria-label="AyeCalc home">
-              <span className="brand-mark" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </span>
-              <span>AyeCalc</span>
-            </a>
-            <p>Numbers, made human.</p>
+      <footer className={styles.footer}>
+        <div className={styles.container}>
+          <div className={styles.footerTop}>
+            <div className={styles.footerBrand}>
+              <Link href="/" className="brand" aria-label="AyeCalc home">
+                <span className="brand-mark" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                AyeCalc<span className={styles.brandPeriod}>.</span>
+              </Link>
+              <p>
+                Little tools for everyday life.
+                <br />
+                Made to be useful. Free to use.
+              </p>
+            </div>
+            <nav aria-label="Tools and learning">
+              <h2>Find your tool</h2>
+              <Link href="/unit-converters">Unit converters</Link>
+              <Link href="/image-tools">Image tools</Link>
+              <Link href="/developer-tools">Developer tools</Link>
+              <Link href="/loan-calculator">Loan calculator</Link>
+              <Link href="/guides">Practical guides</Link>
+            </nav>
+            <nav aria-label="About AyeCalc">
+              <h2>Meet AyeCalc</h2>
+              <Link href="/about">About us</Link>
+              <Link href="/methodology">Our methodology</Link>
+              <Link href="/contact">Contact</Link>
+            </nav>
+            <nav aria-label="Policies">
+              <h2>The details</h2>
+              <Link href="/privacy">Privacy policy</Link>
+              <Link href="/cookies">Cookie policy</Link>
+              <Link href="/terms">Terms of use</Link>
+              <Link href="/disclaimer">Disclaimer</Link>
+              <Link href="/advertising-disclosure">Advertising disclosure</Link>
+            </nav>
           </div>
-          <nav aria-label="Footer navigation">
-            <a href="/developer-tools">Developer tools</a>
-            <a href="/unit-converters">Converters</a>
-            <a href="/guides">Guides</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-            <a href="/privacy">Privacy</a>
-            <a href="/terms">Terms</a>
-          </nav>
-          <p className="copyright">© {new Date().getFullYear()} AyeCalc. All rights reserved.</p>
+          <div className={styles.footerBottom}>
+            <span>
+              © {new Date().getFullYear()} AyeCalc. All rights reserved.
+            </span>
+            <a href="#top">
+              Back to top <span aria-hidden="true">↑</span>
+            </a>
+          </div>
         </div>
       </footer>
-      <ScrollToTop />
-    </>
+    </div>
   );
 }

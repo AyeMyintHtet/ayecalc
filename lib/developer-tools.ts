@@ -1,10 +1,12 @@
-import { createPageMetadata } from "@/lib/metadata";
+import { createPageMetadata } from "./metadata.ts";
+import { upscalerTool } from "./upscaler-tool.ts";
 
 export type DeveloperToolDefinition = {
   slug: string;
   title: string;
   shortTitle: string;
   seoTitle?: string;
+  socialImage?: string;
   searchTerms?: string[];
   reviewed?: string;
   lastModified?: string;
@@ -26,6 +28,7 @@ export type DeveloperToolDefinition = {
 };
 
 export const developerTools: DeveloperToolDefinition[] = [
+  upscalerTool,
   {
     slug: "css-corner-shape-generator",
     title: "CSS Corner Shape Generator",
@@ -106,6 +109,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "css-clamp-generator",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "CSS Clamp Generator & Fluid Typography Calculator",
     shortTitle: "CSS Clamp Generator",
     seoTitle: "Free CSS Clamp Generator & Fluid Typography Tool",
@@ -138,7 +143,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Choose viewport bounds that reflect the layout rather than device names. Test the generated value at the minimum, midpoint, maximum, and with browser zoom. For text, keep line height and measure readable as font size changes.",
     limitation:
       "A mathematically fluid font size is not automatically accessible. Very small minimums, extreme scaling, fixed-height containers, and viewport-only sizing can still cause readability or overflow problems.",
-    benefits: ["Pixel and REM output", "Copy-ready CSS", "No network calculation"],
+    benefits: [
+      "Pixel and REM output",
+      "Copy-ready CSS",
+      "No network calculation",
+    ],
     codeSnippets: [
       {
         label: "CSS",
@@ -182,6 +191,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "rem-em-px-converter",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "REM, EM & PX Converter",
     shortTitle: "REM/EM/PX Matrix",
     searchTerms: [
@@ -253,6 +264,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "tailwind-spacing-converter",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "Tailwind Spacing Converter",
     shortTitle: "Tailwind Spacing Converter",
     searchTerms: [
@@ -288,11 +301,11 @@ export const developerTools: DeveloperToolDefinition[] = [
     codeSnippets: [
       {
         label: "Tailwind HTML",
-        code: "<div class=\"p-6 gap-6\">\n  <!-- 1.5rem with the default spacing variable -->\n</div>",
+        code: '<div class="p-6 gap-6">\n  <!-- 1.5rem with the default spacing variable -->\n</div>',
       },
       {
         label: "Tailwind theme",
-        code: "@import \"tailwindcss\";\n\n@theme {\n  --spacing: 0.25rem;\n}",
+        code: '@import "tailwindcss";\n\n@theme {\n  --spacing: 0.25rem;\n}',
       },
       {
         label: "Generated CSS model",
@@ -368,14 +381,19 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Base utilities apply at every size; sm:, md:, lg:, xl:, and 2xl: override them from their minimum widths upward.",
     method:
       "Start with the unprefixed mobile layout, which acts as the base or XS view. Configure grid-template columns and gap, then move through Tailwind's mobile-first breakpoints. Each block combines col-span and row-span utilities at every breakpoint, while document order determines automatic grid placement.",
-    exampleTitle: "Build a sidebar and main-content layout across six screen sizes",
+    exampleTitle:
+      "Build a sidebar and main-content layout across six screen sizes",
     exampleText:
       "Use one column at the base size, two at sm, four at md, and progressively wider grids through 2xl. A sidebar can span the full base grid, one column at sm, and three of twelve columns at 2xl, while the main area uses the remaining tracks.",
     guidance:
       "Design the smallest layout first, keep source order meaningful, and add breakpoint overrides only where the content needs them. Check that column spans never exceed their active grid, avoid unnecessary row spans, and test the copied markup with real content at widths around every breakpoint.",
     limitation:
       "The preview models Tailwind's default breakpoints and common grid utilities. A project with custom breakpoints, custom spacing, dense auto-placement, explicit start lines, subgrid, or arbitrary templates may need manual changes after copying the markup.",
-    benefits: ["Drag-and-drop blocks", "Six responsive layouts", "Live Tailwind markup"],
+    benefits: [
+      "Drag-and-drop blocks",
+      "Six responsive layouts",
+      "Live Tailwind markup",
+    ],
     codeSnippets: [
       {
         label: "Responsive Tailwind grid",
@@ -429,9 +447,10 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "aspect-ratio-calculator",
+    reviewed: "September 18, 2026",
     title: "Aspect Ratio Calculator",
     shortTitle: "Aspect Ratio Calculator",
-    lastModified: "2026-08-24T00:00:00.000Z",
+    lastModified: "2026-09-18T00:00:00.000Z",
     searchTerms: [
       "size ratio calculator",
       "ratio calculator",
@@ -470,7 +489,7 @@ export const developerTools: DeveloperToolDefinition[] = [
       },
       {
         label: "HTML",
-        code: "<img src=\"image.jpg\" width=\"1920\" height=\"1080\" alt=\"\">",
+        code: '<img src="image.jpg" width="1920" height="1080" alt="">',
       },
     ],
     faqs: [
@@ -502,6 +521,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "color-converter",
+    reviewed: "September 18, 2026",
+    lastModified: "2026-09-18T00:00:00.000Z",
     title: "HEX, RGB & HSL Color Converter",
     shortTitle: "Color Converter",
     searchTerms: [
@@ -518,14 +539,14 @@ export const developerTools: DeveloperToolDefinition[] = [
     ],
     category: "CSS color",
     description:
-      "Convert HEX colors to RGB and HSL instantly, including alpha values, with a live preview and copyable CSS output.",
+      "Convert HEX, RGB, and HSL colors in either direction, including alpha transparency, with a live preview and copyable CSS output.",
     introduction:
-      "Enter a CSS hexadecimal color and get equivalent RGB and HSL notation. The converter supports short and full hexadecimal forms with optional alpha transparency.",
+      "Enter a HEX, RGB, or HSL color and get equivalent CSS notation. Use comma-separated or modern space-separated RGB and HSL values, with optional alpha transparency.",
     formula: "RGB channels → hue, saturation, and lightness",
     formulaNote:
       "HEX stores RGB channel bytes; HSL describes the same sRGB color by hue, saturation, and lightness.",
     method:
-      "Expand short hexadecimal notation, parse each channel from base 16, normalize the RGB channels, then calculate the maximum, minimum, chroma, hue sector, saturation, and lightness.",
+      "Parse the supplied HEX, RGB, or HSL syntax into sRGB channels, then calculate the equivalent formats. RGB channels accept 0–255 or percentages; HSL accepts a hue angle and percentage saturation and lightness. Channel values outside their supported ranges are rejected, and exported RGB channels are rounded to bytes.",
     exampleTitle: "Convert #67e5b4 to RGB and HSL",
     exampleText:
       "The hexadecimal channels are 103 red, 229 green, and 180 blue. The equivalent CSS values are rgb(103 229 180) and approximately hsl(157 71% 65%).",
@@ -577,6 +598,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "viewport-unit-converter",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "PX to VW, VH, Vmin & Vmax Converter",
     shortTitle: "Viewport Unit Converter",
     searchTerms: [
@@ -667,7 +690,8 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Check two HEX colors against WCAG 2.2 AA and AAA text contrast thresholds with a live preview and exact contrast ratio.",
     introduction:
       "Compare foreground and background colors using WCAG relative luminance. Review normal-text and large-text thresholds without sending color values to a server.",
-    formula: "contrast = (lighter luminance + 0.05) ÷ (darker luminance + 0.05)",
+    formula:
+      "contrast = (lighter luminance + 0.05) ÷ (darker luminance + 0.05)",
     formulaNote:
       "WCAG AA requires 4.5:1 for normal text and 3:1 for large text; AAA uses 7:1 and 4.5:1.",
     method:
@@ -755,7 +779,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Use JPG for broadly compatible photographs, PNG when lossless output is more important than file size, and WebP for modern web delivery. Inspect gradients, fine detail, and color after conversion, especially when the source uses HDR or a wide color gamut.",
     limitation:
       "The converter exports the primary still image only. It does not preserve Live Photo video, secondary images, EXIF, location data, depth maps, HDR gain maps, or every color-profile behavior. A converted file can also be larger than its HEIC source.",
-    benefits: ["Paste, drop, or upload", "Batch convert up to 10", "Photos stay on device"],
+    benefits: [
+      "Paste, drop, or upload",
+      "Batch convert up to 10",
+      "Photos stay on device",
+    ],
     codeSnippets: [
       {
         label: "HTML image",
@@ -803,8 +831,8 @@ export const developerTools: DeveloperToolDefinition[] = [
     title: "Batch Watermark Images Online",
     shortTitle: "Batch Watermark Images",
     seoTitle: "Free Batch Watermark Images Online",
-    reviewed: "August 25, 2026",
-    lastModified: "2026-08-25T00:00:00.000Z",
+    reviewed: "September 18, 2026",
+    lastModified: "2026-09-18T00:00:00.000Z",
     searchTerms: [
       "batch watermark images",
       "batch watermark photos",
@@ -837,7 +865,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Use a high-contrast logo or text that remains readable on both light and dark areas. Keep the mark large enough to survive responsive resizing, inspect every output near important subjects, and retain an unwatermarked master copy. Use descriptive filenames and accurate alt text when publishing the results; a watermark is not a substitute for useful page content or image accessibility.",
     limitation:
       "A visible watermark can be cropped, covered, or removed and does not prove ownership by itself. The tool accepts static raster images only, does not preserve animation or embedded metadata, and re-encoding can change color, quality, and file size. SVG logo upload is not supported.",
-    benefits: ["Text or logo watermark", "Batch up to 10 images", "Photos stay on device"],
+    benefits: [
+      "Text or logo watermark",
+      "Batch up to 10 images",
+      "Photos stay on device",
+    ],
     codeSnippets: [
       {
         label: "Canvas logo watermark",
@@ -882,6 +914,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "image-resizer",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "Free Image Resizer Online",
     shortTitle: "Image Resizer",
     searchTerms: [
@@ -917,7 +951,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Resize to the largest dimensions the final layout actually needs. Keep the aspect ratio locked for photographs and interface assets unless intentional distortion is required, and inspect text or fine detail after a large reduction.",
     limitation:
       "Upscaling cannot restore missing detail. Browser encoders can produce slightly different file sizes, color output, and compression artifacts, and generated files do not retain EXIF, camera, location, or resolution metadata.",
-    benefits: ["Batch resize up to 10", "Aspect-safe dimensions", "Local processing"],
+    benefits: [
+      "Batch resize up to 10",
+      "Aspect-safe dimensions",
+      "Local processing",
+    ],
     codeSnippets: [
       {
         label: "Canvas resize",
@@ -957,6 +995,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "image-compressor",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "Free Image Compressor Online",
     shortTitle: "Image Compressor",
     searchTerms: [
@@ -992,7 +1032,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Compare detail around text, hair, gradients, and high-contrast edges rather than relying only on byte size. WebP is often useful for web delivery, while JPEG remains broadly compatible for opaque photographs.",
     limitation:
       "A requested byte size is not guaranteed because image complexity and browser encoders differ. PNG quality is lossless and does not use the quality slider, and re-encoding can occasionally create a file larger than its source.",
-    benefits: ["Quality and target size", "Before/after comparison", "Private batch compression"],
+    benefits: [
+      "Quality and target size",
+      "Before/after comparison",
+      "Private batch compression",
+    ],
     codeSnippets: [
       {
         label: "JPEG quality",
@@ -1067,7 +1111,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Choose an aspect ratio that matches the final placement and leave enough space around important subjects. Use numeric controls or arrow-key movement for precise placement, then verify the output dimensions before downloading.",
     limitation:
       "Cropping permanently removes pixels outside the selection. Editor zoom changes only the working view, extreme rotations or repeated lossy exports can affect quality, and embedded metadata is not preserved.",
-    benefits: ["Free and preset crops", "Touch and keyboard controls", "Rotate and flip"],
+    benefits: [
+      "Free and preset crops",
+      "Touch and keyboard controls",
+      "Rotate and flip",
+    ],
     codeSnippets: [
       {
         label: "Canvas crop",
@@ -1107,6 +1155,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "image-format-converter",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "Free Image Format Converter Online",
     shortTitle: "Image Format Converter",
     searchTerms: [
@@ -1142,7 +1192,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Use PNG when lossless pixels or broad transparency support matters, JPEG for opaque photographs, and WebP when modern web compression and optional transparency fit the delivery requirements.",
     limitation:
       "The first release does not accept GIF, SVG, HEIC, or AVIF and does not preserve animation. Browser format support can differ, and conversion does not improve detail already lost in a compressed source.",
-    benefits: ["JPEG, PNG, and WebP", "Batch ZIP download", "Transparency controls"],
+    benefits: [
+      "JPEG, PNG, and WebP",
+      "Batch ZIP download",
+      "Transparency controls",
+    ],
     codeSnippets: [
       {
         label: "Convert to WebP",
@@ -1220,7 +1274,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Start with the original file because screenshots, social platforms, recompression, and metadata-stripping exports can remove credentials and other fields. Read Trusted, Valid, and Invalid states carefully; compare the signer, actions, dates, source types, rights information, and known source context. Check the privacy result before sharing an image that may contain location data.",
     limitation:
       "Content Credentials are tamper-evident provenance claims, not a truth detector. A trusted signature does not guarantee that the depicted scene or every assertion is accurate, while missing credentials or metadata do not prove that an image is fake, real, human-made, or AI-generated. This local mode does not fetch remote manifests or perform live OCSP revocation checks.",
-    benefits: ["Official C2PA validation", "EXIF, IPTC & XMP", "Image stays local"],
+    benefits: [
+      "Official C2PA validation",
+      "EXIF, IPTC & XMP",
+      "Image stays local",
+    ],
     codeSnippets: [
       {
         label: "Read an embedded manifest",
@@ -1361,6 +1419,8 @@ export const developerTools: DeveloperToolDefinition[] = [
   },
   {
     slug: "background-remover",
+    lastModified: "2026-09-18T00:00:00.000Z",
+    reviewed: "September 18, 2026",
     title: "Free Background Remover Online",
     shortTitle: "Background Remover",
     searchTerms: [
@@ -1395,7 +1455,11 @@ export const developerTools: DeveloperToolDefinition[] = [
       "Use a clearly defined foreground subject, adequate lighting, and visible separation between subject and background. Inspect hair, fur, glass, shadows, and similarly colored edges at full size before using the result in production.",
     limitation:
       "Automatic segmentation can remove fine foreground detail or retain parts of a complex background. Processing speed depends on the device, browser, image dimensions, model cache, and available memory. The tool does not provide manual mask correction.",
-    benefits: ["Local image processing", "Transparent PNG output", "No account"],
+    benefits: [
+      "Local image processing",
+      "Transparent PNG output",
+      "No account",
+    ],
     codeSnippets: [
       {
         label: "HTML transparent image",
@@ -1457,6 +1521,7 @@ export function createDeveloperToolMetadata(tool: DeveloperToolDefinition) {
     description: tool.description,
     path: `/${tool.slug}`,
     keywords: Array.from(new Set(keywords)),
+    image: tool.socialImage,
     imageAlt: `${tool.shortTitle} on AyeCalc`,
   });
 }

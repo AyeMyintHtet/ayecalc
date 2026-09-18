@@ -36,7 +36,10 @@ export function convertValue(
   }
 }
 
-export function formatConversionNumber(value: number, maximumFractionDigits = 6) {
+export function formatConversionNumber(
+  value: number,
+  maximumFractionDigits = 6,
+) {
   if (!Number.isFinite(value)) return "—";
 
   const normalizedValue = Object.is(value, -0) ? 0 : value;
@@ -45,4 +48,13 @@ export function formatConversionNumber(value: number, maximumFractionDigits = 6)
     maximumFractionDigits,
     useGrouping: true,
   }).format(normalizedValue);
+}
+
+/** Numeric serialization for CSS: display grouping must never enter generated code. */
+export function formatCodeNumber(value: number, maximumFractionDigits = 6) {
+  if (!Number.isFinite(value)) return "";
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits,
+    useGrouping: false,
+  }).format(Object.is(value, -0) ? 0 : value);
 }

@@ -12,10 +12,98 @@ export type HslColor = {
   alpha: number;
 };
 
+const cssNumber = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i;
+
+function numericChannel(value: string, percentScale: number) {
+  const percentage = value.endsWith("%");
+  const raw = percentage ? value.slice(0, -1) : value;
+  if (!cssNumber.test(raw)) return null;
+  const number = Number(raw) * (percentage ? percentScale / 100 : 1);
+  return Number.isFinite(number) ? number : null;
+}
+
+export function hslToRgb({
+  hue,
+  saturation,
+  lightness,
+  alpha,
+}: HslColor): ParsedColor {
+  const h = ((hue % 360) + 360) % 360;
+  const s = saturation / 100;
+  const l = lightness / 100;
+  const a = s * Math.min(l, 1 - l);
+  const channel = (n: number) => {
+    const k = (n + h / 30) % 12;
+    return Math.round((l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * 255);
+  };
+  return { red: channel(0), green: channel(8), blue: channel(4), alpha };
+}
+
+/** Common sRGB CSS syntax; deliberately rejects variables, calc(), and wide-gamut colors. */
+export function parseCssColor(input: string): ParsedColor | null {
+  const hex = parseHexColor(input);
+  if (hex) return hex;
+  const match = input.trim().match(/^(rgba?|hsla?)\(([^()]*)\)$/i);
+  if (!match) return null;
+  const name = match[1].toLowerCase();
+  const body = match[2].trim();
+  const commaSyntax = body.includes(",");
+  if (commaSyntax && body.includes("/")) return null;
+  const parts = commaSyntax
+    ? body.split(",").map((part) => part.trim())
+    : body.split(/\s*\/\s*/);
+  if (!commaSyntax && parts.length > 2) return null;
+  const values = commaSyntax ? parts.slice(0, 3) : parts[0].trim().split(/\s+/);
+  if (values.length !== 3 || (commaSyntax && ![3, 4].includes(parts.length)))
+    return null;
+  const alphaText = commaSyntax ? parts[3] : parts[1];
+  const alpha = alphaText === undefined ? 1 : numericChannel(alphaText, 1);
+  if (alpha === null || alpha < 0 || alpha > 1) return null;
+  if (name.startsWith("rgb")) {
+    const channels = values.map((part) => numericChannel(part, 255));
+    if (channels.some((part) => part === null || part < 0 || part > 255))
+      return null;
+    return {
+      red: Math.round(channels[0]!),
+      green: Math.round(channels[1]!),
+      blue: Math.round(channels[2]!),
+      alpha,
+    };
+  }
+  const angle = values[0].match(
+    /^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)(deg|grad|rad|turn)?$/i,
+  );
+  if (!angle || !values[1].endsWith("%") || !values[2].endsWith("%"))
+    return null;
+  const units: Record<string, number> = {
+    deg: 1,
+    grad: 0.9,
+    rad: 180 / Math.PI,
+    turn: 360,
+  };
+  const hue = Number(angle[1]) * units[angle[2]?.toLowerCase() ?? "deg"];
+  const saturation = numericChannel(values[1], 100);
+  const lightness = numericChannel(values[2], 100);
+  if (
+    !Number.isFinite(hue) ||
+    saturation === null ||
+    lightness === null ||
+    saturation < 0 ||
+    saturation > 100 ||
+    lightness < 0 ||
+    lightness > 100
+  )
+    return null;
+  return hslToRgb({ hue, saturation, lightness, alpha });
+}
+
 export function parseHexColor(input: string): ParsedColor | null {
   const normalized = input.trim().replace(/^#/, "");
 
-  if (!/^[\da-f]+$/i.test(normalized) || ![3, 4, 6, 8].includes(normalized.length)) {
+  if (
+    !/^[\da-f]+$/i.test(normalized) ||
+    ![3, 4, 6, 8].includes(normalized.length)
+  ) {
     return null;
   }
 

@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { converterDefinitions } from "@/lib/converters";
-import { developerTools } from "@/lib/developer-tools";
-import { guides } from "@/lib/guides";
-import { infoPages } from "@/lib/info-pages";
-import { defaultContentLastModified, siteConfig } from "@/lib/metadata";
+import { converterDefinitions } from "../lib/converters.ts";
+import { developerTools } from "../lib/developer-tools.ts";
+import { guides } from "../lib/guides.ts";
+import { infoPages } from "../lib/info-pages.ts";
+import { defaultContentLastModified, siteConfig } from "../lib/metadata.ts";
 
 const fallbackLastModified = new Date(defaultContentLastModified);
 
@@ -13,11 +13,16 @@ const staticPages: Array<{
 }> = [
   {
     path: "",
-    lastModified: new Date("2026-09-11T00:00:00.000Z"),
+    lastModified: new Date("2026-09-18T00:00:00.000Z"),
+  },
+  { path: "/image-tools", lastModified: new Date("2026-09-18T00:00:00.000Z") },
+  {
+    path: "/loan-calculator",
+    lastModified: new Date("2026-09-18T00:00:00.000Z"),
   },
   {
     path: "/developer-tools",
-    lastModified: new Date("2026-09-11T00:00:00.000Z"),
+    lastModified: new Date("2026-09-18T00:00:00.000Z"),
   },
   {
     path: "/unit-converters",
@@ -25,7 +30,7 @@ const staticPages: Array<{
   },
   {
     path: "/guides",
-    lastModified: new Date("2026-08-17T00:00:00.000Z"),
+    lastModified: new Date("2026-09-18T00:00:00.000Z"),
   },
   {
     path: "/contact",

@@ -1,0 +1,25 @@
+.error {
+  min-height: 1.5em;
+  margin: 12px 0;
+  color: #a32923;
+  font-size: 0.85rem;
+}
+.totals {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 0;
+}
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.totals dt {
+  color: #52665f;
+}
+.totals dd {
+  margin: 0;
+  font-weight: 700;
+  color: #10221d;
+}

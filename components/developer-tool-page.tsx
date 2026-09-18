@@ -24,20 +24,39 @@ export default function DeveloperToolPage({
 }: DeveloperToolPageProps) {
   const canonicalUrl = `${siteConfig.url}/${tool.slug}`;
   const isImageTool = tool.category === "Image tools";
+  const directoryPath = isImageTool ? "/image-tools" : "/developer-tools";
+  const directoryName = isImageTool ? "Image tools" : "Developer tools";
+  const isUpscaler = tool.slug === "ai-image-upscaler";
   const isBackgroundRemover = tool.slug === "background-remover";
   const isHeicConverter = tool.slug === "heic-to-jpg";
   const isCornerShapeGenerator = tool.slug === "css-corner-shape-generator";
   const isAiImageScanner = tool.slug === "ai-image-scanner";
   const isCredentialInspector = tool.slug === "content-credentials-inspector";
-  const priorityRelatedSlugs = isCredentialInspector
-    ? ["ai-image-scanner", "image-format-converter", "image-compressor", "batch-watermark-images"]
-    : isAiImageScanner
-      ? ["content-credentials-inspector"]
-      : [];
+  const priorityRelatedSlugs = isUpscaler
+    ? [
+        "image-resizer",
+        "image-compressor",
+        "background-remover",
+        "image-format-converter",
+      ]
+    : isCredentialInspector
+      ? [
+          "ai-image-scanner",
+          "image-format-converter",
+          "image-compressor",
+          "batch-watermark-images",
+        ]
+      : isAiImageScanner
+        ? ["content-credentials-inspector"]
+        : [];
   const relatedTools = [
     ...priorityRelatedSlugs
-      .map((slug) => developerTools.find((candidate) => candidate.slug === slug))
-      .filter((candidate): candidate is DeveloperToolDefinition => Boolean(candidate)),
+      .map((slug) =>
+        developerTools.find((candidate) => candidate.slug === slug),
+      )
+      .filter((candidate): candidate is DeveloperToolDefinition =>
+        Boolean(candidate),
+      ),
     ...developerTools.filter(
       (candidate) =>
         candidate.slug !== tool.slug &&
@@ -77,19 +96,21 @@ export default function DeveloperToolPage({
           ? "MultimediaApplication"
           : "DeveloperApplication",
         operatingSystem: "Any",
-        browserRequirements: isBackgroundRemover
-          ? "Modern browser with JavaScript; network access required for first-use model files"
-          : isHeicConverter
-            ? "Modern browser with JavaScript, Web Workers, WebAssembly, and OffscreenCanvas"
-          : isCornerShapeGenerator
-            ? "Modern browser with JavaScript and CSS corner-shape support for the live preview"
-          : isAiImageScanner
-            ? "Modern browser with JavaScript, Web Workers, and WebAssembly; network access required for first-use model files"
-          : isCredentialInspector
-            ? "Modern browser with JavaScript, Web Workers, and WebAssembly"
-          : isImageTool
-            ? "Modern browser with JavaScript and Canvas image encoding"
-            : "JavaScript enabled for live calculations",
+        browserRequirements: isUpscaler
+          ? "JavaScript, Web Workers, WebAssembly, and OffscreenCanvas; network access for first-use model and runtime downloads"
+          : isBackgroundRemover
+            ? "Modern browser with JavaScript; network access required for first-use model files"
+            : isHeicConverter
+              ? "Modern browser with JavaScript, Web Workers, WebAssembly, and OffscreenCanvas"
+              : isCornerShapeGenerator
+                ? "Modern browser with JavaScript and CSS corner-shape support for the live preview"
+                : isAiImageScanner
+                  ? "Modern browser with JavaScript, Web Workers, and WebAssembly; network access required for first-use model files"
+                  : isCredentialInspector
+                    ? "Modern browser with JavaScript, Web Workers, and WebAssembly"
+                    : isImageTool
+                      ? "Modern browser with JavaScript and Canvas image encoding"
+                      : "JavaScript enabled for live calculations",
         featureList: tool.benefits,
         offers: {
           "@type": "Offer",
@@ -110,8 +131,8 @@ export default function DeveloperToolPage({
           {
             "@type": "ListItem",
             position: 2,
-            name: "Developer Tools",
-            item: `${siteConfig.url}/developer-tools`,
+            name: directoryName,
+            item: `${siteConfig.url}${directoryPath}`,
           },
           {
             "@type": "ListItem",
@@ -146,14 +167,14 @@ export default function DeveloperToolPage({
 
       <SiteHeader currentSlug={tool.slug} />
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className={styles.hero}>
           <div className={styles.heroGlow} aria-hidden="true" />
           <div className={styles.pageContainer}>
             <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
               <Link href="/">Home</Link>
               <span aria-hidden="true">/</span>
-              <Link href="/developer-tools">Developer tools</Link>
+              <Link href={directoryPath}>{directoryName}</Link>
               <span aria-hidden="true">/</span>
               <span aria-current="page">{tool.shortTitle}</span>
             </nav>
@@ -221,18 +242,18 @@ export default function DeveloperToolPage({
                     ? "Using the transparent PNG"
                     : isCredentialInspector
                       ? "Reading the evidence report"
-                    : isImageTool
-                      ? "Using the processed image"
-                      : "Copyable code examples"}
+                      : isImageTool
+                        ? "Using the processed image"
+                        : "Copyable code examples"}
                 </h2>
                 <p>
                   {isBackgroundRemover
                     ? "Preserve the PNG alpha channel and provide accurate dimensions and alternative text when adding the result to a page."
                     : isCredentialInspector
                       ? "Read credential validation, AI disclosures, attribution, rights, capture, and privacy fields as separate signals. Save the JSON report when a technical record is useful."
-                    : isImageTool
-                      ? "Keep the exported dimensions, format, transparency, and compression level appropriate for where the image will be used."
-                      : "Use these examples as a starting point, then match the values and assumptions to the rendered project."}
+                      : isImageTool
+                        ? "Keep the exported dimensions, format, transparency, and compression level appropriate for where the image will be used."
+                        : "Use these examples as a starting point, then match the values and assumptions to the rendered project."}
                 </p>
                 <div className={styles.snippetGrid}>
                   {tool.codeSnippets.map((snippet) => (
@@ -315,17 +336,23 @@ export default function DeveloperToolPage({
             <div className={styles.relatedHeading}>
               <div>
                 <span className={styles.sectionKicker}>
-                  {isImageTool ? "Continue creating" : "Build better interfaces"}
+                  {isImageTool
+                    ? "Continue creating"
+                    : "Build better interfaces"}
                 </span>
                 <h2>Related tools</h2>
               </div>
-              <Link href="/developer-tools">View all developer tools</Link>
+              <Link href={directoryPath}>
+                View all {directoryName.toLowerCase()}
+              </Link>
             </div>
             <div className={styles.relatedGrid}>
               {relatedTools.map((relatedTool) => (
                 <Link href={`/${relatedTool.slug}`} key={relatedTool.slug}>
                   <span>{relatedTool.category}</span>
-                  <strong className={styles.relatedToolName}>{relatedTool.shortTitle}</strong>
+                  <strong className={styles.relatedToolName}>
+                    {relatedTool.shortTitle}
+                  </strong>
                   <p>{relatedTool.description}</p>
                   <small aria-hidden="true">Open tool ↗</small>
                 </Link>
@@ -349,6 +376,7 @@ export default function DeveloperToolPage({
             <p>Numbers, made human.</p>
           </div>
           <nav aria-label="Footer navigation">
+            <Link href="/image-tools">Image tools</Link>
             <Link href="/developer-tools">Developer tools</Link>
             <Link href="/unit-converters">Converters</Link>
             <Link href="/guides">Guides</Link>

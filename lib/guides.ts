@@ -1,4 +1,5 @@
-import { createPageMetadata } from "@/lib/metadata";
+import { createPageMetadata } from "./metadata.ts";
+import { upscalingGuide } from "./upscaling-guide.ts";
 
 export type GuideSection = {
   id: string;
@@ -241,7 +242,11 @@ export const guides: GuideDefinition[] = [
         href: "https://www.w3.org/TR/css-values-3/#font-relative-lengths",
       },
     ],
-    relatedToolSlugs: ["px-to-rem", "css-clamp-generator", "rem-em-px-converter"],
+    relatedToolSlugs: [
+      "px-to-rem",
+      "css-clamp-generator",
+      "rem-em-px-converter",
+    ],
   },
   {
     slug: "tailwind-spacing-rem",
@@ -271,7 +276,7 @@ export const guides: GuideDefinition[] = [
           "Numeric utilities such as p-6, mt-8, and gap-4 are generated from the --spacing theme variable. With the framework's 0.25rem value, multiply the numeric suffix by 0.25rem.",
           "This means spacing 4 is 1rem, spacing 6 is 1.5rem, and spacing 8 is 2rem. At a 16px root those values correspond to 16px, 24px, and 32px, but the rem result remains tied to the actual root context.",
         ],
-        code: "@import \"tailwindcss\";\n\n@theme {\n  --spacing: 0.25rem;\n}\n\n/* p-6 => padding: calc(var(--spacing) * 6) */",
+        code: '@import "tailwindcss";\n\n@theme {\n  --spacing: 0.25rem;\n}\n\n/* p-6 => padding: calc(var(--spacing) * 6) */',
       },
       {
         id: "custom",
@@ -397,6 +402,7 @@ export const guides: GuideDefinition[] = [
     ],
     relatedToolSlugs: ["css-clamp-generator", "contrast-checker"],
   },
+  upscalingGuide,
 ];
 
 export function getGuide(slug: string) {
@@ -408,11 +414,13 @@ export function createGuideMetadata(guide: GuideDefinition) {
     title: guide.title,
     description: guide.description,
     path: `/guides/${guide.slug}`,
-    keywords: Array.from(new Set([
-      guide.title.toLowerCase(),
-      guide.category.toLowerCase(),
-      ...(guide.searchTerms ?? []),
-    ])),
+    keywords: Array.from(
+      new Set([
+        guide.title.toLowerCase(),
+        guide.category.toLowerCase(),
+        ...(guide.searchTerms ?? []),
+      ]),
+    ),
     imageAlt: `${guide.title} on AyeCalc`,
   });
 }

@@ -6,7 +6,7 @@ import {
   formatHexColor,
   formatHslColor,
   formatRgbColor,
-  parseHexColor,
+  parseCssColor,
   rgbToHsl,
 } from "@/lib/color-utils";
 
@@ -15,11 +15,12 @@ export default function ColorConverter() {
   const [copyState, setCopyState] = useState("");
 
   const calculation = useMemo(() => {
-    const parsed = parseHexColor(hexInput);
+    const parsed = parseCssColor(hexInput);
 
     if (!parsed) {
       return {
-        error: "Enter a 3, 4, 6, or 8 digit hexadecimal color.",
+        error:
+          "Enter a HEX color, rgb(255 0 0), or hsl(0 100% 50%). Alpha is optional.",
         formats: null,
       };
     }
@@ -68,7 +69,7 @@ export default function ColorConverter() {
       <div className={styles.colorLayout}>
         <div className={styles.colorFields}>
           <label className={styles.field}>
-            <span>HEX color</span>
+            <span>HEX, RGB, or HSL color</span>
             <span className={styles.hexShell}>
               <input
                 className={styles.nativeColor}
@@ -80,19 +81,27 @@ export default function ColorConverter() {
               <input
                 className={styles.hexInput}
                 type="text"
+                placeholder="rgb(103 229 180 / 0.8)"
                 value={hexInput}
                 onChange={(event) => updateHex(event.target.value)}
                 spellCheck="false"
-                autoCapitalize="characters"
+                autoCapitalize="none"
                 aria-invalid={Boolean(calculation.error)}
               />
             </span>
           </label>
-          <p className={styles.error} role={calculation.error ? "alert" : undefined}>
+          <p
+            className={styles.error}
+            role={calculation.error ? "alert" : undefined}
+          >
             {calculation.error}
           </p>
 
-          <div className={styles.formatList} aria-live="polite" aria-atomic="true">
+          <div
+            className={styles.formatList}
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {calculation.formats &&
               Object.entries(calculation.formats).map(([label, value]) => (
                 <div className={styles.formatRow} key={label}>

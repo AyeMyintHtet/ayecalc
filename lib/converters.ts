@@ -1,4 +1,4 @@
-import { convertValue, formatConversionNumber } from "@/lib/conversion-math";
+import { convertValue, formatConversionNumber } from "./conversion-math.ts";
 
 export type ContextField = {
   key: "rootFontSize" | "elementFontSize";
@@ -106,9 +106,15 @@ export const converterDefinitions: ConverterDefinition[] = [
     tableValues: [1, 2, 4, 8, 10, 12, 14, 16, 18, 20, 24, 32, 48, 64, 80, 96],
     exampleInput: 24,
     codeSnippets: [
-      { label: "CSS", code: "html { font-size: 16px; }\n.heading { font-size: 1.5rem; } /* 24px */" },
+      {
+        label: "CSS",
+        code: "html { font-size: 16px; }\n.heading { font-size: 1.5rem; } /* 24px */",
+      },
       { label: "JavaScript", code: "const rem = pixels / rootFontSize;" },
-      { label: "Sass", code: "@use \"sass:math\";\n@function rem($px, $base: 16) {\n  @return math.div($px, $base) * 1rem;\n}" },
+      {
+        label: "Sass",
+        code: '@use "sass:math";\n@function rem($px, $base: 16) {\n  @return math.div($px, $base) * 1rem;\n}',
+      },
     ],
   },
   {
@@ -151,12 +157,20 @@ export const converterDefinitions: ConverterDefinition[] = [
     inputStep: 0.125,
     allowNegative: true,
     contextFields: [rootFontSize],
-    tableValues: [0.125, 0.25, 0.5, 0.75, 1, 1.125, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6],
+    tableValues: [
+      0.125, 0.25, 0.5, 0.75, 1, 1.125, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6,
+    ],
     exampleInput: 1.5,
     codeSnippets: [
-      { label: "CSS", code: "html { font-size: 16px; }\n.heading { font-size: 1.5rem; } /* 24px */" },
+      {
+        label: "CSS",
+        code: "html { font-size: 16px; }\n.heading { font-size: 1.5rem; } /* 24px */",
+      },
       { label: "JavaScript", code: "const pixels = rem * rootFontSize;" },
-      { label: "Sass", code: "@function px($rem, $base: 16) {\n  @return $rem * $base * 1px;\n}" },
+      {
+        label: "Sass",
+        code: "@function px($rem, $base: 16) {\n  @return $rem * $base * 1px;\n}",
+      },
     ],
   },
   {
@@ -198,9 +212,15 @@ export const converterDefinitions: ConverterDefinition[] = [
     tableValues: [1, 2, 4, 8, 10, 12, 14, 16, 18, 20, 24, 32, 48, 64, 80, 96],
     exampleInput: 24,
     codeSnippets: [
-      { label: "CSS", code: ".component {\n  font-size: 16px;\n  padding: 1.5em; /* 24px */\n}" },
+      {
+        label: "CSS",
+        code: ".component {\n  font-size: 16px;\n  padding: 1.5em; /* 24px */\n}",
+      },
       { label: "JavaScript", code: "const em = pixels / elementFontSize;" },
-      { label: "Sass", code: "@use \"sass:math\";\n@function em($px, $context: 16) {\n  @return math.div($px, $context) * 1em;\n}" },
+      {
+        label: "Sass",
+        code: '@use "sass:math";\n@function em($px, $context: 16) {\n  @return math.div($px, $context) * 1em;\n}',
+      },
     ],
   },
   {
@@ -243,12 +263,20 @@ export const converterDefinitions: ConverterDefinition[] = [
     inputStep: 0.125,
     allowNegative: true,
     contextFields: [elementFontSize],
-    tableValues: [0.125, 0.25, 0.5, 0.75, 1, 1.125, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6],
+    tableValues: [
+      0.125, 0.25, 0.5, 0.75, 1, 1.125, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6,
+    ],
     exampleInput: 1.5,
     codeSnippets: [
-      { label: "CSS", code: ".component {\n  font-size: 16px;\n  padding: 1.5em; /* 24px */\n}" },
+      {
+        label: "CSS",
+        code: ".component {\n  font-size: 16px;\n  padding: 1.5em; /* 24px */\n}",
+      },
       { label: "JavaScript", code: "const pixels = em * elementFontSize;" },
-      { label: "Sass", code: "@function px-from-em($em, $context: 16) {\n  @return $em * $context * 1px;\n}" },
+      {
+        label: "Sass",
+        code: "@function px-from-em($em, $context: 16) {\n  @return $em * $context * 1px;\n}",
+      },
     ],
   },
   {
@@ -290,9 +318,18 @@ export const converterDefinitions: ConverterDefinition[] = [
     tableValues: [0.125, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6],
     exampleInput: 1.5,
     codeSnippets: [
-      { label: "CSS", code: "html { font-size: 16px; }\n.component { font-size: 20px; }\n/* 1rem equals 0.8em here */" },
-      { label: "JavaScript", code: "const em = (rem * rootFontSize) / elementFontSize;" },
-      { label: "Sass", code: "@use \"sass:math\";\n@function rem-to-em($rem, $root: 16, $context: 16) {\n  @return math.div($rem * $root, $context) * 1em;\n}" },
+      {
+        label: "CSS",
+        code: "html { font-size: 16px; }\n.component { font-size: 20px; }\n/* 1rem equals 0.8em here */",
+      },
+      {
+        label: "JavaScript",
+        code: "const em = (rem * rootFontSize) / elementFontSize;",
+      },
+      {
+        label: "Sass",
+        code: '@use "sass:math";\n@function rem-to-em($rem, $root: 16, $context: 16) {\n  @return math.div($rem * $root, $context) * 1em;\n}',
+      },
     ],
   },
   {
@@ -505,8 +542,13 @@ export function getConverterFaqs(converter: ConverterDefinition) {
   const example = getExample(converter);
   const contextAnswer = converter.contextFields.length
     ? `The calculator starts with ${converter.contextFields
-        .map((field) => `${field.defaultValue}${field.unit} for the ${field.shortLabel}`)
-        .join(" and ")}. You can change ${converter.contextFields.length === 1 ? "it" : "either value"} to match your CSS.`
+        .map(
+          (field) =>
+            `${field.defaultValue}${field.unit} for the ${field.shortLabel}`,
+        )
+        .join(
+          " and ",
+        )}. You can change ${converter.contextFields.length === 1 ? "it" : "either value"} to match your CSS.`
     : `The converter uses the fixed relationship described in the formula: ${converter.formulaNote}`;
 
   return [

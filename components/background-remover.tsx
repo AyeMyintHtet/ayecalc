@@ -16,6 +16,7 @@ import {
   validateImageFileBasics,
 } from "@/lib/image-tools";
 import styles from "@/components/background-remover.module.css";
+import ImageNextStep from "@/components/image-next-step";
 
 type Dimensions = { width: number; height: number };
 type ToolStatus =
@@ -40,15 +41,13 @@ type WorkerMessage =
 
 function createDownloadName(fileName: string) {
   const baseName = fileName.replace(/\.[^.]+$/, "").trim() || "image";
-  const safeName = baseName.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "");
+  const safeName = baseName
+    .replace(/[^a-z0-9_-]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
   return `${safeName || "image"}-no-background.png`;
 }
 
-function rgbaToPng(
-  buffer: ArrayBuffer,
-  width: number,
-  height: number,
-) {
+function rgbaToPng(buffer: ArrayBuffer, width: number, height: number) {
   return new Promise<Blob>((resolve, reject) => {
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -74,6 +73,7 @@ export default function BackgroundRemover() {
   const [dimensions, setDimensions] = useState<Dimensions | null>(null);
   const [originalUrl, setOriginalUrl] = useState("");
   const [resultUrl, setResultUrl] = useState("");
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const [status, setStatus] = useState<ToolStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState(
@@ -92,13 +92,13 @@ export default function BackgroundRemover() {
   const isBusy = ["loading-model", "processing", "encoding"].includes(status);
 
   useEffect(() => {
-    setImagePixelLimit(
-      getRuntimeImagePixelLimit(MAX_BACKGROUND_IMAGE_PIXELS),
-    );
+    setImagePixelLimit(getRuntimeImagePixelLimit(MAX_BACKGROUND_IMAGE_PIXELS));
   }, []);
 
   useEffect(() => {
+    const operation = operationRef;
     return () => {
+      operation.current += 1;
       workerRef.current?.terminate();
       if (originalUrlRef.current) URL.revokeObjectURL(originalUrlRef.current);
       if (resultUrlRef.current) URL.revokeObjectURL(resultUrlRef.current);
@@ -112,6 +112,7 @@ export default function BackgroundRemover() {
   }
 
   function replaceResultUrl(nextUrl: string) {
+    if (!nextUrl) setResultBlob(null);
     if (resultUrlRef.current) URL.revokeObjectURL(resultUrlRef.current);
     resultUrlRef.current = nextUrl;
     setResultUrl(nextUrl);
@@ -181,7 +182,9 @@ export default function BackgroundRemover() {
       setProgress(0);
       setMessage("Image ready. Start removal when you are ready.");
     } catch {
-      setError("The browser could not decode this image. Try another supported file.");
+      setError(
+        "The browser could not decode this image. Try another supported file.",
+      );
     }
   }
 
@@ -206,6 +209,8 @@ export default function BackgroundRemover() {
     );
 
     worker.onmessage = async (event: MessageEvent<WorkerMessage>) => {
+      if (worker !== workerRef.current) return;
+      const operation = operationRef.current;
       const workerMessage = event.data;
 
       if (workerMessage.type === "status") {
@@ -239,11 +244,16 @@ export default function BackgroundRemover() {
           workerMessage.width,
           workerMessage.height,
         );
+        if (operation !== operationRef.current || worker !== workerRef.current)
+          return;
+        setResultBlob(png);
         replaceResultUrl(URL.createObjectURL(png));
         setStatus("complete");
         setProgress(100);
         setMessage("Background removed. Inspect the edges before downloading.");
       } catch (error) {
+        if (operation !== operationRef.current || worker !== workerRef.current)
+          return;
         setError(
           error instanceof Error
             ? error.message
@@ -254,7 +264,9 @@ export default function BackgroundRemover() {
 
     worker.onerror = () => {
       stopWorker();
-      setError("The background-removal worker stopped unexpectedly. Try again.");
+      setError(
+        "The background-removal worker stopped unexpectedly. Try again.",
+      );
     };
 
     workerRef.current = worker;
@@ -297,7 +309,9 @@ export default function BackgroundRemover() {
       <div className={styles.toolHeading}>
         <div>
           <span>Browser-based image segmentation</span>
-          <h2 style={{color:"rgb(57, 113, 95)"}}>Remove an image background</h2>
+          <h2 style={{ color: "rgb(57, 113, 95)" }}>
+            Remove an image background
+          </h2>
         </div>
         <span className={styles.privacyBadge}>Image stays local</span>
       </div>
@@ -320,12 +334,19 @@ export default function BackgroundRemover() {
           onChange={handleInputChange}
           disabled={isBusy}
         />
-        <span className={styles.uploadIcon} aria-hidden="true">↑</span>
-        <strong>{selectedFile ? "Choose a different image" : "Drop an image here"}</strong>
+        <span className={styles.uploadIcon} aria-hidden="true">
+          ↑
+        </span>
+        <strong>
+          {selectedFile ? "Choose a different image" : "Drop an image here"}
+        </strong>
         <p>
-          JPEG, PNG, or WebP · up to {formatImageBytes(MAX_BACKGROUND_IMAGE_FILE_BYTES)} and{" "}
+          JPEG, PNG, or WebP · up to{" "}
+          {formatImageBytes(MAX_BACKGROUND_IMAGE_FILE_BYTES)} and{" "}
           {formatImageMegapixels(imagePixelLimit)}
-          {imagePixelLimit < MAX_BACKGROUND_IMAGE_PIXELS ? " on this device" : ""}
+          {imagePixelLimit < MAX_BACKGROUND_IMAGE_PIXELS
+            ? " on this device"
+            : ""}
         </p>
         <button
           type="button"
@@ -363,7 +384,8 @@ export default function BackgroundRemover() {
           <div className={styles.fileMeta}>
             <span>{selectedFile.name}</span>
             <span>
-              {dimensions.width} × {dimensions.height}px · {formatImageBytes(selectedFile.size)}
+              {dimensions.width} × {dimensions.height}px ·{" "}
+              {formatImageBytes(selectedFile.size)}
             </span>
           </div>
 
@@ -399,6 +421,12 @@ export default function BackgroundRemover() {
             </figure>
           </div>
 
+          {resultBlob && status === "complete" && (
+            <ImageNextStep
+              blob={resultBlob}
+              fileName={createDownloadName(selectedFile.name)}
+            />
+          )}
           <div className={styles.actions}>
             {resultUrl && status === "complete" ? (
               <a

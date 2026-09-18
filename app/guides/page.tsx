@@ -5,11 +5,16 @@ import { guides } from "@/lib/guides";
 import { createPageMetadata, siteConfig } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
-  title: "CSS & Developer Guides",
+  title: "Image & Developer Guides",
   description:
-    "Read practical AyeCalc guides about CSS units, fluid typography, Tailwind spacing, design handoff, and accessible interface calculations.",
+    "Read practical AyeCalc guides about image enhancement, CSS units, fluid typography, Tailwind spacing, and accessible interface calculations.",
   path: "/guides",
-  keywords: ["CSS guides", "developer guides", "REM guide", "fluid typography guide"],
+  keywords: [
+    "CSS guides",
+    "developer guides",
+    "REM guide",
+    "fluid typography guide",
+  ],
 });
 
 const jsonLd = {
@@ -18,10 +23,10 @@ const jsonLd = {
     {
       "@type": "CollectionPage",
       url: `${siteConfig.url}/guides`,
-      name: "AyeCalc CSS and Developer Guides",
+      name: "AyeCalc Image and Developer Guides",
       description:
-        "Practical guides for CSS units, responsive typography, and developer workflows.",
-      dateModified: "2026-08-17",
+        "Practical guides for photo enhancement, CSS units, responsive typography, and developer workflows.",
+      dateModified: "2026-09-18",
     },
     {
       "@type": "BreadcrumbList",
@@ -58,10 +63,10 @@ export default function GuidesPage() {
             <span aria-current="page">Guides</span>
           </nav>
           <span className={styles.eyebrow}>Knowledge base</span>
-          <h1>CSS and developer guides</h1>
+          <h1>Image and developer guides</h1>
           <p className={styles.heroLead}>
-            Understand the assumptions behind the tools, choose units intentionally,
-            and carry calculations into accessible production interfaces.
+            Understand image quality, choose CSS units intentionally, and use
+            the tools with clear assumptions and realistic expectations.
           </p>
         </div>
       </section>
@@ -70,17 +75,24 @@ export default function GuidesPage() {
         <div className={styles.container}>
           <div className={styles.sectionHeading}>
             <div>
-              <span className={styles.sectionKicker}>Practical explanations</span>
+              <span className={styles.sectionKicker}>
+                Practical explanations
+              </span>
               <h2>Learn the method, not only the answer</h2>
             </div>
             <p>
-              Each guide connects technical definitions to design and development
-              decisions, with primary references and related calculators.
+              Each guide connects technical definitions to design and
+              development decisions, with primary references and related
+              calculators.
             </p>
           </div>
           <div className={styles.cardGrid}>
             {guides.map((guide) => (
-              <Link className={styles.card} href={`/guides/${guide.slug}`} key={guide.slug}>
+              <Link
+                className={styles.card}
+                href={`/guides/${guide.slug}`}
+                key={guide.slug}
+              >
                 <span>{guide.category}</span>
                 <strong>{guide.title}</strong>
                 <p>{guide.description}</p>

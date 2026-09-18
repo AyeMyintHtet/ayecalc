@@ -40,14 +40,16 @@ export default function ClampGenerator() {
       validValues.rootFontSize <= 0
     ) {
       return {
-        error: "Use non-negative sizes and a positive viewport maximum and root size.",
+        error:
+          "Use non-negative sizes and a positive viewport maximum and root size.",
         result: null,
       };
     }
 
     if (validValues.maximumViewport <= validValues.minimumViewport) {
       return {
-        error: "Maximum viewport width must be greater than minimum viewport width.",
+        error:
+          "Maximum viewport width must be greater than minimum viewport width.",
         result: null,
       };
     }
@@ -59,16 +61,23 @@ export default function ClampGenerator() {
       };
     }
 
-    return {
-      error: "",
-      result: calculateClamp(
-        validValues.minimumViewport,
-        validValues.maximumViewport,
-        validValues.minimumSize,
-        validValues.maximumSize,
-        validValues.rootFontSize,
-      ),
-    };
+    try {
+      return {
+        error: "",
+        result: calculateClamp(
+          validValues.minimumViewport,
+          validValues.maximumViewport,
+          validValues.minimumSize,
+          validValues.maximumSize,
+          validValues.rootFontSize,
+        ),
+      };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : "Enter smaller values.",
+        result: null,
+      };
+    }
   }, [
     maximumSize,
     maximumViewport,
@@ -125,7 +134,10 @@ export default function ClampGenerator() {
         />
       </div>
 
-      <p className={styles.error} role={calculation.error ? "alert" : undefined}>
+      <p
+        className={styles.error}
+        role={calculation.error ? "alert" : undefined}
+      >
         {calculation.error}
       </p>
 
@@ -142,7 +154,9 @@ export default function ClampGenerator() {
           {calculation.result?.remValue ?? "Enter valid values"}
         </code>
         {calculation.result && (
-          <code className={styles.secondaryCode}>{calculation.result.pixelValue}</code>
+          <code className={styles.secondaryCode}>
+            {calculation.result.pixelValue}
+          </code>
         )}
       </div>
     </div>

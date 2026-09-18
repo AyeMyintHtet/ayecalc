@@ -83,7 +83,64 @@
   outline-offset: 3px;
 }
 
+.light {
+  position: relative;
+  color: #183e32;
+  background: #fcfcf8;
+}
+
+.light .inner {
+  width: min(1200px, calc(100% - 64px));
+  min-height: 88px;
+  border-bottom-color: #e3e7df;
+}
+
+.light .brand {
+  font-size: 24px;
+}
+
+.light .brandMark {
+  width: 33px;
+  height: 33px;
+  padding-bottom: 8px;
+  background: #d7efb5;
+}
+
+.light .nav {
+  gap: 28px;
+  color: #53625b;
+}
+
+.light .nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.light .nav a:hover {
+  color: #183e32;
+}
+
+.light a:focus-visible {
+  outline-color: #24714e;
+}
+
+@media (max-width: 1000px) {
+  .light .nav {
+    gap: 18px;
+  }
+
+  .light .nav a:last-child {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
+  .light .inner {
+    width: calc(100% - 40px);
+    min-height: 76px;
+  }
+
   .inner {
     width: min(100% - 34px, 620px);
     min-height: 72px;

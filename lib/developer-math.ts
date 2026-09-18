@@ -1,4 +1,4 @@
-import { formatConversionNumber } from "./conversion-math";
+import { formatCodeNumber } from "./conversion-math.ts";
 
 export type ClampResult = {
   slope: number;
@@ -18,6 +18,23 @@ export function calculateClamp(
   maximumSize: number,
   rootFontSize: number,
 ): ClampResult {
+  if (
+    ![
+      minimumViewport,
+      maximumViewport,
+      minimumSize,
+      maximumSize,
+      rootFontSize,
+    ].every(Number.isFinite) ||
+    minimumViewport < 0 ||
+    maximumViewport <= minimumViewport ||
+    minimumSize < 0 ||
+    maximumSize < minimumSize ||
+    rootFontSize <= 0
+  )
+    throw new RangeError(
+      "Use increasing viewport widths, non-negative sizes, and a positive root font size.",
+    );
   const rate =
     (maximumSize - minimumSize) / (maximumViewport - minimumViewport);
   const slope = rate * 100;
@@ -26,13 +43,23 @@ export function calculateClamp(
   const maximumRem = maximumSize / rootFontSize;
   const interceptRem = intercept / rootFontSize;
 
-  const slopeText = formatConversionNumber(Math.abs(trimNumber(slope)), 4);
-  const interceptText = formatConversionNumber(Math.abs(trimNumber(intercept)), 4);
-  const minimumText = formatConversionNumber(trimNumber(minimumSize), 4);
-  const maximumText = formatConversionNumber(trimNumber(maximumSize), 4);
-  const minimumRemText = formatConversionNumber(trimNumber(minimumRem), 4);
-  const maximumRemText = formatConversionNumber(trimNumber(maximumRem), 4);
-  const interceptRemText = formatConversionNumber(Math.abs(trimNumber(interceptRem)), 4);
+  if (
+    ![slope, intercept, minimumRem, maximumRem, interceptRem].every(
+      Number.isFinite,
+    )
+  ) {
+    throw new RangeError("These values are too large to generate CSS.");
+  }
+  const slopeText = formatCodeNumber(Math.abs(trimNumber(slope)), 4);
+  const interceptText = formatCodeNumber(Math.abs(trimNumber(intercept)), 4);
+  const minimumText = formatCodeNumber(trimNumber(minimumSize), 4);
+  const maximumText = formatCodeNumber(trimNumber(maximumSize), 4);
+  const minimumRemText = formatCodeNumber(trimNumber(minimumRem), 4);
+  const maximumRemText = formatCodeNumber(trimNumber(maximumRem), 4);
+  const interceptRemText = formatCodeNumber(
+    Math.abs(trimNumber(interceptRem)),
+    4,
+  );
   const pixelPreferred =
     intercept >= 0
       ? `${interceptText}px + ${slopeText}vw`
@@ -58,6 +85,13 @@ export function convertCssUnitMatrix(
   rootFontSize: number,
   elementFontSize: number,
 ) {
+  if (
+    ![value, rootFontSize, elementFontSize].every(Number.isFinite) ||
+    rootFontSize <= 0 ||
+    elementFontSize <= 0
+  ) {
+    throw new RangeError("Enter a finite value and positive font sizes.");
+  }
   const pixels =
     sourceUnit === "px"
       ? value
@@ -65,11 +99,14 @@ export function convertCssUnitMatrix(
         ? value * rootFontSize
         : value * elementFontSize;
 
-  return {
+  const result = {
     px: pixels,
     rem: pixels / rootFontSize,
     em: pixels / elementFontSize,
   };
+  if (!Object.values(result).every(Number.isFinite))
+    throw new RangeError("These values are too large to convert.");
+  return result;
 }
 
 export function calculateTailwindSpacing(
@@ -77,7 +114,19 @@ export function calculateTailwindSpacing(
   spacingRem: number,
   rootFontSize: number,
 ) {
+  if (
+    ![multiplier, spacingRem, rootFontSize].every(Number.isFinite) ||
+    multiplier < 0 ||
+    spacingRem <= 0 ||
+    rootFontSize <= 0
+  ) {
+    throw new RangeError(
+      "Enter a non-negative spacing number and positive base values.",
+    );
+  }
   const rem = multiplier * spacingRem;
+  if (![rem, rem * rootFontSize].every(Number.isFinite))
+    throw new RangeError("These values are too large to convert.");
 
   return {
     rem,
@@ -102,6 +151,16 @@ export function simplifyAspectRatio(width: number, height: number) {
   const scale = 1000;
   const integerWidth = Math.round(width * scale);
   const integerHeight = Math.round(height * scale);
+  if (
+    ![width, height].every((value) => value >= 0.001 && value <= 9e12) ||
+    ![integerWidth, integerHeight].every(
+      (value) => Number.isSafeInteger(value) && value > 0,
+    )
+  ) {
+    throw new RangeError(
+      "Use dimensions from 0.001 to 9 trillion; ratios are rounded to three decimal places.",
+    );
+  }
   const divisor = greatestCommonDivisor(integerWidth, integerHeight) || 1;
 
   return {
@@ -116,7 +175,17 @@ export function calculateProportionalHeight(
   height: number,
   targetWidth: number,
 ) {
-  return (targetWidth * height) / width;
+  const result = (targetWidth / width) * height;
+  if (
+    ![width, height, targetWidth, result].every(
+      (value) => Number.isFinite(value) && value > 0,
+    )
+  ) {
+    throw new RangeError(
+      "These dimensions are outside the supported numeric range.",
+    );
+  }
+  return result;
 }
 
 export function convertPixelsToViewportUnits(
@@ -124,13 +193,25 @@ export function convertPixelsToViewportUnits(
   viewportWidth: number,
   viewportHeight: number,
 ) {
+  if (
+    ![pixels, viewportWidth, viewportHeight].every(Number.isFinite) ||
+    viewportWidth <= 0 ||
+    viewportHeight <= 0
+  ) {
+    throw new RangeError(
+      "Enter a finite pixel value and positive viewport dimensions.",
+    );
+  }
   const smallerDimension = Math.min(viewportWidth, viewportHeight);
   const largerDimension = Math.max(viewportWidth, viewportHeight);
 
-  return {
+  const result = {
     vw: (pixels / viewportWidth) * 100,
     vh: (pixels / viewportHeight) * 100,
     vmin: (pixels / smallerDimension) * 100,
     vmax: (pixels / largerDimension) * 100,
   };
+  if (!Object.values(result).every(Number.isFinite))
+    throw new RangeError("These values are too large to convert.");
+  return result;
 }

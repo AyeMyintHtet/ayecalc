@@ -36,35 +36,38 @@ type InspectionResult = {
   metadataError?: string;
 };
 
-const EMPTY_METADATA = summarizeMetadata({});
-
 const credentialStateCopy: Record<
   CredentialState,
   { label: string; description: string; icon: string }
 > = {
   trusted: {
     label: "Trusted credentials",
-    description: "The manifest is valid and its signer chains to a recognized trust anchor.",
+    description:
+      "The manifest is valid and its signer chains to a recognized trust anchor.",
     icon: "✓",
   },
   valid: {
     label: "Valid signature",
-    description: "The content binding and signature validated, but signer trust was not established.",
+    description:
+      "The content binding and signature validated, but signer trust was not established.",
     icon: "✓",
   },
   invalid: {
     label: "Validation failed",
-    description: "One or more checks failed. Treat the credential history as unreliable.",
+    description:
+      "One or more checks failed. Treat the credential history as unreliable.",
     icon: "!",
   },
   found: {
     label: "Credentials found",
-    description: "A manifest was read, but the available result does not establish full validity.",
+    description:
+      "A manifest was read, but the available result does not establish full validity.",
     icon: "i",
   },
   "not-found": {
     label: "No credentials found",
-    description: "No embedded C2PA manifest was found. This does not make the image suspicious.",
+    description:
+      "No embedded C2PA manifest was found. This does not make the image suspicious.",
     icon: "—",
   },
 };
@@ -151,10 +154,16 @@ function SummaryCard({
   );
 }
 
-function FactList({ facts }: { facts: Array<[string, string | number | undefined]> }) {
-  const visibleFacts = facts.filter((fact): fact is [string, string | number] => {
-    return fact[1] !== undefined && fact[1] !== "";
-  });
+function FactList({
+  facts,
+}: {
+  facts: Array<[string, string | number | undefined]>;
+}) {
+  const visibleFacts = facts.filter(
+    (fact): fact is [string, string | number] => {
+      return fact[1] !== undefined && fact[1] !== "";
+    },
+  );
   if (!visibleFacts.length) return null;
 
   return (
@@ -212,7 +221,8 @@ export default function ContentCredentialsInspector() {
   const operationRef = useRef(0);
 
   const isInspecting = status === "inspecting";
-  const credentialCopy = credentialStateCopy[result?.credentials.state ?? "not-found"];
+  const credentialCopy =
+    credentialStateCopy[result?.credentials.state ?? "not-found"];
   const aiDisclosed = Boolean(
     result?.credentials.aiDisclosed || result?.metadata.aiDisclosed,
   );
@@ -297,7 +307,9 @@ export default function ContentCredentialsInspector() {
     const metadataFailed = metadataResult.status === "rejected";
     if (credentialFailed && metadataFailed) {
       setStatus("error");
-      setMessage("This file could not be inspected. Try another supported image.");
+      setMessage(
+        "This file could not be inspected. Try another supported image.",
+      );
       return;
     }
 
@@ -324,7 +336,9 @@ export default function ContentCredentialsInspector() {
         : undefined,
     });
     setStatus("complete");
-    setMessage("Inspection complete. Review the evidence and limitations below.");
+    setMessage(
+      "Inspection complete. Review the evidence and limitations below.",
+    );
   }
 
   const reportObject = useMemo(() => {
@@ -395,20 +409,26 @@ export default function ContentCredentialsInspector() {
         ...group,
         entries: group.entries.filter(
           (entry) =>
-            entry.searchText.includes(query) || group.label.toLowerCase().includes(query),
+            entry.searchText.includes(query) ||
+            group.label.toLowerCase().includes(query),
         ),
       }))
       .filter((group) => group.entries.length);
   }, [metadataQuery, result]);
 
-  const credentialTone = result?.credentials.state === "invalid"
-    ? "danger"
-    : result?.credentials.state === "trusted" || result?.credentials.state === "valid"
-      ? "positive"
-      : "neutral";
+  const credentialTone =
+    result?.credentials.state === "invalid"
+      ? "danger"
+      : result?.credentials.state === "trusted" ||
+          result?.credentials.state === "valid"
+        ? "positive"
+        : "neutral";
 
   return (
-    <section className={styles.toolCard} aria-labelledby="credential-inspector-title">
+    <section
+      className={styles.toolCard}
+      aria-labelledby="credential-inspector-title"
+    >
       <div className={styles.toolHeading}>
         <div>
           <span>Local provenance check</span>
@@ -436,13 +456,17 @@ export default function ContentCredentialsInspector() {
           }}
           onDragOver={(event) => event.preventDefault()}
           onDragLeave={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            if (
+              !event.currentTarget.contains(event.relatedTarget as Node | null)
+            ) {
               setIsDragging(false);
             }
           }}
           onDrop={handleDrop}
         >
-          <span className={styles.uploadIcon} aria-hidden="true">⌁</span>
+          <span className={styles.uploadIcon} aria-hidden="true">
+            ⌁
+          </span>
           <strong>Drop one image here</strong>
           <p>JPEG, PNG, WebP, AVIF, HEIC, HEIF, TIFF, or GIF · up to 100 MB</p>
           <button
@@ -459,7 +483,6 @@ export default function ContentCredentialsInspector() {
             <div className={styles.previewFrame}>
               {!previewUnavailable ? (
                 // A validated raster file is rendered through the browser's image decoder.
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={previewUrl}
                   alt={`Preview of ${selectedFile.name}`}
@@ -477,7 +500,8 @@ export default function ContentCredentialsInspector() {
             <figcaption>
               <strong>{selectedFile.name}</strong>
               <span>
-                {formatImageBytes(selectedFile.size)} · {resolveCredentialImageMime(selectedFile)}
+                {formatImageBytes(selectedFile.size)} ·{" "}
+                {resolveCredentialImageMime(selectedFile)}
               </span>
             </figcaption>
           </figure>
@@ -489,7 +513,11 @@ export default function ContentCredentialsInspector() {
                   {isInspecting ? "◌" : "⌕"}
                 </span>
                 <div>
-                  <small>{isInspecting ? "Local inspection running" : "Ready to inspect"}</small>
+                  <small>
+                    {isInspecting
+                      ? "Local inspection running"
+                      : "Ready to inspect"}
+                  </small>
                   <h3>
                     {isInspecting
                       ? "Checking credentials and metadata"
@@ -497,7 +525,10 @@ export default function ContentCredentialsInspector() {
                   </h3>
                   <p>{message}</p>
                   {isInspecting ? (
-                    <div className={styles.progressTrack} aria-label="Inspection in progress">
+                    <div
+                      className={styles.progressTrack}
+                      aria-label="Inspection in progress"
+                    >
                       <span />
                     </div>
                   ) : null}
@@ -529,12 +560,20 @@ export default function ContentCredentialsInspector() {
                     <h3>Embedded evidence report</h3>
                     <p>{message}</p>
                   </div>
-                  <button type="button" className={styles.secondaryButton} onClick={resetInspector}>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={resetInspector}
+                  >
                     New image
                   </button>
                 </div>
 
-                <div className={styles.tabList} role="tablist" aria-label="Inspection results">
+                <div
+                  className={styles.tabList}
+                  role="tablist"
+                  aria-label="Inspection results"
+                >
                   {(
                     [
                       ["overview", "Overview"],
@@ -569,13 +608,23 @@ export default function ContentCredentialsInspector() {
                         <SummaryCard
                           eyebrow="Content Credentials"
                           title={credentialCopy.label}
-                          description={result.credentialError ?? credentialCopy.description}
-                          tone={result.credentialError ? "warning" : credentialTone}
-                          icon={result.credentialError ? "!" : credentialCopy.icon}
+                          description={
+                            result.credentialError ?? credentialCopy.description
+                          }
+                          tone={
+                            result.credentialError ? "warning" : credentialTone
+                          }
+                          icon={
+                            result.credentialError ? "!" : credentialCopy.icon
+                          }
                         />
                         <SummaryCard
                           eyebrow="AI disclosure"
-                          title={aiDisclosed ? "AI use disclosed" : "No AI disclosure found"}
+                          title={
+                            aiDisclosed
+                              ? "AI use disclosed"
+                              : "No AI disclosure found"
+                          }
                           description={
                             aiDisclosed
                               ? "An embedded source type or IPTC AI field explicitly mentions AI use."
@@ -598,7 +647,11 @@ export default function ContentCredentialsInspector() {
                         />
                         <SummaryCard
                           eyebrow="Privacy check"
-                          title={result.metadata.hasGps ? "Location data found" : "No GPS coordinates found"}
+                          title={
+                            result.metadata.hasGps
+                              ? "Location data found"
+                              : "No GPS coordinates found"
+                          }
                           description={
                             result.metadata.hasGps
                               ? "Review the metadata before sharing this file publicly."
@@ -609,7 +662,8 @@ export default function ContentCredentialsInspector() {
                         />
                       </div>
 
-                      {(result.credentials.sourceTypes.length || result.metadata.sourceTypes.length) ? (
+                      {result.credentials.sourceTypes.length ||
+                      result.metadata.sourceTypes.length ? (
                         <section className={styles.sourceTypePanel}>
                           <span>Declared digital source type</span>
                           <div>
@@ -643,10 +697,13 @@ export default function ContentCredentialsInspector() {
                       <aside className={styles.evidenceNotice}>
                         <span aria-hidden="true">i</span>
                         <p>
-                          <strong>Read this as evidence, not a truth score.</strong> Content
-                          Credentials can show whether signed provenance data stayed bound to this
-                          file. They do not prove that every claim or visible scene is true, and
-                          missing credentials do not prove manipulation.
+                          <strong>
+                            Read this as evidence, not a truth score.
+                          </strong>{" "}
+                          Content Credentials can show whether signed provenance
+                          data stayed bound to this file. They do not prove that
+                          every claim or visible scene is true, and missing
+                          credentials do not prove manipulation.
                         </p>
                       </aside>
                     </div>
@@ -654,12 +711,17 @@ export default function ContentCredentialsInspector() {
 
                   {activeTab === "credentials" ? (
                     <div className={styles.credentialsPanel}>
-                      <div className={`${styles.credentialBanner} ${styles[result.credentials.state]}`}>
+                      <div
+                        className={`${styles.credentialBanner} ${styles[result.credentials.state]}`}
+                      >
                         <span aria-hidden="true">{credentialCopy.icon}</span>
                         <div>
                           <small>Validation state</small>
                           <h4>{credentialCopy.label}</h4>
-                          <p>{result.credentialError ?? credentialCopy.description}</p>
+                          <p>
+                            {result.credentialError ??
+                              credentialCopy.description}
+                          </p>
                         </div>
                       </div>
 
@@ -667,16 +729,25 @@ export default function ContentCredentialsInspector() {
                         <>
                           <FactList
                             facts={[
-                              ["Active manifest", result.credentials.activeLabel],
+                              [
+                                "Active manifest",
+                                result.credentials.activeLabel,
+                              ],
                               ["Asset title", result.credentials.title],
                               ["Manifest format", result.credentials.format],
                               ["Claim generator", result.credentials.generator],
                               ["Signer", result.credentials.signer],
                               ["Certificate issuer", result.credentials.issuer],
                               ["Signed", result.credentials.signedAt],
-                              ["Signature algorithm", result.credentials.algorithm],
+                              [
+                                "Signature algorithm",
+                                result.credentials.algorithm,
+                              ],
                               ["Manifests", result.credentials.manifestCount],
-                              ["Ingredients", result.credentials.ingredientCount],
+                              [
+                                "Ingredients",
+                                result.credentials.ingredientCount,
+                              ],
                             ]}
                           />
 
@@ -687,17 +758,27 @@ export default function ContentCredentialsInspector() {
                                 <h4>Recorded actions</h4>
                               </div>
                               <ol>
-                                {result.credentials.actions.map((action, index) => (
-                                  <li key={`${action.action}-${index}`}>
-                                    <span aria-hidden="true">{index + 1}</span>
-                                    <div>
-                                      <strong>{action.action}</strong>
-                                      {action.software ? <p>{action.software}</p> : null}
-                                      {action.sourceType ? <small>{action.sourceType}</small> : null}
-                                      {action.when ? <time>{action.when}</time> : null}
-                                    </div>
-                                  </li>
-                                ))}
+                                {result.credentials.actions.map(
+                                  (action, index) => (
+                                    <li key={`${action.action}-${index}`}>
+                                      <span aria-hidden="true">
+                                        {index + 1}
+                                      </span>
+                                      <div>
+                                        <strong>{action.action}</strong>
+                                        {action.software ? (
+                                          <p>{action.software}</p>
+                                        ) : null}
+                                        {action.sourceType ? (
+                                          <small>{action.sourceType}</small>
+                                        ) : null}
+                                        {action.when ? (
+                                          <time>{action.when}</time>
+                                        ) : null}
+                                      </div>
+                                    </li>
+                                  ),
+                                )}
                               </ol>
                             </section>
                           ) : null}
@@ -724,9 +805,9 @@ export default function ContentCredentialsInspector() {
                         <aside className={styles.emptyPanel}>
                           <strong>Nothing to expand</strong>
                           <p>
-                            The inspector does not fetch remote manifests or perform online
-                            revocation checks. It reports embedded credentials available in the
-                            selected file.
+                            The inspector does not fetch remote manifests or
+                            perform online revocation checks. It reports
+                            embedded credentials available in the selected file.
                           </p>
                         </aside>
                       )}
@@ -740,18 +821,25 @@ export default function ContentCredentialsInspector() {
                         <input
                           type="search"
                           value={metadataQuery}
-                          onChange={(event) => setMetadataQuery(event.target.value)}
+                          onChange={(event) =>
+                            setMetadataQuery(event.target.value)
+                          }
                           placeholder="Try camera, copyright, GPS, AI system…"
                         />
                       </label>
 
                       {result.metadataError ? (
-                        <p className={styles.inlineWarning}>{result.metadataError}</p>
+                        <p className={styles.inlineWarning}>
+                          {result.metadataError}
+                        </p>
                       ) : null}
 
                       <div className={styles.metadataGroups}>
                         {filteredMetadataGroups.map((group, index) => (
-                          <details key={group.key} open={Boolean(metadataQuery) || index === 0}>
+                          <details
+                            key={group.key}
+                            open={Boolean(metadataQuery) || index === 0}
+                          >
                             <summary>
                               <span>{group.label}</span>
                               <b>{group.entries.length}</b>
@@ -770,7 +858,11 @@ export default function ContentCredentialsInspector() {
 
                       {!filteredMetadataGroups.length ? (
                         <aside className={styles.emptyPanel}>
-                          <strong>{metadataQuery ? "No matching fields" : "No metadata found"}</strong>
+                          <strong>
+                            {metadataQuery
+                              ? "No matching fields"
+                              : "No metadata found"}
+                          </strong>
                           <p>
                             {metadataQuery
                               ? "Try a broader search term."
@@ -787,13 +879,24 @@ export default function ContentCredentialsInspector() {
                         <div>
                           <span>Portable result</span>
                           <h4>Technical JSON report</h4>
-                          <p>Binary payloads are summarized instead of copied into the report.</p>
+                          <p>
+                            Binary payloads are summarized instead of copied
+                            into the report.
+                          </p>
                         </div>
                         <div>
-                          <button type="button" className={styles.secondaryButton} onClick={() => void copyReport()}>
+                          <button
+                            type="button"
+                            className={styles.secondaryButton}
+                            onClick={() => void copyReport()}
+                          >
                             {copyLabel}
                           </button>
-                          <button type="button" className={styles.primaryButton} onClick={downloadReport}>
+                          <button
+                            type="button"
+                            className={styles.primaryButton}
+                            onClick={downloadReport}
+                          >
                             Download JSON
                           </button>
                         </div>
@@ -809,21 +912,31 @@ export default function ContentCredentialsInspector() {
       )}
 
       {status === "error" ? (
-        <p className={styles.standaloneError} role="alert">{message}</p>
+        <p className={styles.standaloneError} role="alert">
+          {message}
+        </p>
       ) : null}
 
       <div className={styles.disclosureGrid}>
         <div>
           <span aria-hidden="true">⌂</span>
-          <p><strong>Browser-only</strong>The selected image is not uploaded.</p>
+          <p>
+            <strong>Browser-only</strong>The selected image is not uploaded.
+          </p>
         </div>
         <div>
           <span aria-hidden="true">✓</span>
-          <p><strong>Cryptographic checks</strong>Uses the official C2PA browser SDK.</p>
+          <p>
+            <strong>Cryptographic checks</strong>Uses the official C2PA browser
+            SDK.
+          </p>
         </div>
         <div>
           <span aria-hidden="true">i</span>
-          <p><strong>No automatic verdict</strong>Provenance evidence is not a truth guarantee.</p>
+          <p>
+            <strong>No automatic verdict</strong>Provenance evidence is not a
+            truth guarantee.
+          </p>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 # AyeCalc AI Project Context
 
-Last updated: 2026-08-14
+Last updated: 2026-09-18
 
 This is the single-file onboarding document for any AI model, developer, or new computer working on AyeCalc. Read it completely before making changes. It explains the product, codebase, owner preferences, quality standards, SEO strategy, monetization strategy, current risks, and required workflow.
 
@@ -9,12 +9,12 @@ This is the single-file onboarding document for any AI model, developer, or new 
 ## 1. Product identity
 
 - Product name: AyeCalc
-- Production domain: `https://ayecalc.com`
+- Production domain: `https://www.ayecalc.com`
 - Product type: free calculators, converters, developer utilities, generators, formatters, estimators, and other useful search-driven web tools
-- Example routes: `/loan-calculator`, `/percentage-calculator`, `/px-to-rem`, `/json-formatter`
+- Example routes: `/loan-calculator`, `/px-to-rem`, `/ai-image-upscaler`, `/image-tools`
 - Brand promise: fast, accurate, private, clear, attractive, and easy to use
 - Primary audience: people arriving from search who want an immediate answer or practical result
-- Primary language at present: English
+- Primary audience and language: worldwide English; owner confirmed Search Console verification on September 18, 2026
 
 AyeCalc is not limited to traditional calculators. A page is a good fit when it satisfies a real searchable task with a useful interactive tool and enough original explanation to stand alone as a high-quality page.
 
@@ -53,13 +53,23 @@ These are standing instructions unless the owner explicitly changes them:
 - `next/font` with Inter and Manrope
 - npm with `package-lock.json`
 - Import alias: `@/*`
-- No database or external service is currently represented in the repository
+- No database or server image-processing API; AI tools download model/runtime assets from Hugging Face and jsDelivr and run in browser workers
+- Node 22.13+, ESLint 9, and Node test runner; `npm run check` runs lint, TypeScript, and tests without a build
+- Optional image-tool preferences use explicit Save/Restore/Forget local storage; image transfers between tools use temporary memory only
 
 Current important files:
 
 - `app/layout.tsx`: root layout, global metadata, fonts, viewport
 - `app/page.tsx`: current homepage, content, FAQ, and JSON-LD
-- `components/calculator.tsx`: current client-side loan-payment calculator
+- `components/calculator.tsx` and `lib/loan-math.ts`: validated fixed-rate loan calculator
+- `app/loan-calculator/page.tsx`: dedicated loan methodology and tool page
+- `app/image-tools/page.tsx`: image tool directory
+- `app/ai-image-upscaler/page.tsx`, `components/image-upscaler.tsx`, `workers/image-upscaler.worker.ts`: local Swin2SR 2× upscaler
+- `lib/developer-tools.ts`, `lib/converters.ts`, `lib/guides.ts`: content registries used for metadata, links, and sitemap
+- `lib/image-batch.ts`, `components/image-batch-output-settings.tsx`, `components/image-batch-results.tsx`: shared batch settings, requests, and results
+- `SEARCH_CONSOLE.md`: owner release checks and future-page SEO checklist
+- `MODEL_NOTICES.md`: upscaler provenance, revision, and license
+- `.github/workflows/checks.yml`: lint, type checks, and tests only
 - `app/globals.css`: complete visual system and responsive styles
 - `app/sitemap.ts`: sitemap generation
 - `app/robots.ts`: crawler rules
@@ -384,16 +394,16 @@ Current official references to recheck before ad work:
 
 ## 13. Current known project risks and backlog
 
-These items were observed in the current repository and should be verified or fixed before public claims or serious monetization:
+Current source review, September 18, 2026:
 
-- Homepage JSON-LD contains an aggregate rating of `4.9` with `1240` ratings. Remove it unless real evidence supports it.
-- Homepage UI contains a `1,240,000+ calculations this month` claim. Remove it unless measured evidence supports it.
-- Homepage category counts such as `18 calculators` and `24 calculators` must reflect real published tools.
-- Category cards currently link to a homepage calculator fragment instead of real crawlable category or tool routes.
-- Homepage loan `SoftwareApplication` schema uses the homepage URL; dedicated loan schema and content belong on `/loan-calculator` when that page exists.
-- The sitemap currently creates `lastModified` with the current date. Replace it with truthful content update dates.
-- A dedicated `/loan-calculator` page is not currently represented in the known file list.
-- A dedicated `/px-to-rem` page is not currently represented in the known file list.
+- Dedicated loan, pixel/REM, and image-upscaler routes exist. Directories and the sitemap use published tools; unsupported ratings and activity counts are absent from the current homepage.
+- Canonicals use the HTTPS www origin. Sitemap dates come from deliberate content changes. Confirm host-level redirects and production canonical behavior after deployment.
+- The owner reports Search Console is verified. No account reports were accessed, and no indexing or ranking outcome has been measured for this release. Follow `SEARCH_CONSOLE.md` after deployment.
+- The upscaler uses a pinned 2× model with tile processing and device limits. Source tests and model inference checks do not replace mobile/desktop browser, download, cancellation, and memory checks.
+- Real images, settings controls, accessibility, Core Web Vitals, and production bundling still require owner verification. Do not claim measured performance scores or guaranteed rankings.
+- Loan estimates exclude fees, insurance, taxes, extra payments, and changing rates. Inputs must be valid rather than silently replaced with defaults.
+- Keep generated CSS numeric values free of locale grouping separators. Keep human-facing number formatting separate.
+- Review dependency advisories regularly. The PostCSS override stays within its existing major version; reassess it when Next.js changes.
 
 Do not silently preserve misleading content because it already exists.
 

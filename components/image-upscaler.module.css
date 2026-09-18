@@ -1,0 +1,252 @@
+.card {
+  padding: clamp(20px, 4vw, 44px);
+  border: 1px solid #c9dfd6;
+  border-radius: 24px;
+  background: #fffefa;
+  color: #10221d;
+  box-shadow: 0 20px 70px #00181018;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.heading h2 {
+  margin: 10px 0;
+  font:
+    700 clamp(1.4rem, 3vw, 2rem)/1.2 var(--font-manrope),
+    sans-serif;
+  letter-spacing: -0.035em;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #246449;
+  font-size: 0.73rem;
+  font-weight: 800;
+}
+.badge {
+  border: 1px solid #bcdbcd;
+  padding: 9px 13px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  background: #edf8f1;
+  color: #225b43;
+}
+.intro {
+  color: #4c665b;
+  margin: 8px 0 24px;
+  line-height: 1.6;
+}
+.drop {
+  border: 2px dashed #b8d7c7;
+  background: #f3f9f4;
+  border-radius: 18px;
+  padding: 30px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+.dragging {
+  background: #dff5e8;
+  border-color: #236e4d;
+}
+.drop p {
+  margin: 0;
+  color: #486153;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.drop small {
+  margin-top: 4px;
+  color: #486153;
+}
+.drop a,
+.notes a,
+.error a {
+  text-decoration: underline;
+}
+.uploadIcon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #d8eddf;
+  font-size: 1.7rem;
+}
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 46px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.primary {
+  color: #fff;
+  background: #18573e;
+  border: 1px solid #18573e;
+}
+.primary:hover {
+  background: #0f432d;
+}
+.secondary {
+  color: #18573e;
+  background: #fffefa;
+  border: 1px solid #a5bfaf;
+}
+.primary:disabled,
+.secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.card button:focus-visible,
+.card a:focus-visible,
+.card input:focus-visible {
+  outline: 3px solid #267453;
+  outline-offset: 4px;
+}
+.fileDetails {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0 16px;
+  font-size: 0.85rem;
+}
+.fileDetails strong {
+  overflow-wrap: anywhere;
+}
+.fileDetails span {
+  color: #486153;
+}
+.preview {
+  max-height: 560px;
+  min-height: 120px;
+  width: min(100%, 740px);
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid #c4d8ca;
+  background: repeating-conic-gradient(#e6ece7 0% 25%, #fff 0% 50%) 50% / 20px
+    20px;
+}
+.preview img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+}
+.after {
+  position: absolute;
+  inset: 0;
+}
+.divider {
+  width: 2px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: white;
+  box-shadow: 0 0 0 1px #0004;
+  pointer-events: none;
+}
+.originalLabel,
+.enhancedLabel {
+  position: absolute;
+  top: 12px;
+  padding: 6px 10px;
+  background: #10221dde;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+.originalLabel {
+  left: 12px;
+}
+.enhancedLabel {
+  right: 12px;
+}
+.comparison {
+  display: grid;
+  gap: 8px;
+  margin: 16px auto 0;
+  max-width: 740px;
+  color: #486153;
+  font-size: 0.85rem;
+}
+.comparison input {
+  width: 100%;
+  min-height: 44px;
+  accent-color: #236e4d;
+}
+.status {
+  margin: 20px 0;
+  font-size: 0.88rem;
+  color: #486153;
+  line-height: 1.7;
+}
+.error {
+  color: #a62a23;
+}
+.progress {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #deeadf;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #267453;
+  transition: width 0.2s;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.notes {
+  margin-top: 26px;
+  border-top: 1px solid #dce7df;
+  padding-top: 12px;
+  color: #52645a;
+  font-size: 0.78rem;
+  line-height: 1.8;
+}
+@media (max-width: 600px) {
+  .heading {
+    gap: 8px;
+  }
+  .actions > * {
+    width: 100%;
+  }
+  .drop {
+    padding: 24px 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress span {
+    transition: none;
+  }
+}

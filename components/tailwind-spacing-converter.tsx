@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import CopyOutputButton from "@/components/copy-output-button";
 import styles from "@/components/developer-tools.module.css";
-import { formatConversionNumber } from "@/lib/conversion-math";
+import {
+  formatCodeNumber,
+  formatConversionNumber,
+} from "@/lib/conversion-math";
 import { calculateTailwindSpacing } from "@/lib/developer-math";
 
 export default function TailwindSpacingConverter() {
@@ -20,22 +23,35 @@ export default function TailwindSpacingConverter() {
       !multiplier.trim() ||
       !spacingRem.trim() ||
       !rootFontSize.trim() ||
-      ![numericMultiplier, numericSpacing, numericRoot].every(Number.isFinite) ||
+      ![numericMultiplier, numericSpacing, numericRoot].every(
+        Number.isFinite,
+      ) ||
       numericMultiplier < 0 ||
       numericSpacing <= 0 ||
       numericRoot <= 0
     ) {
-      return { error: "Enter a non-negative spacing number and positive base values.", result: null };
+      return {
+        error: "Enter a non-negative spacing number and positive base values.",
+        result: null,
+      };
     }
 
-    return {
-      error: "",
-      result: calculateTailwindSpacing(
-        numericMultiplier,
-        numericSpacing,
-        numericRoot,
-      ),
-    };
+    try {
+      return {
+        error: "",
+        result: calculateTailwindSpacing(
+          numericMultiplier,
+          numericSpacing,
+          numericRoot,
+        ),
+      };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Enter supported values.",
+        result: null,
+      };
+    }
   }, [multiplier, rootFontSize, spacingRem]);
 
   const remText = calculation.result
@@ -45,7 +61,7 @@ export default function TailwindSpacingConverter() {
     ? formatConversionNumber(calculation.result.px)
     : "—";
   const cssValue = calculation.result
-    ? `calc(var(--spacing) * ${formatConversionNumber(Number(multiplier))})`
+    ? `calc(var(--spacing) * ${formatCodeNumber(Number(multiplier))})`
     : "";
 
   return (
@@ -81,7 +97,10 @@ export default function TailwindSpacingConverter() {
         />
       </div>
 
-      <p className={styles.error} role={calculation.error ? "alert" : undefined}>
+      <p
+        className={styles.error}
+        role={calculation.error ? "alert" : undefined}
+      >
         {calculation.error}
       </p>
 
@@ -114,7 +133,9 @@ export default function TailwindSpacingConverter() {
           <span>Generated CSS value</span>
           <CopyOutputButton value={cssValue} disabled={!calculation.result} />
         </div>
-        <code className={styles.codeValue}>{cssValue || "Enter valid values"}</code>
+        <code className={styles.codeValue}>
+          {cssValue || "Enter valid values"}
+        </code>
       </div>
     </div>
   );

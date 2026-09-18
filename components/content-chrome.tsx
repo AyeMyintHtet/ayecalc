@@ -19,6 +19,8 @@ export function ContentFooter() {
           <p>Numbers, made human.</p>
         </div>
         <nav aria-label="Footer navigation">
+          <Link href="/image-tools">Image tools</Link>
+          <Link href="/loan-calculator">Loan calculator</Link>
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/methodology">Methodology</Link>
@@ -38,7 +40,9 @@ export function ContentPage({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className={styles.page}>{children}</main>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
+        {children}
+      </main>
       <ContentFooter />
     </>
   );
