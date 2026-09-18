@@ -10,6 +10,9 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Inference runs in browser workers; no native CUDA download is needed.
+      ONNXRUNTIME_NODE_INSTALL: skip
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -70,6 +70,7 @@ Current important files:
 - `SEARCH_CONSOLE.md`: owner release checks and future-page SEO checklist
 - `MODEL_NOTICES.md`: upscaler provenance, revision, and license
 - `.github/workflows/checks.yml`: lint, type checks, and tests only
+- `vercel.json`: installs locked dependencies with `ONNXRUNTIME_NODE_INSTALL=skip` to avoid unused native CUDA downloads from NuGet on Linux; the same setting is used in CI. Browser WASM inference is unaffected.
 - `app/globals.css`: complete visual system and responsive styles
 - `app/sitemap.ts`: sitemap generation
 - `app/robots.ts`: crawler rules
